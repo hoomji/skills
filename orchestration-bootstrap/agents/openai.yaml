@@ -1,0 +1,3 @@
+display_name: Orchestration Bootstrap
+short_description: Install a file-driven Codex/Claude orchestration workflow.
+default_prompt: Add the full orchestration workflow to this repository.
