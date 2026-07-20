@@ -20,8 +20,16 @@ of what they were trying to get Claude to do).
 ### 1. Diagnose against all five moves
 Assess the prompt against **every** move in the reference below — not just the
 first weakness you spot. For each move, note: present, missing, or misapplied.
+Flag a move as missing or misapplied only if fixing it would **materially change
+what the model does** — not merely make the prompt marginally tighter. A prompt
+that a competent engineer would run as-is has no gaps: mark every move
+**present** — a satisfied move is a finding, not a gap, so never upgrade one into
+a weakness to justify a change. Suggestions such as "could add an example" or
+"could name a type" are optional refinements, not weaknesses; leaving them
+unchanged is correct.
 
-*Done when:* all five moves are assessed and the specific weaknesses named.
+*Done when:* all five moves are assessed and the specific weaknesses named. If no
+move is missing or misapplied, record the prompt as **already sharp**.
 
 ### 2. Resolve the load-bearing blanks
 Separate missing context into what can be retrieved and what only the user can
@@ -63,12 +71,18 @@ plain statement that a single agent at the recommended effort suffices. The matc
 model reference has been read and its relevant guidance identified.
 
 ### 4. Rewrite
-Produce the sharpened prompt carrying every fix from step 1, the resolved context or
-explicit blanks from step 2, and the applicable model-specific guidance from step 3.
-Keep the user's voice and intent; change only what those sources require.
+If step 1 found the prompt **already sharp** (no missing or misapplied move), return
+it unchanged and say so in one line; offer any refinement as an explicit, bracketed
+suggestion, never imposed. Never manufacture a weakness to justify a rewrite.
 
-*Done when:* the rewrite reflects every diagnosed weakness and applicable
-model-specific instruction without importing irrelevant reference material.
+Otherwise, produce the sharpened prompt carrying every fix from step 1, the resolved
+context or explicit blanks from step 2, and the applicable model-specific guidance
+from step 3. Keep the user's voice and intent; change only what those sources require.
+
+*Done when:* an already-sharp prompt is returned essentially unchanged with a one-line
+note; otherwise the rewrite reflects every diagnosed weakness and applicable
+model-specific instruction, without importing irrelevant reference material or
+inventing weaknesses.
 
 ### 5. Present
 Show, in this order: the **sharpened prompt** (fenced, ready to copy) · one bullet
