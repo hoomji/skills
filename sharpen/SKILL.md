@@ -1,14 +1,15 @@
 ---
 name: sharpen
-description: Rewrite a rough prompt into a sharper one and recommend the model and effort level to run it at. User-invoked — type /sharpen with the prompt to improve.
+description: Rewrite a rough prompt into a sharper one and recommend how to run it — model, effort level, and whether to escalate to a multi-agent workflow. User-invoked — type /sharpen with the prompt to improve.
 disable-model-invocation: true
 ---
 
 # Sharpen
 
-Take a rough prompt and return a sharper one, plus the model and effort to run it
-at. Apply the **same five moves every run** — the rewrite is a fixed process, not
-improvised, so the same weak prompt gets sharpened the same way each time.
+Take a rough prompt and return a sharper one, plus how to run it — model, effort,
+and whether to escalate to a workflow. Apply the **same five moves every run** — the
+rewrite is a fixed process, not improvised, so the same weak prompt gets sharpened
+the same way each time.
 
 The prompt to sharpen is whatever the user passes in, or the most recent prompt
 they're pointing at. If nothing is supplied, ask for the prompt (or a description
@@ -22,30 +23,57 @@ first weakness you spot. For each move, note: present, missing, or misapplied.
 
 *Done when:* all five moves are assessed and the specific weaknesses named.
 
-### 2. Mark the blanks
-A rewrite must never invent the user's private context. Wherever a fix needs
-something only the user knows — the **referent** (which file / PR / range), the
-**why**, the **win condition**, or a **load-bearing constraint** — leave a
-`[bracketed blank]` for them to fill instead of guessing a value.
+### 2. Resolve the load-bearing blanks
+Separate missing context into what can be retrieved and what only the user can
+supply. Retrieve available context from the conversation, workspace, and named
+sources before asking for it.
 
-*Done when:* every fix that depends on private context is a bracket, not a fabrication.
+When unresolved blanks would materially change the prompt — especially the
+**referent** (which file / PR / range), the **why**, the **win condition**, or a
+**load-bearing constraint** — reference the [`/grill-with-docs`](../../../../../.agents/skills/grill-with-docs/SKILL.md)
+skill to interview the user and retain the resulting project context. Ask one focused
+question at a time, following the answer until the ambiguity is resolved, then
+resume sharpening. For a prompt outside a codebase, ask the same focused questions
+directly without creating project docs.
 
-### 3. Rewrite
-Produce the sharpened prompt carrying every fix from step 1 and every blank from
-step 2. Keep the user's voice and intent; change what the moves require and nothing
-more.
+If a blank is not load-bearing, or the user wants a template instead of an
+interview, leave a `[bracketed blank]` for them to fill. Never invent private
+context.
 
-*Done when:* the rewrite reflects every weakness found and adds nothing the moves don't call for.
+*Done when:* every load-bearing blank is filled from retrieved or elicited context,
+and every remaining private-context dependency is bracketed rather than fabricated.
 
-### 4. Recommend model and effort
-Apply the decision rule in the reference below.
+### 3. Recommend how to run it — model, effort, and whether to escalate
+Apply the decision rules in the running-it reference below, in order: pick the model,
+tune the effort (naming a sweep when the level isn't obvious), then make the
+escalate-or-not call.
 
-*Done when:* one model and one effort level are named, each with a one-line why.
+Once the model is chosen, read exactly one model-specific reference:
+
+- **Fable 5:** [`FABLE_5.md`](FABLE_5.md)
+- **Opus 4.8:** [`OPUS_4_8.md`](OPUS_4_8.md)
+
+Identify only the guidance that bears on this prompt; the reference does not license
+unrelated scaffolding.
+
+*Done when:* one model is named with a one-line why; a starting effort level is named
+(or a candidate sweep when unclear), each with a one-line why; and the escalate call
+is explicit — either a workflow with the justifying need and how to trigger it, or a
+plain statement that a single agent at the recommended effort suffices. The matching
+model reference has been read and its relevant guidance identified.
+
+### 4. Rewrite
+Produce the sharpened prompt carrying every fix from step 1, the resolved context or
+explicit blanks from step 2, and the applicable model-specific guidance from step 3.
+Keep the user's voice and intent; change only what those sources require.
+
+*Done when:* the rewrite reflects every diagnosed weakness and applicable
+model-specific instruction without importing irrelevant reference material.
 
 ### 5. Present
 Show, in this order: the **sharpened prompt** (fenced, ready to copy) · one bullet
-per move you changed, saying what and why · the **model + effort** line. Lead with
-the sharpened prompt; keep the rest brief.
+per move you changed, saying what and why · the **run line** — model + effort +
+escalate-or-not call. Lead with the sharpened prompt; keep the rest brief.
 
 *Done when:* all three are present and the sharpened prompt is first.
 
@@ -78,11 +106,11 @@ pin down? *Fix:* replace the description with 3–5 representative examples in i
 structure, including the hard case. Watch for accidental regularities the examples
 would teach.
 
-## Model and effort — reference
+## Running it — reference
 
 For current model IDs, pricing, effort levels, and behavioral specifics, consult the
-`/claude-api` skill — it is the source of truth and stays current. The decision rule
-here is stable:
+`/claude-api` skill — it is the source of truth and stays current. The decision rules
+here are stable.
 
 **Model.** Default to the **daily driver** (Opus 4.8): cheaper, faster, and it handles
 almost everything. Reach for the **heavyweight** (Fable 5) only when the task is hard,
@@ -90,13 +118,37 @@ long-horizon, and well-specified enough to run autonomously, and its higher cost
 minutes-long turns are acceptable. Stay on the daily driver for anything routine,
 latency-sensitive, interactive, or cyber/bio-adjacent — the heavyweight refuses those.
 
-**Effort.** Default `high`. Use `xhigh` for coding and agentic work; `max` only when
-correctness outweighs cost; `low`/`medium` for routine or latency-sensitive tasks.
-The heavyweight's `low` roughly matches older models' `high`, so start lower than
-instinct. When the right level is unclear, say so and suggest a two-level sweep.
+**Effort — depth within one agent.** Effort dials how hard a single agent thinks; it
+spends thinking tokens and turn count together. Reason *to* a level rather than
+asserting one:
 
-**Prompt-to-model fit.** Match the rewrite's altitude to the chosen model — the
-stronger the model, the higher you fly. For the heavyweight, de-prescribe further,
-add the why, grant autonomy and parallelism, and set one boundary (it over-reaches).
-For the daily driver, add explicit triggers and an autonomy grant (it under-reaches:
-it asks a lot and won't reach for tools, subagents, or memory unless told).
+- *Start point.* Default `high`; `xhigh` for coding and agentic work; `max` only when
+  correctness outweighs cost, never reflexively; `low`/`medium` for routine, subagent,
+  or simple tasks. On the heavyweight, `low` already performs very well — often beating
+  older models even at their highest effort — so start lower than instinct; if a task
+  completes correctly but slowly, turn effort *down*.
+- *Sweep when unclear.* The cost/quality curve is not monotonic — higher effort up
+  front often *reduces* total turns and cost on agentic work, while for some tasks a
+  lower level is just as good and faster. When the right level isn't obvious, name a
+  **sweep** of two adjacent candidates to run on the actual task and compare.
+- *Define done.* A high-effort run needs a defined 'done' or full task spec up front,
+  or the deliberation wanders and you pay for thinking you can't use. If the rewrite
+  doesn't pin the win condition, lower the effort or tighten the spec first.
+- *Latency is a separate dial.* Effort affects latency only indirectly, through turn
+  count; the dedicated latency control is fast mode (output tokens/sec). Don't lower
+  effort to chase speed — reach for fast mode instead.
+
+**Escalate to a workflow (ultracode) — breadth across many agents.** After model and
+effort, decide whether one agent is enough or the task should escalate from depth (one
+agent thinking hard) to **breadth** (many independent agents plus verification a single
+context can't give itself). Escalate when the task needs one of:
+
+- *Comprehensiveness* — decompose it and cover the parts in parallel.
+- *Confidence* — independent or adversarial verification before committing.
+- *Scale* — work bigger than one context window: migrations, audits, broad sweeps.
+
+A workflow is opt-in and costly (dozens of agents, many tokens), so recommend it only
+when the scale justifies the spend — never for trivial or quick work. When you do,
+tell the user how to trigger it: include the keyword **ultracode**, or ask for a
+workflow / multi-agent orchestration. When none of the three needs apply, say plainly
+that a single agent at the recommended effort suffices.
