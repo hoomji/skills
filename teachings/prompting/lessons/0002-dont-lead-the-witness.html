@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 2 — Don't lead the witness</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 2 · Decision-framing</p>
+  <h1>Don't lead the witness</h1>
+  <p class="lede">Ask for the decision you're actually making — not the answer you already half-decided.</p>
+
+  <p>In <a href="0001-say-what-you-want-and-why.html">Lesson 1</a> you learned to say
+  <em>what</em> you want and <em>why</em>. This lesson sharpens the "why" into its most
+  useful form and adds the move most people miss entirely. It comes straight out of
+  <strong>your own cassette prompt</strong> — the one that asked <em>"if there was a
+  CLI/dashboard, would it help…?"</em> Three habits turn that kind of prompt from a
+  rubber stamp into real decision support.</p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    You'll stop getting answers that merely agree with the idea you walked in with, and
+    start getting the recommendation you'd actually act on.
+  </div>
+
+  <h2>Move 1 — State the <em>decision</em>, not just the question</h2>
+
+  <p>Lesson 1's "why" was about the goal. Push it one step further: tell the model
+  <strong>what you will do with the answer</strong>. That's the <em>decision frame</em>,
+  and it changes everything downstream — because the same question has different right
+  answers depending on the choice you're making.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Question only</p>
+      <p>"Would a dashboard help keep the cassettes up to date?"</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Decision framed</p>
+      <p>"I'm deciding whether to spend this sprint on cassette tooling. A 'win' is
+      cutting the weekly CI flakes from stale cassettes. Given that, is tooling worth it
+      — and if so, the cheapest version that removes the pain?"</p>
+    </div>
+  </div>
+
+  <p>Notice the frame does two jobs: it names the <strong>choice</strong> (build this
+  sprint, or not) and it defines <strong>what counts as a win</strong> (fewer flakes, not
+  "better" in the abstract). Without those, the model invents its own — usually a generic
+  survey — and you get an answer to a question you weren't asking.</p>
+
+  <h2>Move 2 — Don't pre-commit to a solution</h2>
+
+  <p>Your prompt said <em>"if there was a CLI/dashboard."</em> That quietly narrows the
+  model to <strong>grading your idea</strong> instead of finding the best one. The real
+  question was "how do we keep cassettes fresh?" — and the best answer might be a git
+  hook, a scheduled job, or a staleness lint check, none of which are a dashboard.</p>
+
+  <div class="note">
+    <span class="label">Why this matters more with capable models</span>
+    Frontier models like Opus 4.8 and Fable are <em>more</em> likely to follow your
+    framing, not less. They're trained to be helpful and to take instructions literally,
+    so if you hand them a solution to evaluate, they'll evaluate it — thoroughly, and
+    without pushing back that you may be solving the wrong problem. The aperture is yours
+    to set. Set it wide.
+  </div>
+
+  <p>The fix is one clause: ask for the <strong>space of options first</strong>, then
+  offer your candidate as one of them. <em>"Propose the 2–3 lightest ways to keep
+  cassettes fresh, including non-tool options; I've been assuming a dashboard but I want
+  the best fit, not a defense of that."</em></p>
+
+  <h2>Move 3 — Ask for a recommendation, not a survey</h2>
+
+  <p>"What are the pros and cons?" invites both-sidesism: a tidy table where every option
+  looks equally reasonable and you're left to decide anyway. But deciding is the part you
+  wanted help with. A frontier model is a capable thought partner — so make it
+  <strong>take a position</strong>.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Survey</p>
+      <p>"What are the pros and cons of each approach?"</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Recommendation</p>
+      <p>"Compare them briefly, then <strong>recommend one</strong> and commit to it.
+      Give me the single biggest risk of that pick and how I'd know if it's going wrong."</p>
+    </div>
+  </div>
+
+  <p>You still get the reasoning — you just also get a decision to react to, which is far
+  easier to sharpen than a neutral list. If you disagree, saying "no, because X" gets you
+  further than picking from a menu.</p>
+
+  <div class="key">
+    <span class="label">The three moves, together</span>
+    <strong>Frame the decision</strong> (what you'll do with the answer + what a win is) ·
+    <strong>widen the aperture</strong> (options first, your idea as one candidate) ·
+    <strong>demand a position</strong> (recommend + name the risk).
+  </div>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">1. A prompt that names a solution up front ("if we built X…") tends to make Claude —</p>
+    <button data-c="1">defend it, not compare</button>
+    <button data-c="0">ignore the whole request</button>
+    <button data-c="0">write much shorter output</button>
+    <button data-c="0">demand more examples first</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">2. The most useful thing to add so the answer fits your actual choice is —</p>
+    <button data-c="1">the decision you're making</button>
+    <button data-c="0">a much firmer tone</button>
+    <button data-c="0">several more code examples</button>
+    <button data-c="0">the current date today</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+
+  <p>Here's a fresh leading prompt — different domain on purpose, so it's real practice.
+  <strong>Rewrite it</strong> with all three moves before you reveal the model answer.</p>
+
+  <pre>"Should I add Redis caching to the API to make it faster?"</pre>
+
+  <details class="reveal">
+    <summary>Reveal one strong rewrite (compare the moves, not the wording)</summary>
+    <p><em>"Our <code>/quote</code> endpoint's p95 is ~1.2s and I need it under 400ms
+    before the launch next month — <strong>that's the decision: what gets me there
+    fastest with the least new infra to run?</strong> I've been assuming Redis, but I
+    want the best fit, not a defense of it: <strong>propose the 2–3 most promising
+    approaches</strong> (caching, query changes, precompute, whatever applies), then
+    <strong>recommend one</strong> and tell me its single biggest risk and how I'd catch
+    it early."</em></p>
+    <p>The moves: decision + win-condition (<em>under 400ms before launch</em>) ·
+    aperture widened (<em>approaches</em>, Redis demoted to "one assumption") ·
+    a position demanded (<em>recommend one + the risk</em>). Notice it also inherits
+    Lesson 1: explicit metric and constraint ("least new infra to run").</p>
+  </details>
+
+  <div class="note">
+    <span class="label">When you actually <em>do</em> want a survey</span>
+    Decision-framing is for when you're choosing. If you genuinely want the landscape —
+    you're learning, or briefing someone else — then a neutral pros/cons list is the
+    right ask. The skill is matching the frame to the job, not always demanding a verdict.
+  </div>
+
+  <div class="course-foot">
+    <div class="ask">
+      <strong>Ask me things.</strong> Bring me a prompt where you already had a solution
+      in mind — we'll widen its aperture together and see if Claude surfaces an option you
+      hadn't considered. That's the most convincing way to feel this one work.
+    </div>
+    <p><strong>Primary source to read next (~15 min):</strong>
+    <a href="https://www.anthropic.com/engineering/claude-code-best-practices">Anthropic —
+    Claude Code best practices</a>. Its "explore, then plan, then act" pattern is Move 2 and
+    Move 3 applied to agentic coding: have Claude propose an approach before it writes a line.</p>
+    <p>Builds on: <a href="0001-say-what-you-want-and-why.html">Lesson 1 — Say what you want, and why</a> ·
+    Reference: <a href="../GLOSSARY.md">Glossary</a>.</p>
+    <p>Next up (Lesson 3, when you're ready): <em>Altitude — how much to specify, and why
+    "CRITICAL: YOU MUST" backfires on Opus and Fable.</em></p>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right — hand a capable model a solution and it evaluates that solution, thoroughly, without questioning whether it\'s the right problem. Widen the aperture yourself.',
+      q2: 'Right — the decision frame (what you\'ll do with the answer + what a win is) is what lets the model tailor its response to your actual choice. Tone, examples, and dates don\'t.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

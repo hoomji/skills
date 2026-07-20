@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 8 — Iterating like an engineer</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 8 · Iteration</p>
+  <h1>Iterating like an engineer — evals &amp; the prompt debug loop</h1>
+  <p class="lede"><em>The meta-skill that makes the other seven compound: stop judging prompts by vibes, and start measuring them.</em></p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    You can turn "did this change help?" from a gut feeling into a measured yes/no — a
+    tiny <strong>eval</strong> plus a one-variable-at-a-time <strong>debug loop</strong>.
+  </div>
+
+  <h2>The problem with "that looks better"</h2>
+  <p>
+    Everything you've learned so far — explicit intent, altitude, examples, effort, verification — is a
+    <em>change you make to a prompt, a skill, or a <code>CLAUDE.md</code> rule</em>. And every change raises the
+    same question: did it actually help, or did you just get a good roll? Judging one output by feel can't answer
+    that. The model is <strong>stochastic</strong>: the same prompt gives different runs, so a single nice result
+    is evidence of almost nothing. This is the discipline that ties the whole course together — treat prompt work
+    like engineering, not vibes.
+  </p>
+
+  <h2>An eval is small, concrete, and checkable</h2>
+  <p>
+    An <strong>eval</strong> is a handful of representative test cases — inputs — each paired with a
+    <strong>checkable pass condition</strong>: an expected property, or a rubric you can score against. Five to
+    ten cases beats judging one output by feel, every time. And — straight from
+    <a href="0004-show-dont-tell.html">Lesson 4</a> — the cases must be <em>representative</em>, which means
+    including the hard ones: the weird provider, the empty input, the cassette that should be rejected. An eval
+    of only happy paths certifies only the happy path.
+  </p>
+  <p>
+    For your work that's concrete. Testing a skill or a <code>CLAUDE.md</code> rule? Your eval is a set of
+    representative cases — a normal EVM chain, a non-EVM protocol, a provider with a custom method, a malformed
+    cassette. Each case has a bar: <em>schema regenerates, type-checker passes, CU mapping present, no rule
+    violated</em>. That set <em>is</em> your instrument.
+  </p>
+
+  <h2>Define the bar first</h2>
+  <p>
+    Before you touch anything, write down what "good" means — the same "define done" move from
+    <a href="0006-max-effort.html">Lesson 6</a>. Without a bar you cannot tell improvement from noise; you'll
+    stare at two outputs, prefer whichever you read second, and call it progress. Decide the pass condition
+    <em>first</em>, while you're honest, then let the runs fall where they fall.
+  </p>
+
+  <h2>The loop: change one thing, run, compare, keep or revert</h2>
+  <p>
+    Then it's classic debugging. <strong>Change one variable</strong> — the wording, one example, the effort
+    tier, a single rule. Run the eval. Compare to the bar. Keep the change or revert it. Change two things at
+    once and you cannot attribute the result to either; that's not iteration, that's guessing with extra steps.
+  </p>
+  <p>
+    Because the model is stochastic, "it passed once" is not a pass. Run each case a few times and judge
+    <strong>consistency</strong> — a fix that works on one roll and fails on the next hasn't fixed anything. The
+    goal isn't one green run; it's a process you <em>trust</em>.
+  </p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Vibes</p>
+      "I reworded the add-chain skill and the next run looked cleaner, so it's better — shipped." One run, no
+      bar, two edits bundled in. You can't say what helped, or whether the next run regresses.
+    </div>
+    <div class="strong">
+      <p class="tag">Measured</p>
+      "Five representative chain cases, bar defined up front. Changed only the wording, ran each three times,
+      compared to the bar. Four of five improved and held across runs — kept it; the effort bump is a separate run."
+    </div>
+  </div>
+
+  <h2>This is how you ran the sweep</h2>
+  <p>
+    You've already met this loop without the name. The effort <strong>sweep</strong> from Lesson 6 — running
+    across effort tiers against "your own eval set" — <em>is</em> this process, with effort as the one variable.
+    Refining the <code>sharpen</code> skill is the same loop with wording as the variable. Knowing a
+    <code>CLAUDE.md</code> change actually helped is the same loop with the rule as the variable. One method,
+    everything downstream.
+  </p>
+  <p>
+    Keep the eval set as a <strong>regression suite</strong>: re-run it whenever you change the prompt, the
+    skill, or the <strong>model</strong>. That last one matters — models change (the migration Lesson 5 covered),
+    and a suite that certified the old model is exactly what tells you whether the new one still clears the bar.
+  </p>
+
+  <h2>When judging doesn't scale, judge with the model</h2>
+  <p>
+    When hand-judging doesn't scale, scale it with the model: an <strong>LLM-as-judge</strong> scores outputs
+    against a rubric. But the judge needs a <em>clear</em> rubric — show-don't-tell applies to the judge too, and
+    a vague rubric produces vague scores. Independent or adversarial judges raise confidence, the same
+    verification instinct as <a href="0007-ultracode.html">Lesson 7</a>.
+  </p>
+
+  <div class="note">
+    <span class="label">Sharp beats big</span>
+    A tiny, sharp eval with a real bar beats a big, vague one — five cases you can actually check are worth more
+    than fifty you eyeball. And say it once more, because it's the trap everyone falls into: a single passing run
+    is <em>not</em> verification. Consistency across runs is.
+  </div>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">Why isn't one passing run proof that a prompt change helped?</p>
+    <button data-c="1">the model is stochastic, so a single good run proves little</button>
+    <button data-c="0">the bar is unwritten, so a single result cannot mean anything</button>
+    <button data-c="0">one output looks polished, so another run would only add cost</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">Why change only one variable per run in the debug loop?</p>
+    <button data-c="1">otherwise you cannot attribute the effect to either change</button>
+    <button data-c="0">otherwise the eval set grows excessively large to run</button>
+    <button data-c="0">otherwise the model refuses to score its own output</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+  <p>
+    You just tweaked a skill or a <code>CLAUDE.md</code> rule — say you loosened a rule in the add-chain skill so
+    it stops over-editing the OpenAPI schema. Right now you'd judge it by running it once and eyeballing the
+    diff. Instead: <strong>sketch a 5-case eval and the one-variable loop you'd run.</strong> Name the cases, the
+    bar, what single variable you change, and how you decide keep-or-revert.
+  </p>
+
+  <details class="reveal">
+    <summary>Model answer</summary>
+    <p>
+      <strong>The bar, first.</strong> A run passes when: the type-checker is green, the OpenAPI schema
+      regenerates with no unintended edits, CU mappings exist for the new methods, and no explicit
+      <code>CLAUDE.md</code> rule is violated. Written down before I touch the skill.
+    </p>
+    <p>
+      <strong>Five representative cases</strong> (deliberately not all happy): (1) a plain EVM chain; (2) a
+      non-EVM protocol with custom JSON-RPC methods; (3) a provider that already exists, so no schema churn is
+      expected; (4) a chain whose config is subtly malformed and <em>should</em> be rejected; (5) a chain that
+      previously triggered the over-editing bug — the case this change exists for.
+    </p>
+    <p>
+      <strong>The loop.</strong> Change exactly one variable: the loosened rule wording — nothing else, not the
+      effort tier, not the examples. Run all five cases three times each (stochastic, so I judge consistency, not
+      a single roll). Compare each run to the bar. <strong>Keep</strong> only if the target case (5) now clears
+      the bar <em>and</em> cases 1–4 still hold across runs — no regressions. If case 3 starts churning the
+      schema or case 4 stops rejecting, I revert and try a narrower wording. Then this five-case set becomes the
+      regression suite I re-run next time I touch the skill, or when the model changes.
+    </p>
+  </details>
+
+  <div class="course-foot">
+    <div class="ask">
+      <strong>This is the capstone — so bring me something real.</strong> Paste a prompt, a skill, or a
+      <code>CLAUDE.md</code> rule you've been changing by feel, and we'll build your first actual eval together —
+      cases, bar, and the loop — until "did that help?" has a number behind it.
+    </div>
+    <p><strong>Primary source:</strong> Anthropic's prompt-engineering guidance on defining success criteria and
+      building empirical evaluations — define the bar, build evals, iterate against them. Ask the teacher for the
+      current links.</p>
+    <p><strong>Builds on:</strong> <a href="0006-max-effort.html">Lesson 6 — Max effort</a> (the sweep is this
+      loop with effort as the variable) · <a href="0004-show-dont-tell.html">Lesson 4 — Show, don't tell</a>
+      (representative edge cases; a clear rubric for the judge). This lesson ties the whole course together.</p>
+    <p><strong>Reference:</strong> <a href="../reference/prompting-cheat-sheet.html">Prompting cheat sheet</a> ·
+      <a href="../GLOSSARY.md">Glossary</a></p>
+    <p><strong>Next up:</strong> you've finished the core course. Two optional directions, your pick — an appendix
+      on <em>Structured output</em> (forcing exact shapes without fragile examples), or bring a real prompt or
+      skill and we build your first eval together.</p>
+  </div>
+
+</div>
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right: the model is stochastic, so the same prompt yields different runs — one nice output is a good roll, not proof. You verify by judging consistency across a few runs of each case. An unwritten bar is a real problem, but it is a separate one; and a polished-looking output is exactly the vibe-judgment this lesson warns against, not a reason to skip re-running.',
+      q2: 'Right: change two things at once and you cannot say which one moved the result — classic debugging. The eval set size is fixed by your cases, not by how many variables you change per run; and an LLM-as-judge scores fine against a clear rubric — refusal is not the issue. One variable per run is the only way to attribute the effect.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

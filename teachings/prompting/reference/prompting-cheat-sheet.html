@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompting Cheat Sheet</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Reference · Lessons 1–7</p>
+  <h1>Prompting Cheat Sheet</h1>
+  <p class="lede">The compressed essence. Every prompt answers: <strong>what</strong>, <strong>why</strong>, <strong>how much</strong> — and sometimes it's better to <strong>show</strong> than say.</p>
+
+  <div class="sheet-grid">
+    <div class="card">
+      <span class="num">Lesson 1 · WHAT</span>
+      <h3>Explicitness</h3>
+      <p>The model acts on what you wrote, not what you meant. Name the things you'd otherwise assume:</p>
+      <ul>
+        <li><strong>Scope</strong> — which file/PR/range; what <em>not</em> to touch</li>
+        <li><strong>Format</strong> — size, shape, audience of the output</li>
+        <li><strong>Constraints</strong> — no new deps, keep signatures, etc.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="num">Lesson 1 + 2 · WHY</span>
+      <h3>Intent → Decision frame</h3>
+      <p>Say the goal <em>and</em> what you'll do with the answer. Lets the model generalize to cases you didn't spell out.</p>
+      <ul>
+        <li>What's the <strong>choice</strong> you're making?</li>
+        <li>What counts as a <strong>win</strong>?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="num">Lesson 2 · APERTURE</span>
+      <h3>Don't lead the witness</h3>
+      <p>Naming a solution up front makes a capable model <em>defend it</em>, not compare.</p>
+      <ul>
+        <li>Ask for <strong>options first</strong>; your idea is one candidate</li>
+        <li>Demand a <strong>recommendation + the risk</strong>, not a pros/cons survey</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="num">Lesson 3 · HOW MUCH</span>
+      <h3>Altitude</h3>
+      <p>Constrain the <strong>outcome</strong> and <strong>load-bearing constraints</strong>; leave method to the model.</p>
+      <ul>
+        <li><strong>Volume ≠ clarity</strong> — delete <code>CRITICAL/ALWAYS/NEVER</code></li>
+        <li>Say each thing <strong>once, plainly, with the why</strong></li>
+        <li>Stronger model → fly higher</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="num">Lesson 4 · SHOW</span>
+      <h3>Show, don't tell</h3>
+      <p>For a format/tone/edge-rule, demonstrate it — one example beats a paragraph.</p>
+      <ul>
+        <li>Examples become the <strong>pattern</strong> the model copies — include the <strong>hard cases</strong>, keep structure identical</li>
+        <li>It copies <strong>accidental</strong> regularities too — vary what should vary</li>
+        <li>Positive examples &gt; telling it what <em>not</em> to do</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Diagnose a prompt that went wrong</h2>
+
+  <div class="table-scroll">
+  <table class="rule-table">
+    <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+    <tr><td>Did too much / edited the wrong things</td><td>Scope unstated</td><td>Name the referent &amp; boundaries (L1)</td></tr>
+    <tr><td>Answered a subtly different question</td><td>No decision frame</td><td>State the choice + win condition (L2)</td></tr>
+    <tr><td>Just validated the idea I walked in with</td><td>Led the witness</td><td>Ask for options first; demand a pick (L2)</td></tr>
+    <tr><td>Over-triggered a tool / over-engineered / ignored judgment</td><td>Altitude too low, too loud</td><td>Raise altitude; delete the caps (L3)</td></tr>
+    <tr><td>Missed obvious requirements</td><td>Altitude too high / under-specified</td><td>Add explicit outcome + constraints (L1/L3)</td></tr>
+    <tr><td>Format/tone keeps drifting run to run</td><td>Described the shape instead of showing it</td><td>Give 3–5 diverse examples (L4)</td></tr>
+    <tr><td>Output oddly uniform / copies a quirk</td><td>Accidental pattern in your examples</td><td>Vary what should vary; curate (L4)</td></tr>
+  </table>
+  </div>
+
+  <h2>Before → after, one line each</h2>
+
+  <div class="card mini">
+    <p><span class="b">✗ "Clean up the error handling."</span><br>
+    <span class="a">✓ "In <code>session.ts</code> only, replace bare <code>catch{}</code> with logged typed errors — don't touch other files or add deps."</span></p>
+    <p style="margin-top:0.8rem"><span class="b">✗ "If we built a dashboard, would it help?"</span><br>
+    <span class="a">✓ "I'm deciding whether to build cassette tooling this sprint; a win is fewer CI flakes. Propose the 2–3 lightest options (incl. non-tool), recommend one, name its risk."</span></p>
+    <p style="margin-top:0.8rem"><span class="b">✗ "CRITICAL: You MUST ALWAYS write tests."</span><br>
+    <span class="a">✓ "Write tests for new behavior — this ships from main, so untested code hits production. If something can't be tested, say why."</span></p>
+  </div>
+
+  <h2>Model note (Opus 4.8 · Fable)</h2>
+  <p class="mini">Current frontier models follow instructions <strong>literally and eagerly</strong>.
+  Forceful caps and "if in doubt, do X" cause <strong>over-triggering</strong>, not
+  reliability. <strong>Fable</strong> specifically <em>degrades</em> under over-prescription —
+  prompt it at the goal-and-constraints level and trust its planning. Weaker/older models
+  are the reverse: lower altitude, worked examples, more scaffolding.
+  <span style="color:var(--muted)">(Source: in-repo <code>claude-api</code> skill.)</span></p>
+
+  <h2>Spending compute: depth vs breadth</h2>
+  <div class="sheet-grid">
+    <div class="card">
+      <span class="num">Lesson 6 · DEPTH</span>
+      <h3>Effort</h3>
+      <p>How hard <em>one</em> agent thinks per step (low→…→max), one context.</p>
+      <ul>
+        <li>Default <code>high</code>; <code>xhigh</code> for coding/agentic (Claude Code's default)</li>
+        <li><code>max</code> = correctness &gt; cost; watch overthinking / diminishing returns</li>
+        <li><strong>Sweep</strong>, don't assume — the cost/quality curve isn't monotonic</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="num">Lesson 7 · BREADTH</span>
+      <h3>ultracode</h3>
+      <p>Many agents in parallel + independent verification; opt-in.</p>
+      <ul>
+        <li>For <strong>comprehensiveness, confidence, scale</strong> beyond one context</li>
+        <li>Costs dozens of agents / many tokens — justify it; not for trivial work</li>
+        <li>Same discipline as <code>max</code>: full spec up front + a definition of "done"</li>
+      </ul>
+    </div>
+  </div>
+  <p class="mini">Both spend compute for correctness on hard work — and both waste it on easy work.
+  Depth is one mind thinking harder; breadth is many minds checking each other.</p>
+
+  <h2>Prove a change helped — don't vibe it (Lesson 8)</h2>
+  <p>Every move above is a change you make, and the model is stochastic — one nice run proves nothing. Measure:</p>
+  <ol>
+    <li><strong>Define the bar first</strong> — what "good" means, written down before you touch anything.</li>
+    <li><strong>Build a tiny eval</strong> — 5–10 representative cases (include the hard ones), each with a checkable pass condition.</li>
+    <li><strong>Change one variable</strong>, run each case a few times, compare to the bar, keep or revert.</li>
+    <li><strong>Keep it as a regression suite</strong> — re-run when the prompt, skill, or model changes.</li>
+  </ol>
+  <p class="mini">A tiny sharp eval beats a big vague one; a single passing run is not verification — consistency across runs is.
+  This is how you run the effort sweep, refine a skill, or prove a <code>CLAUDE.md</code> change actually worked.</p>
+
+  <h2>The 30-second pre-flight</h2>
+  <p>Before you hit enter, check:</p>
+  <ul class="checklist">
+    <li>Did I name the <strong>scope</strong> and what not to touch?</li>
+    <li>Did I give the <strong>why</strong> / the decision I'm making?</li>
+    <li>Am I leading — should I ask for <strong>options</strong> and a recommendation instead?</li>
+    <li>Is the <strong>altitude</strong> right — precise on outcome, quiet on method, no shouting?</li>
+    <li>Is the shape hard to state? <strong>Show</strong> an example instead of describing it.</li>
+    <li>After I change it, will I <strong>measure</strong> it (tiny eval, one variable) or just eyeball one run?</li>
+  </ul>
+
+  <div class="course-foot">
+    <p>Lessons: <a href="../lessons/0001-say-what-you-want-and-why.html">1 — Say what you want, and why</a> ·
+    <a href="../lessons/0002-dont-lead-the-witness.html">2 — Don't lead the witness</a> ·
+    <a href="../lessons/0003-altitude.html">3 — Altitude</a> ·
+    <a href="../lessons/0004-show-dont-tell.html">4 — Show, don't tell</a> ·
+    <a href="../lessons/0005-fable-vs-opus.html">5 — Fable vs Opus</a> ·
+    <a href="../lessons/0006-max-effort.html">6 — Max effort</a> ·
+    <a href="../lessons/0007-ultracode.html">7 — ultracode</a> ·
+    <a href="../lessons/0008-iterating-like-an-engineer.html">8 — Iterating like an engineer</a>.
+    Glossary: <a href="../GLOSSARY.md">terms</a>.</p>
+    <p><strong>This is a reference — come back to it.</strong> The lessons teach the moves once;
+    this page is what you'll actually reopen before writing a tricky prompt or skill.
+    Ask your teacher (me) to diagnose any prompt against the table above.</p>
+  </div>
+
+</div>
+</body>
+</html>

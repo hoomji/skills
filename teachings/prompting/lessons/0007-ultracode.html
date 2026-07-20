@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 7 — ultracode</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 7 · Orchestration</p>
+  <h1>ultracode — orchestrating many agents</h1>
+  <p class="lede">Effort makes one mind think harder; ultracode makes many minds think at once — and check each other.</p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    You know when to escalate from a single hard-thinking agent to a verifying swarm — and, just as important, when that swarm is overkill.
+  </div>
+
+  <h2>From depth to breadth</h2>
+  <p>Lesson 6 gave you one dial: <em>effort</em>. Effort spends compute <strong>down</strong> — deeper reasoning inside a single context, one agent thinking harder per step before it answers. It is the right dial when the hard part is <em>getting one chain of reasoning right</em>.</p>
+  <p>But some tasks are not deep, they are <strong>wide</strong>. Auditing every provider adapter in <code>unified-request</code> for a missed rate-limit case. Migrating a convention across forty files. Answering a question where you would only trust the result if three independent readers agreed. No amount of single-context thinking fits that in one head — the work is larger than one context window, and one perspective cannot audit itself.</p>
+  <p><strong>ultracode</strong> is the opt-in mode for exactly this. When it is on, Claude Code stops answering substantive tasks solo and instead <strong>authors and runs a workflow</strong> by default — spending compute <em>across</em> many independent processes rather than down through one.</p>
+
+  <h2>What a workflow actually is</h2>
+  <p>A workflow is not "an agent that decides to spawn helpers." It is a <strong>deterministic orchestration script</strong>: the control flow — the loops, the conditionals, the fan-out — lives in <em>code</em>, not in a model's moment-to-moment choices. That script fans out many <strong>subagents</strong> — in <em>parallel</em> (a barrier that waits for every result before the next phase) or in a <em>pipeline</em> (the default: each item flows through the stages independently, no barrier) — and synthesizes their results. On top of those primitives sit the <strong>quality patterns</strong> — the part a single agent cannot do for itself:</p>
+  <ul>
+    <li><strong>Adversarial verify</strong> — spawn N independent skeptics, each prompted to <em>refute</em> a finding. Keep the finding only if it survives.</li>
+    <li><strong>Judge panel</strong> — generate N independent attempts, score them, synthesize the answer from the winner.</li>
+    <li><strong>Loop-until-dry</strong> — keep discovering until K rounds in a row turn up nothing new.</li>
+    <li><strong>Completeness critic</strong> — a final agent whose only job is to ask "what is missing?"</li>
+  </ul>
+
+  <h2>The three reasons it beats one agent</h2>
+  <div class="table-scroll">
+  <table class="rule-table">
+    <thead><tr><th>Reason</th><th>What it buys you</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Comprehensiveness</strong></td><td>Decompose the task and cover the pieces in parallel — nothing falls off the end of one context.</td></tr>
+      <tr><td><strong>Confidence</strong></td><td>Independent perspectives plus adversarial checks <em>before</em> committing — a single context cannot audit its own blind spots.</td></tr>
+      <tr><td><strong>Scale</strong></td><td>Take on work larger than one context window can hold — migrations, audits, broad sweeps.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Note that only <em>confidence</em> is about being right on a narrow point; the other two are about <em>size</em>. That is the tell for whether breadth is what you actually need.</p>
+
+  <h2>How to invoke it</h2>
+  <p>ultracode is <strong>opt-in</strong> — it is not on by default. You turn it on by including the keyword <code>ultracode</code>, through a session setting or skill, or simply by <strong>asking for a workflow / multi-agent orchestration in your own words</strong> ("fan this out," "audit every adapter in parallel and cross-check the findings"). Trivial and conversational turns are still handled solo even when the mode is on — the harness does not waste a swarm on a one-liner.</p>
+
+  <div class="note">
+    <span class="label">Don't swing this at small nails</span>
+    A workflow can spawn dozens of agents and spend a large amount of tokens. Per the Workflow tool contract, concurrency is capped — only about a dozen agents run at once — and a workflow runs in the background, notifying you when it finishes. That cost is exactly why it is opt-in. A rename, a single-file edit, a "what's the flag for X" — those want a solo answer or, at most, max effort. Reach for ultracode only when the <em>scale of the task</em> justifies the scale of the spend.
+  </div>
+
+  <h2>The prompting implication</h2>
+  <p>Here is the through-line from Lesson 6: escalating to a swarm does <strong>not</strong> lower the bar on your prompt — it raises the stakes on it. Max effort demanded a clear task spec and a definition of "done." A workflow demands the <em>same discipline</em>, because you are now spending that compute in parallel across many agents. A vague task fans out into a dozen vaguely-wrong answers, verified against nothing.</p>
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Under-posed</p>
+      <p>"ultracode: look over the codebase and find problems."</p>
+      <p class="mini">No scope, no bar. Twelve agents, twelve definitions of "problem," nothing to verify against.</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Well-posed</p>
+      <p>"ultracode: audit every provider adapter for unhandled 429s. For each hit, spawn skeptics to refute it; report only survivors, with file and line."</p>
+      <p class="mini">Clear unit of work, clear verification bar, clear shape of "done."</p>
+    </div>
+  </div>
+  <p>So the two dials share one operating principle: <strong>effort dials depth, ultracode dials breadth — and both spend compute for correctness on hard work, and both waste it on easy work.</strong> The harness only amplifies a well-posed task. Pose it well.</p>
+
+  <div class="note">
+    <span class="label">This lesson, reflexively</span>
+    Lesson 6 and this one were themselves built with an ultracode workflow: the two lessons were drafted <em>in parallel</em>, then adversarially fact-checked by independent lenses against the tool contract, then revised from what survived. The pattern in this lesson is the pattern that produced it.
+  </div>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">When is spinning up an ultracode workflow the right call?</p>
+    <button data-c="0">A quick rename touching a single file you already know</button>
+    <button data-c="1">A broad audit spanning far more than one context window</button>
+    <button data-c="0">One gnarly algorithm inside a single file you must nail</button>
+    <button data-c="0">A short factual question about one small parameter you forgot</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">What does a workflow add that one max-effort agent cannot?</p>
+    <button data-c="0">Much deeper reasoning inside one single context on every step</button>
+    <button data-c="1">Independent views that check each other before an answer commits</button>
+    <button data-c="0">Lower total token cost by thinking much harder within context</button>
+    <button data-c="0">Faster answers by simply skipping the whole verification step entirely</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+  <p>Take this real task: <em>"Uniblock is adding a new chain, and I want to confirm every JSON-RPC method we advertise for it is actually wired end-to-end — constants, schema, CU mapping, and adapter — with no gaps."</em></p>
+  <p>Decide: solo, max-effort-solo, or a workflow? If a workflow, sketch its <strong>shape</strong> — the phases, and exactly where verification goes. Write your answer before revealing.</p>
+  <details class="reveal">
+    <summary>Model answer</summary>
+    <p><strong>Call:</strong> a workflow. This is a <em>breadth</em> problem — many methods × four layers each — and it is exactly the kind of coverage claim you would only trust if it were independently checked. Depth alone (max effort, one context) would run out of room and could not audit its own misses.</p>
+    <p><strong>Shape:</strong></p>
+    <ol>
+      <li><strong>Enumerate (parallel):</strong> one pass lists every advertised method for the new chain from the schema — the authoritative unit of work.</li>
+      <li><strong>Trace (pipeline):</strong> each method flows independently through a checker that confirms it appears in <code>constants.ts</code>, the OpenAPI schema, the CU mapping, and a live adapter. One item = one method's full trace.</li>
+      <li><strong>Adversarial verify:</strong> for every "wired correctly" claim, spawn skeptics prompted to <em>refute</em> it (find the missing layer). Keep the claim only if it survives.</li>
+      <li><strong>Completeness critic:</strong> a final agent asks "which methods, layers, or edge cases did we never touch?" — catching gaps in the enumeration itself.</li>
+    </ol>
+    <p>Verification lives in steps 3 and 4 — <em>after</em> generation, run by agents who did not do the tracing. That separation is the whole point.</p>
+  </details>
+
+  <div class="course-foot">
+    <div class="ask">
+      Stuck, or want to see it move? Ask the teacher to walk a run with you — to trace the fan-out, the barrier, and the verification pass step by step.
+    </div>
+    <p><strong>Primary source:</strong> the Claude Code Workflow tool / ultracode documentation — the authoritative contract for the mode, its primitives, and its cost model.</p>
+    <p><strong>Builds on:</strong> <a href="0006-max-effort.html">Lesson 6 — Max effort</a> (depth within one context).</p>
+    <p><strong>Reference:</strong> <a href="../reference/prompting-cheat-sheet.html">Prompting cheat sheet</a> · <a href="../GLOSSARY.md">Glossary</a></p>
+    <p><strong>Next up —</strong> your pick: <em>Lesson 8 — Iterating like an engineer: evals and the prompt debug loop</em>, or <em>Structured output</em>. Tell the teacher which.</p>
+  </div>
+
+</div>
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right: a broad audit that exceeds one context window is the paradigm case — it needs scale and parallel coverage, the things a single agent structurally cannot provide. The gnarly single-file algorithm is a depth problem: get one chain of reasoning exactly right, which is max effort\u2019s job, not a swarm\u2019s. The rename and the forgotten parameter are trivial — a solo answer handles them, and a swarm would just burn dozens of agents and a large token bill on work that never justified the spend.',
+      q2: 'Right: the unique thing a workflow buys is independent perspectives that check each other before committing — adversarial verify, judge panels, completeness critics. That is breadth plus self-auditing. Deeper per-step reasoning is what effort gives one agent, not a workflow. It does not lower token cost — it raises it. And it never skips verification; verification is the whole reason to fan out.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

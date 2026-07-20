@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 3 — Altitude</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 3 · Altitude</p>
+  <h1>Altitude</h1>
+  <p class="lede">How much to specify — and why <code>CRITICAL: YOU MUST</code> makes a capable model <em>worse</em>.</p>
+
+  <p>Lessons 1 and 2 were about adding the right things: explicitness, intent, a decision
+  frame. This one is about the opposite failure — adding <em>too much</em>, or adding it
+  too loud. <strong>Altitude</strong> is the level of abstraction you hand off at: do you
+  tell the model the outcome and let it find the method, or do you dictate every step?
+  Get the altitude wrong and even a perfectly explicit prompt underperforms.</p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    You'll know when to stop specifying — and you'll delete the <code>ALWAYS</code> /
+    <code>NEVER</code> / <code>CRITICAL</code> shouting from your skills, because on
+    Opus and Fable it actively hurts.
+  </div>
+
+  <h2>Altitude = the level you hand off at</h2>
+
+  <p>Picture a spectrum. At <strong>low altitude</strong> you dictate method:
+  <em>"run <code>npm test</code>, read each line, if a test fails fix it, re-run…"</em>
+  At <strong>high altitude</strong> you state the outcome: <em>"make sure your change
+  doesn't break the suite before moving on."</em> Neither is universally right — the skill
+  is choosing deliberately.</p>
+
+  <p>The default that works most of the time: <strong>constrain the outcome and the
+  boundaries; leave the method to the model.</strong> Drop to lower altitude only where
+  the method is <em>load-bearing</em> — a specific helper it must use, an order that
+  actually matters, a trap to avoid.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Too low (micromanaged)</p>
+      <p>"First open the file. Then find the function. Then read the whole thing. Then
+      change line 12. Then save. Then check it compiles. Then…"</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Right altitude</p>
+      <p>"Fix the off-by-one in <code>paginate()</code> in <code>list.ts</code> — it drops
+      the last page. Use the existing <code>clampPage()</code> helper rather than a new
+      guard. Don't change the function's signature."</p>
+    </div>
+  </div>
+
+  <p>The good version is high altitude on <em>method</em> (it doesn't narrate the edit)
+  but drops low on the two things that are load-bearing: <em>use <code>clampPage()</code></em>
+  and <em>don't change the signature</em>. That's the move — altitude isn't one setting
+  for the whole prompt, it's per-decision.</p>
+
+  <h2>Volume is not clarity — delete the shouting</h2>
+
+  <p>Here's the counterintuitive part, and it's specific to current models. Prompts full
+  of <code>CRITICAL: YOU MUST ALWAYS…</code> were written to <em>overcome</em> older
+  models that ignored instructions. Opus 4.8 and Fable have the opposite problem: they
+  follow instructions <strong>literally and eagerly</strong>. Shouting at them doesn't add
+  reliability — it makes them <strong>over-trigger</strong>: reaching for a tool when they
+  shouldn't, refusing to use judgment, over-engineering a simple ask.</p>
+
+  <div class="note">
+    <span class="label">Straight from Anthropic's model guidance</span>
+    The migration guidance for Opus 4.7/4.8 says it plainly: rewrite
+    <code>CRITICAL: You MUST use this tool when…</code> → <code>Use this tool when…</code>,
+    and <em>delete</em> <code>If in doubt, use [tool]</code> entirely — it now
+    overtriggers. For <strong>Fable</strong> it's stronger still: prompts written for
+    older models are <em>"often too prescriptive and reduce output quality."</em> The
+    fix is to state the rule <strong>once, plainly, with the why</strong> (Lesson 1) — not
+    to escalate the volume.
+    <br><span style="font-size:0.8rem; color:var(--muted)">Source: in-repo <code>claude-api</code> skill · Model Migration guidance.</span>
+  </div>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Loud (backfires)</p>
+      <p>"CRITICAL: You MUST ALWAYS write tests. NEVER EVER skip this. This is
+      NON-NEGOTIABLE."</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Once, plainly, with the why</p>
+      <p>"Write tests for new behavior — this repo ships from main, so untested code goes
+      straight to production. If something genuinely can't be tested, say so and why."</p>
+    </div>
+  </div>
+
+  <h2>Match the altitude to the model</h2>
+
+  <p>Altitude isn't absolute — it depends who's reading. A more capable model wants a
+  <strong>higher</strong> altitude, because its own planning is good and over-prescription
+  gets in its way.</p>
+
+  <div class="table-scroll">
+  <table class="rule-table">
+    <tr><th>Model</th><th>Prompt at…</th><th>Because</th></tr>
+    <tr><td style="color:var(--fg);font-style:normal">Fable / Opus 4.8</td>
+        <td>High altitude: goal + constraints + the why. Trust its planning.</td>
+        <td>Over-prescription measurably lowers Fable's output quality; it plans well on its own.</td></tr>
+    <tr><td style="color:var(--fg);font-style:normal">Smaller / older models</td>
+        <td>Lower altitude: more explicit steps, worked examples.</td>
+        <td>Less able to bridge from goal to method; the scaffolding does real work.</td></tr>
+  </table>
+  </div>
+
+  <p>This is why the same skill can feel over-engineered on one model and under-specified
+  on another. When you upgrade the model behind a skill, <strong>re-read the prompt and
+  raise its altitude</strong> — strip the step-by-step and the shouting you added for the
+  weaker model.</p>
+
+  <div class="key">
+    <span class="label">Altitude, in one line</span>
+    Specify the <strong>outcome</strong> and the <strong>load-bearing constraints</strong>;
+    leave everything else to the model; say each thing <strong>once, plainly</strong>. The
+    stronger the model, the higher you fly.
+  </div>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">1. Piling <code>CRITICAL: YOU MUST ALWAYS</code> into a prompt for Opus or Fable tends to —</p>
+    <button data-c="1">make it over-trigger the behavior</button>
+    <button data-c="0">improve reliability across every case</button>
+    <button data-c="0">shorten its responses considerably here</button>
+    <button data-c="0">disable its internal reasoning entirely</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">2. For a capable model on a task where the method doesn't matter, specify —</p>
+    <button data-c="1">the outcome and the boundaries</button>
+    <button data-c="0">every step in exact order</button>
+    <button data-c="0">as little as humanly possible</button>
+    <button data-c="0">the tone but nothing else</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+
+  <p>Here's a real-shaped over-prescribed, over-loud <code>CLAUDE.md</code> rule.
+  <strong>Rewrite it</strong>: raise the altitude, drop the volume, keep only the
+  load-bearing bits. Then reveal.</p>
+
+  <pre>"CRITICAL: You MUST ALWAYS run the full test suite after EVERY single
+change. First run `npm test`. Then read the output line by line. Then
+if ANY test fails you MUST fix it before doing ANYTHING else. Then
+re-run `npm test` AGAIN to confirm. NEVER skip any of these steps."</pre>
+
+  <details class="reveal">
+    <summary>Reveal one strong rewrite (compare the moves)</summary>
+    <p><em>"After a change, make sure the test suite is green before moving on — this repo
+    ships from main, so red means broken production. Use your judgment for changes too
+    small to have tests."</em></p>
+    <p>The moves: <strong>altitude raised</strong> (outcome "suite is green," not the
+    run/read/fix/re-run choreography — the model already knows how to run tests) ·
+    <strong>volume dropped</strong> (no caps; stated once) · <strong>the why kept</strong>
+    (ships from main → Lesson 1) · <strong>judgment restored</strong> (the loud version
+    forbade it; the model over-applying "test everything" to a one-line rename is exactly
+    the over-triggering this lesson warns about).</p>
+  </details>
+
+  <div class="note">
+    <span class="label">The trap on the other side</span>
+    "Raise the altitude" is not "say less." Fly too high and you're back to Lesson 1's
+    under-specification — the model fills gaps with defaults you didn't want. The target
+    is <em>precise about outcomes and boundaries, quiet about method.</em> Vague-and-quiet
+    fails just as hard as loud-and-micromanaged.
+  </div>
+
+  <div class="course-foot">
+    <div class="ask">
+      <strong>Ask me things.</strong> Paste a skill or <code>CLAUDE.md</code> of yours
+      that has any <code>ALWAYS</code>/<code>NEVER</code>/<code>CRITICAL</code> in it —
+      we'll re-altitude it together and you'll see how much you can safely cut.
+    </div>
+    <p><strong>Primary source (~10 min):</strong> the in-repo <code>claude-api</code>
+    skill's <em>Prompt-Behavior Changes</em> and <em>Migrating to Opus 4.8 / Fable 5</em>
+    sections — Anthropic's own account of why forceful, over-prescriptive prompts hurt
+    current models. Run <code>/claude-api</code> or ask me to pull the relevant passage.</p>
+    <p>Builds on: <a href="0001-say-what-you-want-and-why.html">Lesson 1</a> ·
+    <a href="0002-dont-lead-the-witness.html">Lesson 2</a> ·
+    Quick reference: <a href="../reference/prompting-cheat-sheet.html">Prompting Cheat Sheet</a>.</p>
+    <p>Next up (Lesson 4, when you're ready): <em>Show, don't tell — designing few-shot
+    examples that steer</em> (the one we deferred), or <em>Fable vs Opus: choosing the
+    model and adjusting the prompt.</em> Your pick.</p>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right — the caps were written to overcome older models\' reluctance. Current models follow literally and over-trigger: reaching for tools they shouldn\'t, refusing judgment, over-engineering. State it once, plainly.',
+      q2: 'Right — outcome + boundaries is the default altitude. "As little as possible" over-corrects into Lesson 1\'s under-specification; step-by-step micromanages; tone-only leaves the real requirements unstated.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

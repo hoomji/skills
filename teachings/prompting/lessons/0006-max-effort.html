@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 6 — Max effort</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 6 · Effort</p>
+  <h1>Max effort — the top of the dial</h1>
+  <p class="lede"><em>How hard the model thinks per step — and why the top setting is usually the wrong reach.</em></p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    You can pick an effort level on purpose — and you know why <code>max</code> is almost never the answer.
+  </div>
+
+  <h2>The dial</h2>
+  <p>
+    Effort runs <code>low</code> → <code>medium</code> → <code>high</code> → <code>xhigh</code> → <code>max</code>.
+    One dial, two coupled things: <strong>how deeply the model thinks per step</strong> and
+    <strong>how many tokens it spends</strong> doing it. Turn it down and you get fewer, more-consolidated tool
+    calls, less preamble, terser confirmations. Turn it up and you get more deliberation before it acts.
+  </p>
+  <p>
+    This all happens inside <em>one agent, one context</em> — it is not fan-out, not subagents, not a bigger
+    model. It is a single Claude instance thinking harder or less hard at each turn. In the API you set it with
+    <code>output_config.effort</code>; in Claude Code it is a session setting. The default is <code>high</code>
+    (the same as omitting it). <code>xhigh</code> sits between <code>high</code> and <code>max</code> and is the
+    default in Claude Code — the sweet spot for most coding and agentic work.
+  </p>
+
+  <div class="note">
+    <span class="label">Not the same as speed</span>
+    Fast mode is a separate API research preview (<code>speed: "fast"</code>, on Opus 4.8/4.7) that raises the
+    output tokens-per-second rate. It is <em>orthogonal</em> to effort: it changes how fast the tokens come out,
+    not how hard the model thinks. Speed and effort are two different dials — don't conflate them.
+  </div>
+
+  <h2>Two halves of "how much"</h2>
+  <p>
+    Lesson 3 was about <strong>altitude</strong>: how much <em>you</em> specify — the height you pitch the
+    instruction at. Effort is the other half: how much the <em>model</em> thinks about what you gave it.
+    Altitude is your work; effort is its work. They multiply. A low-altitude, vague ask at <code>max</code>
+    effort just buys you expensive deliberation over an underspecified target — the model spends tokens guessing
+    at the spec you didn't write. This tension also showed up in Lesson 5, where lower effort on Fable already
+    cleared older models' ceilings.
+  </p>
+
+  <h2>What <code>max</code> is actually for</h2>
+  <p>
+    <code>max</code> is for the rare case where <strong>correctness matters more than cost</strong>: an
+    extremely hard, latency-insensitive task where you'd happily pay for every extra unit of thinking. That's
+    the whole brief. Reach for it when a wrong answer is expensive and you have time to wait.
+  </p>
+  <p>
+    Its failure mode is the flip side: <strong>diminishing returns and overthinking</strong>. Past a point,
+    more tokens stop buying more correctness — the model deliberates over decisions that were already settled,
+    second-guesses good first passes, and burns budget without moving the outcome. Reaching for <code>max</code>
+    reflexively costs you money and latency for gains you often can't measure.
+  </p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Reflexive max</p>
+      "Important refactor across the request-router — set effort to <code>max</code> so it's definitely right."
+      You pay top-of-dial latency and tokens on a task <code>high</code> or <code>xhigh</code> would have nailed,
+      and risk overthinking a clean change.
+    </div>
+    <div class="strong">
+      <p class="tag">Deliberate pick</p>
+      "This is a normal agentic change — start at <code>xhigh</code> (CC's default). If a genuinely hard,
+      correctness-critical migration comes up and I can wait, I'll bump to <code>max</code> for that run only."
+    </div>
+  </div>
+
+  <h2>The discipline: sweep, don't assume</h2>
+  <p>
+    The intelligence / latency / cost relationship is <strong>not monotonic</strong>. Higher effort up front
+    often <em>reduces</em> total cost on agentic work — deeper first-pass thinking means fewer wasted turns, so
+    the whole task finishes in less back-and-forth. For other tasks, <code>medium</code> is just as good and
+    faster. You cannot reason your way to the right tier from the armchair.
+  </p>
+  <p>
+    So sweep it. On Opus 4.8, start at <code>high</code> and iterate — run <code>medium</code> / <code>high</code>
+    / <code>xhigh</code> against your own eval set and read the numbers. On Fable 5, <code>low</code> effort
+    already performs very well, often beating older models at <code>xhigh</code> or <code>max</code>; if a task
+    completes correctly but slowly, turn the dial <em>down</em>. Reserve <code>max</code> for the extremely hard,
+    latency-insensitive cases that actually need it.
+  </p>
+
+  <h2>Prompting implication</h2>
+  <p>
+    At <code>high</code> and above, you're paying for deliberation — so give the model something worth
+    deliberating on. Put the <strong>full task spec up front</strong>, leave a large <code>max_tokens</code> so
+    it has room to think and act, and <strong>define "done"</strong> so the thinking terminates on a target
+    instead of wandering. A high-effort run against a thin prompt is deliberation you paid for and can't use.
+  </p>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">When is <code>max</code> effort the right choice?</p>
+    <button data-c="1">rare hard problems where correctness matters far more than cost</button>
+    <button data-c="0">routine agentic coding where you want the fastest possible turns</button>
+    <button data-c="0">a quick, cheap lookup where low effort is clearly enough</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">Before shipping a skill, how should you settle on an effort level?</p>
+    <button data-c="1">sweep medium, high, and xhigh against your candidate eval set</button>
+    <button data-c="0">pick max always since deeper thinking never hurts final quality</button>
+    <button data-c="0">keep low always since cheaper tokens beat any accuracy gain</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+  <p>
+    A Uniblock skill drives Claude Code to add a new chain across the unified-request codebase: edit constants,
+    wire the provider, regenerate the OpenAPI schema, update CU mappings, run the type-checker. It's multi-step
+    and agentic, it runs many times a week, and mistakes surface in tests and review. <strong>Pick an effort
+    level for this skill's runs and justify it in two sentences.</strong> Then say what you'd do differently
+    if this were instead a one-off, correctness-critical billing migration you only run once.
+  </p>
+
+  <details class="reveal">
+    <summary>Model answer</summary>
+    <p>
+      <strong>Skill runs: <code>xhigh</code> (Claude Code's default), then sweep.</strong> It's routine
+      agentic work where higher effort up front tends to reduce turn count — deeper first-pass thinking means
+      fewer botched edits and re-runs, so the whole chain finishes cheaper. I'd sweep <code>medium</code> /
+      <code>high</code> / <code>xhigh</code> against a couple of real chain-add runs and keep whichever tier
+      lands the change correctly in the fewest turns; <code>max</code> is unjustified here because the task
+      isn't especially hard and I run it constantly.
+    </p>
+    <p>
+      <strong>One-off billing migration: <code>max</code>.</strong> Now correctness clearly outweighs cost, it
+      runs once, and I don't care about latency — exactly what <code>max</code> is for. I'd pair it with a full
+      spec up front, a large <code>max_tokens</code>, and an explicit "done" definition so the deliberation has
+      a target and I actually get value from the tokens I'm paying for.
+    </p>
+  </details>
+
+  <div class="course-foot">
+    <div class="ask">
+      Stuck on where your task lands on the dial? Ask the teacher to sweep a concrete example with you, or to
+      pull the effort guidance from the in-repo <code>/claude-api</code> skill.
+    </div>
+    <p><strong>Primary source:</strong> the in-repo <code>/claude-api</code> skill's effort guidance — run
+      <code>/claude-api</code>, or ask the teacher to pull it.</p>
+    <p><strong>Builds on:</strong> <a href="0003-altitude.html">Lesson 3 — Altitude</a> ·
+      <a href="0005-fable-vs-opus.html">Lesson 5 — Fable vs Opus</a></p>
+    <p><strong>Reference:</strong> <a href="../reference/prompting-cheat-sheet.html">Prompting cheat sheet</a> ·
+      <a href="../GLOSSARY.md">Glossary</a></p>
+    <p><strong>Next up:</strong> Lesson 7 — <a href="0007-ultracode.html">ultracode</a>.</p>
+  </div>
+
+</div>
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right: max is for the rare, extremely hard task where correctness outweighs cost and latency does not matter. Fast routine turns are what lower tiers (or fast mode) are for — max would only add overthinking. A quick, cheap lookup is the textbook case for low effort, the opposite end of the dial.',
+      q2: 'Right: the intelligence/latency/cost curve is not monotonic, so you sweep medium/high/xhigh on your own eval set and read the numbers. "Max always" ignores diminishing returns and overthinking — deeper thinking can hurt by wandering past a settled answer. "Low always" ignores that higher effort up front often reduces total cost on agentic work by cutting wasted turns.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

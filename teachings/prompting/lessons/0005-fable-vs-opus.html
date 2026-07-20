@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 5 — Fable vs Opus</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 5 · Model selection</p>
+  <h1>Fable vs Opus</h1>
+  <p class="lede">Which model to reach for — and why the same prompt should read differently on each.</p>
+
+  <p>This is the lesson you've been curious about since day one. It has two halves: a
+  <strong>decision</strong> (when is Fable worth it over Opus 4.8?) and a
+  <strong>prompting shift</strong> (how your prompt should change when you switch). The
+  second half is the more useful one — and it's the culmination of
+  <a href="0003-altitude.html">Lesson 3</a>: <em>the stronger the model, the higher you
+  fly.</em> Fable is where you fly highest.</p>
+
+  <div class="note">
+    <span class="label">Grounding</span>
+    Everything below is drawn from Anthropic's own model guidance in the in-repo
+    <code>claude-api</code> skill — not my memory. Model facts about current models change
+    fast; when in doubt, ask me to pull the exact passage.
+  </div>
+
+  <h2>The decision: Opus 4.8 is the daily driver, Fable is the heavyweight</h2>
+
+  <p><strong>Opus 4.8 is the default</strong> — it's what your Claude Code sessions run
+  on, it handles the overwhelming majority of real work, and it's cheaper and faster.
+  <strong>Fable 5</strong> is Anthropic's most capable widely-released model, but it is
+  <em>not</em> the default upgrade: it costs roughly twice as much, individual turns can
+  run for many minutes, and it carries caveats (see the table). You reach for it
+  deliberately, for a specific kind of task.</p>
+
+  <div class="key">
+    <span class="label">When Fable earns its price</span>
+    The <strong>hardest reasoning</strong>, <strong>long-horizon autonomous</strong> runs
+    (overnight refactors, end-to-end deliverables), and <strong>first-shot builds of
+    well-specified complex systems</strong> — work that <em>exceeds</em> what Opus handles
+    cleanly. If Opus already does the job, Fable is just a slower, pricier way to get the
+    same answer.
+  </div>
+
+  <div class="table-scroll">
+  <table class="rule-table">
+    <tr><th></th><th>Opus 4.8 — daily driver</th><th>Fable 5 — heavyweight</th></tr>
+    <tr><td style="color:var(--fg);font-style:normal">Reach for it when</td>
+        <td>Almost everything: coding, agentic sessions, knowledge work, skills.</td>
+        <td>Hardest reasoning; long-horizon autonomous work; first-shot complex builds.</td></tr>
+    <tr><td style="color:var(--fg);font-style:normal">Cost &amp; speed</td>
+        <td>~$5/$25 per 1M; fast; interactive-friendly (fast mode available).</td>
+        <td>~$10/$50 per 1M; turns can run <em>minutes</em> — plan async, not blocking.</td></tr>
+    <tr><td style="color:var(--fg);font-style:normal">Default failure mode</td>
+        <td><strong>Under-reaches:</strong> asks permission a lot; won't grab tools, subagents, or memory unless told.</td>
+        <td><strong>Over-reaches:</strong> takes unrequested adjacent actions; can over-plan ambiguous tasks.</td></tr>
+    <tr><td style="color:var(--fg);font-style:normal">How to prompt it</td>
+        <td>High altitude + explicit <em>triggers</em> and autonomy grants.</td>
+        <td>Even higher altitude; de-prescribe; goal + the why; set boundaries.</td></tr>
+    <tr><td style="color:var(--fg);font-style:normal">Gotchas</td>
+        <td>Narrates a lot; sweep <code>effort</code> per task.</td>
+        <td>Refuses cyber/bio-adjacent asks; needs 30-day data retention (no ZDR).</td></tr>
+  </table>
+  </div>
+
+  <p>Note the two failure modes are <em>opposite</em>. That's the whole reason the same
+  prompt shouldn't be identical on both.</p>
+
+  <h2>The prompting shift: fly even higher for Fable</h2>
+
+  <p>Lesson 3 said stronger models want higher altitude. Fable takes this to the limit:
+  Anthropic's guidance is explicit that <strong>prompts written for older models are often
+  too prescriptive and actively reduce Fable's output quality.</strong> Step-by-step
+  choreography that helped a weaker model gets in Fable's way — its own planning is better
+  than your enumerated steps.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Tuned for an older model</p>
+      <p>"Step 1: list the files. Step 2: parse each. Step 3: rewrite the path. Step 4:
+      upload. Step 5: verify. Step 6: delete the old one. Do them one at a time and report
+      after each."</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Tuned for Fable</p>
+      <p>"Migrate the cassettes to the new S3 layout so CI reads only the new paths with
+      zero regressions. <strong>Why:</strong> the old layout flakes on parallel runs. Work
+      autonomously and in parallel where safe; keep a running note of what's migrated and
+      anything that doesn't fit the pattern."</p>
+    </div>
+  </div>
+
+  <p>The Fable version does four things the guidance calls for: <strong>de-prescribes</strong>
+  (goal, not six steps), <strong>gives the why</strong> (Fable connects intent to the work
+  better than it infers it), grants <strong>autonomy + parallelism</strong> (it delegates
+  to subagents well), and offers a <strong>memory surface</strong> (a running note it can
+  write to). None of that would you bother adding for a weaker model.</p>
+
+  <h2>Steer the opposite failure modes</h2>
+
+  <p>Because they fail in opposite directions, the corrective clause you add differs:</p>
+
+  <div class="sheet-grid">
+    <div class="card">
+      <span class="num">Opus 4.8 under-reaches</span>
+      <h3>Grant autonomy &amp; triggers</h3>
+      <p>It asks too much and won't reach for capabilities by default. Push it forward:</p>
+      <p class="mini"><em>"For minor choices (naming, defaults), pick a reasonable option
+      and note it rather than asking. Delegate to subagents when work fans out. Check your
+      memory file before long tasks."</em></p>
+    </div>
+    <div class="card">
+      <span class="num">Fable over-reaches</span>
+      <h3>Set boundaries &amp; nudge to act</h3>
+      <p>It takes adjacent actions and can over-plan. Fence it and unblock it:</p>
+      <p class="mini"><em>"When I'm describing a problem rather than requesting a change,
+      report your assessment and stop. When you have enough to act, act — don't re-survey
+      options you've already weighed."</em></p>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="label">Don't send Fable into the wrong task</span>
+    Fable runs safety classifiers on incoming requests and will refuse cyber- and
+    bio-adjacent work (even benign-adjacent — security tooling can trip a false positive),
+    returning <code>stop_reason: "refusal"</code>. It also can't run under zero-data-retention.
+    For that kind of work, or for anything latency-sensitive and interactive, Opus 4.8 is
+    the right call regardless of raw capability.
+  </div>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">1. Reach for Fable over Opus 4.8 mainly when the task is —</p>
+    <button data-c="1">hard, long-horizon, and well-specified</button>
+    <button data-c="0">quick, cheap, and routine</button>
+    <button data-c="0">latency-sensitive and highly interactive</button>
+    <button data-c="0">security-focused or biology-related work</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">2. Moving a prompt from Opus to Fable, you should usually make it —</p>
+    <button data-c="1">less prescriptive, higher altitude</button>
+    <button data-c="0">louder and more forceful</button>
+    <button data-c="0">longer with more steps</button>
+    <button data-c="0">shorter by cutting context</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+
+  <p>You have an Opus-tuned prompt for a big, autonomous job. <strong>Adapt it for
+  Fable</strong>: raise altitude, add the why, grant autonomy, set a boundary, and plan
+  for a long turn. Then reveal.</p>
+
+  <pre>"Audit every skill in .claude/skills for prompts that use CRITICAL/
+ALWAYS/NEVER. For each: open it, read it, list the offending lines,
+suggest a rewrite, and wait for my approval before changing anything."</pre>
+
+  <details class="reveal">
+    <summary>Reveal one strong Fable rewrite (and how Opus would differ)</summary>
+    <p><em>"Go through <code>.claude/skills</code> and bring every skill's prompts in line
+    with current-model guidance — the goal is no forceful <code>CRITICAL/ALWAYS/NEVER</code>
+    scaffolding, since it makes today's models over-trigger. <strong>Why:</strong> I want
+    these skills to steer Opus and Fable reliably, and the loud phrasing is working against
+    that. Work autonomously across the skills in parallel; keep a running note of what you
+    changed and any judgment calls. Apply the rewrites directly — I'll review the diff at
+    the end rather than approve each file. This is a long pass; report progress, not
+    per-file questions."</em></p>
+    <p>The moves: altitude raised (goal, not open/read/list/suggest/wait) · the why added ·
+    autonomy + parallelism granted (Fable's strength; also cures Opus's ask-too-much habit)
+    · a memory surface (running note) · a boundary on <em>review</em> (diff at the end) ·
+    long-turn framing (progress, not questions).</p>
+    <p><strong>For Opus 4.8</strong> you'd keep almost all of this — Opus under-reaches, so
+    the autonomy grant and "don't ask per file" are if anything <em>more</em> important. The
+    one thing you'd watch differently: Opus narrates more and asks more, so the "review the
+    diff at the end" boundary does real work; Fable needs the "act, don't re-survey" nudge
+    more than Opus does.</p>
+  </details>
+
+  <div class="course-foot">
+    <div class="ask">
+      <strong>Ask me things.</strong> Tell me about a real task you're weighing — I'll help
+      you decide Opus vs Fable and draft the prompt tuned to whichever you pick. Bring the
+      actual constraints (latency? cost? how autonomous?).
+    </div>
+    <p><strong>Primary source:</strong> the in-repo <code>claude-api</code> skill —
+    <em>Migrating to Claude Fable 5</em> (behavioral shifts + prompting guidance) and
+    <em>Migrating to Opus 4.8</em>. Run <code>/claude-api</code> or ask me to pull the
+    behavioral-shifts section verbatim.</p>
+    <p>Builds on: <a href="0003-altitude.html">L3 — Altitude</a> ·
+    Quick reference: <a href="../reference/prompting-cheat-sheet.html">Prompting Cheat Sheet</a> ·
+    <a href="../GLOSSARY.md">Glossary</a>.</p>
+    <p>Next up (Lesson 6, when you're ready): <em>Structured output — forcing exact shapes
+    without fragile examples</em>, or <em>Iterating like an engineer — evals &amp; the
+    debug loop for prompts.</em> Your pick.</p>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right — Fable earns its ~2x cost and minutes-long turns on hard, long-horizon, well-specified work. Routine (overkill), interactive (too slow), and cyber/bio (it refuses) all point back to Opus 4.8.',
+      q2: 'Right — Fable degrades under over-prescription, so raise the altitude. But note "cut context" is the trap: Fable wants MORE of the why, not less. Higher altitude on method, richer on intent.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

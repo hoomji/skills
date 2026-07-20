@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 4 — Show, don't tell</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 4 · Few-shot examples</p>
+  <h1>Show, don't tell</h1>
+  <p class="lede">One good example steers harder than a paragraph describing what you want.</p>
+
+  <p>You've spent three lessons getting the <em>words</em> right — explicit, intentful,
+  well-aimed, at the right altitude. This lesson adds a different instrument entirely:
+  instead of <em>describing</em> the output you want, <strong>demonstrate it</strong>.
+  For anything with a specific shape — a format, a tone, an edge-case rule — a couple of
+  worked examples pin it down far more reliably than prose. This is the highest-leverage
+  move for the skills you author.</p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    You'll replace vague style instructions ("keep it concise and consistent") with
+    examples that make the model produce <em>exactly</em> the shape you want — and you'll
+    know why your examples sometimes teach the wrong thing.
+  </div>
+
+  <h2>Move 1 — Demonstrate the shape instead of describing it</h2>
+
+  <p>Some things are hard to say and easy to show. The exact structure of a commit
+  message, the voice of a wiki summary, how terse a status line should be — you can burn
+  a paragraph trying to specify it, or you can show one instance and let the model match
+  it. <strong>Few-shot</strong> (a.k.a. multishot) prompting is just that: include
+  input→output examples of the task before the real one.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Tell</p>
+      <p>"Summarize each source in a consistent, scannable style — lead with the decision,
+      keep it tight, use our house voice."</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Show</p>
+      <p>"Summarize like these:<br>
+      <code>— Decided: drop Redis, use Postgres LISTEN/NOTIFY. Cheaper to operate; team already knows PG.</code><br>
+      <code>— Decided: cassettes move to S3. Local disk was flaking CI on parallel runs.</code><br>
+      Now summarize this: […]"</p>
+    </div>
+  </div>
+
+  <p>The "house voice" was three adjectives in the tell version and completely unambiguous
+  in the show version — because the model can see it. This is the same instinct as
+  <a href="0003-altitude.html">Lesson 3's altitude</a>: an example lets you <em>delete</em>
+  a stack of prescriptive rules. Showing is often lower-noise than enumerating.</p>
+
+  <div class="note">
+    <span class="label">Anthropic's own guidance</span>
+    Examples are described as <em>the</em> most reliable lever for format and style — and
+    for steering behavior, <strong>positive examples of the thing you want beat telling
+    the model what not to do</strong>. When you catch yourself writing "don't do X,"
+    consider showing an instance of the right thing instead.
+    <br><span style="font-size:0.8rem;color:var(--muted)">Source: Anthropic — Use examples (multishot prompting).</span>
+  </div>
+
+  <h2>Move 2 — Make examples representative — <em>including</em> the hard cases</h2>
+
+  <p>Here's the mechanism you have to internalize: <strong>your examples become the
+  pattern the model generalizes from.</strong> If every example is the easy, uniform case,
+  the model learns to handle only the easy case and improvises on the rest. Cover the
+  variety you actually care about — especially the edge case you'd otherwise write a rule
+  for.</p>
+
+  <ul>
+    <li><strong>Diversity over quantity.</strong> Three examples spanning the real range
+    beat six near-identical ones. Include the tricky input, the empty input, the one that
+    should be rejected.</li>
+    <li><strong>Identical structure.</strong> Keep the input→output framing the same
+    across every example (same delimiters, same fields) so the pattern is unambiguous.</li>
+    <li><strong>3–5 is the usual sweet spot;</strong> go higher for genuinely varied
+    tasks.</li>
+  </ul>
+
+  <h2>Move 3 — The example is the ceiling: watch the accidental patterns</h2>
+
+  <p>The flip side of "the model copies your examples" is that it copies
+  <strong>everything regular about them</strong> — including patterns you didn't intend.
+  If all your examples happen to be one line, output stays one line. If they all open with
+  "Sure!", so will the model. If they're all the happy path, edge cases fall apart.</p>
+
+  <div class="key">
+    <span class="label">The discipline</span>
+    Hold constant only what <em>should</em> be constant; vary what <em>should</em> vary.
+    Before you ship examples, scan them for regularities you didn't mean to teach.
+  </div>
+
+  <p>This is also the trap when few-shot "mysteriously" degrades a capable model: the
+  examples quietly capped it. On Opus 4.8 and Fable — which plan well on their own — a few
+  sharp, well-chosen examples help, but a pile of mediocre or over-uniform ones can pull
+  quality <em>down</em>. Curate, don't accumulate.</p>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">1. For pinning down an exact output format, a good example usually beats —</p>
+    <button data-c="1">a paragraph describing it</button>
+    <button data-c="0">using a firmer tone</button>
+    <button data-c="0">raising the token limit</button>
+    <button data-c="0">adding the current date</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">2. If all your few-shot examples happen to be short, the model will likely —</p>
+    <button data-c="1">copy that and stay short</button>
+    <button data-c="0">ignore the length entirely somehow</button>
+    <button data-c="0">ask you for more examples</button>
+    <button data-c="0">refuse the task as underspecified</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+
+  <p>Convert this <em>tell</em> instruction into a <em>show</em> one. Include at least one
+  edge case, keep the structure identical, and check for accidental patterns before you
+  reveal.</p>
+
+  <pre>"Write a skill instruction so Claude formats git commit messages
+consistently across the repo."</pre>
+
+  <details class="reveal">
+    <summary>Reveal one strong rewrite (compare the moves)</summary>
+    <p><em>"Write commit messages as <code>&lt;type&gt;: &lt;imperative summary&gt;</code>
+    (type ∈ feat / fix / chore / docs / refactor). Like these:</em></p>
+    <pre>feat: add pagination to the quotes endpoint
+fix: stop dropping the last page in paginate()
+refactor: extract clampPage() from list.ts
+
+# breaking change — add `!` and a body explaining the migration:
+feat!: require api_key on all provider calls
+
+Providers now reject unauthenticated requests; callers must pass api_key."</pre>
+    <p>The moves: <strong>shows the shape</strong> instead of describing it (Move 1) ·
+    <strong>includes the edge case</strong> (breaking change) so the model learns the rule
+    from an instance, not prose (Move 2) · <strong>the body appears only where it's
+    load-bearing</strong>, so the model learns "body = breaking change," not "always add a
+    body" — an <em>intentional</em> regularity (Move 3). The summaries are all lowercase,
+    imperative, no trailing period: those are deliberate constants, and the model will
+    correctly copy them. If you didn't want lowercase enforced, you'd vary it in the
+    examples.</p>
+  </details>
+
+  <div class="note">
+    <span class="label">When telling is fine</span>
+    You don't need examples for everything. For a simple, unambiguous ask ("list the three
+    largest files"), a plain instruction is faster and clearer. Reach for few-shot when the
+    <em>shape</em> is hard to state, when consistency across many runs matters (skills!),
+    or when a plain instruction keeps missing the same way.
+  </div>
+
+  <div class="course-foot">
+    <div class="ask">
+      <strong>Ask me things.</strong> Paste a skill of yours that <em>describes</em> a
+      format in prose — we'll convert it to examples and hunt for the accidental patterns
+      together. Your ticket and wiki-source skills are prime candidates.
+    </div>
+    <p><strong>Primary source (~10 min):</strong>
+    <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/multishot-prompting">Anthropic
+    — Use examples (multishot prompting)</a>. The canonical version of all three moves,
+    with the relevance / diversity / structure guidance.</p>
+    <p>Builds on: <a href="0001-say-what-you-want-and-why.html">L1</a> ·
+    <a href="0002-dont-lead-the-witness.html">L2</a> ·
+    <a href="0003-altitude.html">L3</a> ·
+    Quick reference: <a href="../reference/prompting-cheat-sheet.html">Prompting Cheat Sheet</a>.</p>
+    <p>Next up (Lesson 5, when you're ready): <em>Fable vs Opus — choosing the model and
+    tuning the prompt to it</em>, or <em>Structured output — forcing exact shapes without
+    fragile examples.</em> Your pick.</p>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right — for format and style, demonstrating beats describing. Tone, token limits, and dates don\'t pin down a shape; an example does.',
+      q2: 'Right — the examples are the pattern the model generalizes from, so it copies their regularities, intended or not. Vary what should vary.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

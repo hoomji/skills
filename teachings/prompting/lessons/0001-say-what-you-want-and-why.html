@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1 — Say what you want, and why</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Prompting · Lesson 1 · Foundations</p>
+  <h1>Say what you want — and why</h1>
+  <p class="lede">The two things beginners leave out, and why they cost you the most re-rolls in Claude Code.</p>
+
+  <p>Here's the whole game in one sentence: <strong>a model acts on what you actually
+  wrote, not on what you meant.</strong> Almost every "Claude did the wrong thing"
+  moment traces back to a requirement that lived in your head and never made it into
+  the prompt. Two habits fix the large majority of these. This lesson is just those two.</p>
+
+  <div class="key">
+    <span class="label">The one win</span>
+    By the end you'll be able to look at a request that went sideways and say
+    <em>which</em> of the two levers was missing — instead of just retrying and hoping.
+  </div>
+
+  <h2>Lever 1 — Explicitness: name the things you'd otherwise assume</h2>
+
+  <p>A capable model will fill gaps with a <em>reasonable default</em> — which is
+  exactly the problem, because its reasonable default isn't always yours. The fix isn't
+  a longer prompt or a firmer tone. It's naming the specific things you were silently
+  assuming: <strong>scope, format, and constraints</strong>.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">Under-specified</p>
+      <p>"Clean up the error handling in the auth module."</p>
+    </div>
+    <div class="strong">
+      <p class="tag">Explicit</p>
+      <p>"In <code>auth/session.ts</code> only, replace the bare <code>catch {}</code> blocks
+      with logged, typed errors. Don't touch other files, don't add new dependencies,
+      and keep the existing function signatures."</p>
+    </div>
+  </div>
+
+  <p>The second one isn't "more detailed" for its own sake. Every added clause closes a
+  door the model would otherwise have been free to walk through — editing five files,
+  pulling in a library, changing a signature. Anthropic's own guidance calls this
+  <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct">being
+  clear, direct, and detailed</a>, and it's the single highest-return beginner technique.</p>
+
+  <div class="note">
+    <span class="label">Why this bites harder in Claude Code</span>
+    In a one-off chat, a vague answer costs you a re-read. In an agent loop, a vague
+    instruction costs you <em>actions</em> — files edited, commands run — before you
+    notice. Explicitness is cheap insurance against work you have to undo.
+  </div>
+
+  <h2>Lever 2 — Intent: tell it <em>why</em>, not just <em>what</em></h2>
+
+  <p>You cannot enumerate every case. The moment the model hits a situation your prompt
+  didn't cover, it has to guess — and its guess is only as good as its understanding of
+  what you're trying to achieve. Give it the <strong>intent</strong>, and it generalizes
+  in the direction you actually want.</p>
+
+  <div class="compare">
+    <div class="weak">
+      <p class="tag">What only</p>
+      <p>"Summarize this meeting note in 5 bullets."</p>
+    </div>
+    <div class="strong">
+      <p class="tag">What + why</p>
+      <p>"Summarize this meeting note in ~5 bullets. It's going into a project wiki page
+      that future-me reads to remember decisions — so favor decisions made and open
+      questions over who-said-what."</p>
+    </div>
+  </div>
+
+  <p>With the "why," the model knows what to keep when it must choose. This is also the
+  fix for the classic skill-authoring failure: an instruction like <em>"be concise"</em>
+  gets interpreted a dozen ways, but <em>"be concise because this renders in a narrow
+  terminal and the reader has been watching you work"</em> tells it <em>which kind</em>
+  of concise. State the goal; let the model reason to the specifics.</p>
+
+  <div class="key">
+    <span class="label">Rule of thumb</span>
+    Explicitness handles the cases you <em>can</em> foresee. Intent handles the ones you
+    <em>can't</em>. You almost always want both.
+  </div>
+
+  <h2>Check yourself</h2>
+
+  <div class="quiz" id="q1">
+    <p class="q">1. In Claude Code you asked it to fix one file and it reformatted five.
+    Most likely, the prompt was missing —</p>
+    <button data-c="1">The scope was unstated</button>
+    <button data-c="0">The tone was weak</button>
+    <button data-c="0">The prompt was short</button>
+    <button data-c="0">The examples were few</button>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p class="q">2. Why does telling Claude the <em>reason</em> behind a request help most?</p>
+    <button data-c="1">It generalizes to unspecified cases</button>
+    <button data-c="0">It shortens the total output</button>
+    <button data-c="0">It disables the safety filters</button>
+    <button data-c="0">It forces a fixed format</button>
+    <div class="feedback"></div>
+  </div>
+
+  <h2>Do it once</h2>
+
+  <p>Here is a real-shaped, weak prompt. <strong>Rewrite it</strong> so it carries both
+  levers — explicit scope/format/constraints, and the intent behind it. Do it in your
+  head or on paper before you reveal the model answer.</p>
+
+  <pre>"Write a CLAUDE.md rule so Claude stops leaving TODO comments."</pre>
+
+  <details class="reveal">
+    <summary>Reveal one strong rewrite (yours may differ — compare the moves, not the words)</summary>
+    <p><em>"Add a rule to CLAUDE.md: <strong>never leave <code>TODO</code>/<code>FIXME</code>
+    comments in code you write</strong> — either implement it now or, if it's genuinely
+    out of scope, raise it to me in chat instead. <strong>Why:</strong> this repo ships
+    to production from main and stray TODOs rot silently; I'd rather decide explicitly
+    than discover them months later. Keep the rule to two sentences so it stays scannable
+    among the other rules."</em></p>
+    <p>Notice the moves: explicit trigger (<code>TODO</code>/<code>FIXME</code>), explicit
+    alternative behavior (implement or escalate), the <strong>why</strong> (so the model
+    generalizes to cases like a half-finished helper), and a format constraint (two
+    sentences) so the rule fits its neighbors.</p>
+  </details>
+
+  <div class="note">
+    <span class="label">A caveat you'll unlearn later, on purpose</span>
+    "Explicit" does <em>not</em> mean "shout." Piling on <code>CRITICAL: YOU MUST
+    ALWAYS…</code> actually backfires on current Opus and Fable models — they follow
+    instructions literally and over-trigger on forceful language. Clarity ≠ volume.
+    We'll dig into this in a later lesson on <em>altitude</em> and model-specific tuning.
+  </div>
+
+  <div class="course-foot">
+    <div class="ask">
+      <strong>I'm your teacher — ask me things.</strong> Stuck on why one of your prompts
+      failed? Paste it into the chat and we'll diagnose which lever was missing. That's
+      the fastest way to make this stick.
+    </div>
+    <p><strong>Primary source to read next (10 min):</strong>
+    <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct">Anthropic
+    — Be clear, direct, and detailed</a>. It's the canonical version of Lever 1.</p>
+    <p>Reference: <a href="../GLOSSARY.md">Glossary</a> ·
+    Terms introduced: <em>explicitness</em>, <em>intent</em>.</p>
+    <p>Next up (Lesson 2, when you're ready): <em>Show, don't tell — designing few-shot
+    examples that actually steer.</em></p>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (quiz) {
+    var fb = quiz.querySelector('.feedback');
+    var msgs = {
+      q1: 'Right — the model had no scope boundary, so five files was a "reasonable default." Firmness, length, and examples weren\'t the issue.',
+      q2: 'Right — intent lets the model choose well in situations your prompt never named. It doesn\'t shorten output, touch safety, or fix format by itself.'
+    };
+    quiz.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        quiz.querySelectorAll('button').forEach(function (x) {
+          x.disabled = true;
+          if (x.dataset.c === '1') x.classList.add('correct');
+        });
+        if (b.dataset.c !== '1') b.classList.add('wrong');
+        fb.textContent = msgs[quiz.id];
+        fb.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>
