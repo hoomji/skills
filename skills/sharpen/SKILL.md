@@ -30,7 +30,7 @@ sources before asking for it.
 
 When unresolved blanks would materially change the prompt — especially the
 **referent** (which file / PR / range), the **why**, the **win condition**, or a
-**load-bearing constraint** — reference the [`/grill-with-docs`](../../../../../.agents/skills/grill-with-docs/SKILL.md)
+**load-bearing constraint** — reference the [`/grill-with-docs`](../../../../../../.agents/skills/grill-with-docs/SKILL.md)
 skill to interview the user and retain the resulting project context. Ask one focused
 question at a time, following the answer until the ambiguity is resolved, then
 resume sharpening. For a prompt outside a codebase, ask the same focused questions
