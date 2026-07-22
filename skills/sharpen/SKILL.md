@@ -43,26 +43,31 @@ unchanged is correct.
 *Done when:* all five moves are assessed and the specific weaknesses named. If no
 move is missing or misapplied, record the prompt as **already sharp**.
 
-### 2. Resolve the load-bearing blanks
+### 2. Resolve the load-bearing blanks — bracket, deliver, then ask
 Separate missing context into what can be retrieved and what only the user can
 supply. Retrieve available context from the conversation, workspace, and named
-sources before asking for it.
+sources before treating anything as a blank.
 
-When unresolved blanks would materially change the prompt — especially the
-**referent** (which file / PR / range), the **why**, the **win condition**, or a
-**load-bearing constraint** — use the [`grilling`](../grilling/SKILL.md) skill to
-interview the user one focused question at a time, and the
-[`domain-modeling`](../domain-modeling/SKILL.md) skill to retain the resulting
-project context (glossary and decisions). Follow each answer until the ambiguity is
-resolved, then resume sharpening. For a prompt outside a codebase, run the same
-focused interview directly without creating project docs.
+For every blank that remains — load-bearing or not — leave a clearly marked
+`[bracketed blank]` in the sharpened prompt and keep going. **Never halt to
+interview before delivering, and never invent private context to fill a blank.** The
+load-bearing blanks (the **referent** — which file / PR / range — the **why**, the
+**win condition**, a **load-bearing constraint**) get the same treatment: bracket
+them so the prompt is runnable as-is, deliver the full sharpened prompt in step 6,
+and *then* pose the focused question(s) that would resolve them so the user can
+refine. Bracket-and-deliver-then-ask — the user always leaves with a usable prompt in
+hand, sharper still once they answer.
 
-If a blank is not load-bearing, or the user wants a template instead of an
-interview, leave a `[bracketed blank]` for them to fill. Never invent private
-context.
+If the user engages those questions, use the [`grilling`](../grilling/SKILL.md) skill
+to interview one focused question at a time, and the
+[`domain-modeling`](../domain-modeling/SKILL.md) skill to retain the resulting project
+context (glossary and decisions); outside a codebase, interview directly without
+creating project docs. That refinement happens *after* the deliverable, never instead
+of it.
 
-*Done when:* every load-bearing blank is filled from retrieved or elicited context,
-and every remaining private-context dependency is bracketed rather than fabricated.
+*Done when:* the sharpened prompt is delivered with every unresolved blank bracketed
+(never fabricated), and every load-bearing blank additionally has a focused clarifying
+question posed alongside the deliverable rather than blocking it.
 
 ### 3. Recommend how to run it — model, effort, and whether to escalate
 Apply the decision rules in [`RUNNING_IT.md`](RUNNING_IT.md), in order: pick the model,
@@ -84,17 +89,23 @@ plain statement that a single agent at the recommended effort suffices. The matc
 model reference has been read and its relevant guidance identified.
 
 ### 4. Rewrite
-If step 1 found the prompt **already sharp** (no missing or misapplied move), return
-it unchanged and say so in one line; offer any refinement as an explicit, bracketed
-suggestion, never imposed. Never manufacture a weakness to justify a rewrite.
+If step 1 found the prompt **already sharp** (no missing or misapplied move), the
+sharpened prompt **is the original, reproduced verbatim in a fence** — say in one line
+that it's already sharp. Reformatting tight prose into bullets, restating it as a
+structured spec, or folding in a constraint the user never wrote (a secrets/PII guard, a
+swallow-vs-rethrow control-flow policy, an added example) are all **edits**, and an
+already-sharp prompt gets none of them. Offer any such idea only as an explicitly
+bracketed, take-it-or-leave-it suggestion *below* the prompt, never woven in. A detail the
+executor can settle by reading the code (which logger, which error type) is not a blank and
+not a gap — leave it to them. Never manufacture a weakness to justify a rewrite.
 
 Otherwise, produce the sharpened prompt carrying every fix from step 1, the resolved
 context or explicit blanks from step 2, and the applicable model-specific guidance
 from step 3. Keep the user's voice and intent; change only what those sources require.
 
-*Done when:* an already-sharp prompt is returned essentially unchanged with a one-line
-note; otherwise the rewrite reflects every diagnosed weakness and applicable
-model-specific instruction, without importing irrelevant reference material or
+*Done when:* an already-sharp prompt is returned verbatim in a fence with a one-line note
+and no woven-in additions; otherwise the rewrite reflects every diagnosed weakness and
+applicable model-specific instruction, without importing irrelevant reference material or
 inventing weaknesses.
 
 ### 5. Branch into adjacent prompts
@@ -140,6 +151,9 @@ prompt — the main one *or* an alternative — yourself in this session when *a
    model pick for the recommended prompt.
 3. **The running effort is within ±1 of your pick.** This session's effort sits within
    one step of the step-3 effort on the `low → medium → high → xhigh → max` ladder.
+4. **No unresolved load-bearing blank blocks execution.** If a bracketed blank from step 2
+   is one you'd have to guess to proceed — an unidentified referent, an unknown win
+   condition — present and ask instead of running; do not fabricate it to unlock the fast path.
 
 When the recommended prompt is an **alternative** (a reinterpretation of intent), the fast
 path *also* requires the recommendation to be **high-confidence**; a low-confidence branch
@@ -153,12 +167,13 @@ alternative, why it beats the main — then execute that prompt directly.
 **Otherwise, present** for the user to run elsewhere, in this order: the **main sharpened
 prompt** (fenced, ready to copy) · the 2–3 adjacent options (fenced, each with its why) ·
 the recommendation plus its **run line** — model + effort + escalate-or-not call · one
-bullet per move you changed, saying what and why. Lead with the main sharpened prompt; keep
-the rest brief.
+bullet per move you changed, saying what and why · any focused **clarifying question(s)**
+for load-bearing blanks from step 2. Lead with the main sharpened prompt; keep the rest brief.
 
 *Done when:* the main sharpened prompt and the adjacent options have been printed (fenced)
-in every case; and either the recommended prompt was executed in this session under a
-one-line rationale (fast path, with the high-confidence bar met if it was an alternative),
+in every case; any load-bearing clarifying questions from step 2 are surfaced alongside; and
+either the recommended prompt was executed in this session under a one-line rationale (fast
+path, with the high-confidence bar met if it was an alternative and no blocking blank open),
 or the presentation parts are shown with the main sharpened prompt first.
 
 ## The five moves — reference

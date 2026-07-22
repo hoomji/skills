@@ -8,20 +8,33 @@ For current model IDs, pricing, effort levels, and behavioral specifics, consult
 here are stable.
 
 **Model.** Default to the **daily driver** (Opus 4.8): cheaper, faster, and it handles
-almost everything. Reach for the **heavyweight** (Fable 5) only when the task is hard,
+almost everything. Reach for the **heavyweight** (Fable 5) when the task is hard,
 long-horizon, and well-specified enough to run autonomously, and its higher cost and
-minutes-long turns are acceptable. Stay on the daily driver for anything routine,
+minutes-long turns are acceptable. A large unattended batch job — e.g. "migrate all N X
+end-to-end with passing tests," work scoped to run over a weekend — is the **signature
+heavyweight case**: name the heavyweight as *the* recommendation, not a fallback, a
+reserve, or a daily-driver pilot. Stay on the daily driver for anything routine,
 latency-sensitive, interactive, or cyber/bio-adjacent — the heavyweight refuses those.
 
 **Effort — depth within one agent.** Effort dials how hard a single agent thinks; it
 spends thinking tokens and turn count together. Reason *to* a level rather than
 asserting one:
 
-- *Start point.* Default `high`; `xhigh` for coding and agentic work; `max` only when
-  correctness outweighs cost, never reflexively; `low`/`medium` for routine, subagent,
-  or simple tasks. On the heavyweight, `low` already performs very well — often beating
-  older models even at their highest effort — so start lower than instinct; if a task
-  completes correctly but slowly, turn effort *down*.
+- *Start point.* Match effort to the *kind* of task, not its apparent size:
+  - `xhigh` for bounded, well-specified **coding/implementation** and agentic work — a
+    short diff is still coding, so don't drop to `low`/`medium` just because the change
+    looks small.
+  - `high` for **diagnostic, analytic, or decision** work, for writing, and for any task
+    whose **win condition can't be pinned** up front (a bug with unknown repro, an
+    open-ended "improve X") — these often read as coding but calibrate to `high`, not `xhigh`.
+  - `max` only when correctness outweighs cost, never reflexively.
+  - `low`/`medium` only for genuinely routine, mechanical, or subagent tasks.
+
+  Recommend the effort the *task* needs, independent of the effort this session happens to
+  be running at — never lower your pick just to match the current session. On the
+  heavyweight, simple tasks run well at `low` (start lower than instinct there), but a
+  large, long-horizon, autonomous job still warrants `high`/`xhigh` for the coordination;
+  if a task completes correctly but slowly, turn effort *down*.
 - *Sweep when unclear.* The cost/quality curve is not monotonic — higher effort up
   front often *reduces* total turns and cost on agentic work, while for some tasks a
   lower level is just as good and faster. When the right level isn't obvious, name a
