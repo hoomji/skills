@@ -24,14 +24,24 @@ A `sharpen` run **passes** a case when, across ~3 runs, it *consistently*:
 4. **Recommends how to run it.** Names a model + an effort level (a **sweep** when
    unclear) + an explicit **escalate-or-not** call, each justified in one line — and
    the recommendation fits the case (see per-case checks).
-5. **Presents in order — or fast-paths correctly.** By default: sharpened prompt first,
-   fenced; then the per-move bullets; then the run line. When the invocation is an
-   implement/fix request the user wants done now *and* the running model + effort match
-   the recommendation (effort within ±1), the fast path is correct instead: a one-line
-   rationale, then the sharpened task executed in-session — no presentation.
+5. **Prints the prompts, then presents in order — or fast-paths correctly.** The main
+   sharpened prompt is always printed first, fenced — in every case, including the fast
+   path — followed by the 2–3 adjacent options (fenced, each with a why). By default the
+   recommendation + run line come next, then the per-move bullets. When the invocation is
+   an implement/fix request the user wants done now *and* the running model + effort match
+   the recommendation for the recommended prompt (effort within ±1), the fast path is
+   correct instead: print the prompts, a one-line rationale naming which prompt is running
+   and why, then execute that prompt in-session (bullets and run line may be skipped). A
+   fast path that runs a recommended **alternative** additionally requires the branch win
+   to be high-confidence.
+6. **Branches adjacent, main intact.** Offers 2–3 adjacent-*intent* prompts
+   (broader/narrower/sideways in scope), each fenced with a one-line why, leaves the main
+   rewrite untouched, and recommends one across main + alternatives with a one-line why. On
+   a narrow prompt, labels them honest minor scope variations rather than forcing
+   divergence; never fabricates a fork.
 
 The **set** passes when every positive case passes and no negative/exception case
-regresses (C7, C8).
+regresses (C7, C8, C11).
 
 ---
 
@@ -55,12 +65,21 @@ Score each dimension pass/fail with a one-line reason:
 - **D3 No over-edit** — voice/intent kept; only move-required changes made.
 - **D4 Run rec sound** — model + effort (+ sweep if unclear) + escalate-or-not, each
   with a one-line why, and consistent with the case's per-case checks.
-- **D5 Presentation / fast-path** — default: sharpened prompt first and fenced; move
-  bullets; run line. Fast-path exception (implement/fix intent + running model matches +
-  effort within ±1): a one-line rationale then in-session execution, no presentation —
-  score pass. Fast-pathing a hand-off/design/survey, or a model/effort mismatch, fails.
+- **D5 Presentation / fast-path** — the main sharpened prompt is printed first and fenced
+  in every case, followed by the adjacent options. Default order: main prompt, adjacent
+  options, recommendation + run line, then move bullets. Fast-path exception (implement/fix
+  intent + running model matches + effort within ±1): the fenced prompts, a one-line
+  rationale naming which prompt runs and why, then in-session execution of that prompt
+  (bullets/run line may be omitted) — score pass. Failing to print the fenced main prompt
+  fails. Fast-pathing a hand-off/design/survey, a model/effort mismatch, or a
+  low-confidence alternative, fails.
+- **D6 Branch quality** — 2–3 adjacent prompts, each a distinct reading of *intent/scope*
+  (not a restyling), each fenced with a one-line why; the main rewrite left unchanged; no
+  fabricated forks on a narrow prompt (labeled minor scope variations instead); one prompt
+  recommended across main + alternatives with a one-line why, and a run-line computed for
+  the winner.
 
-A case passes only if **all five** hold on the majority of runs.
+A case passes only if **all six** hold on the majority of runs.
 
 ---
 
@@ -146,12 +165,37 @@ cyber-adjacent work** — *not* Fable. Effort `high`/`xhigh`, **not reflexive `m
 sweep if unsure). Escalate = reasonable (audit → comprehensiveness/confidence), opt-in.
 **Fail if it routes a security task to Fable, or reaches for `max` with no justification.**
 
+### C11 — Branching: clear intent  **[trap: forced divergence]**
+**Input:** `"In config/logging.ts, change the default log level from 'info' to 'warn', update the accompanying comment, and return a diff."`
+**Targets:** the branch step (step 5) on an unambiguous prompt.
+**Checks [trap]:** the main rewrite stays faithful and near-unchanged (this prompt is
+already tight); the 2–3 adjacent prompts are **honestly labeled as minor scope variations**
+(e.g. narrower: touch only the constant, leave the comment; broader: make the level
+env-configurable; sideways: audit other hard-coded levels), **not** dressed up as "what you
+probably meant." The recommendation defaults to the **main** prompt unless a variation is
+clearly better. **Fail if it invents unrelated intents, presents forced divergence, or
+recommends an alternative over the clearly-correct main with no justification.** Daily
+driver; `high`/`xhigh` (bounded coding); no escalation. Fast path (implement intent): runs
+the **main**, not an alternative.
+
+### C12 — Branching: wide-open intent
+**Input:** `"Improve the onboarding flow."`
+**Targets:** the branch step (step 5) on a genuinely ambiguous prompt; blank handling of an
+unpinnable win condition.
+**Checks:** brackets or asks the **win condition / target metric** (D2 — does not fabricate
+one); the 2–3 adjacent prompts are **genuinely distinct intents/scopes** (e.g. cut
+steps-to-first-value; fix drop-off at a specific step; instrument and measure before
+changing; widen from signup to activation), each fenced + runnable with a one-line why;
+recommends one with a justified why tied to the likely highest-leverage reading; the main
+sharpened prompt stays faithful to the literal ask. Daily driver; effort `high` (unpinnable
+win condition — not reflexive `xhigh`); no escalation (single agent).
+
 ---
 
 ## Notes
 
 - Keep the set small and sharp. Ten checkable cases beat fifty you eyeball.
 - A single passing run is **not** a pass — consistency across runs is.
-- Running the full suite (10 cases × ~3 runs, LLM-judged) is a good use of a **workflow**:
+- Running the full suite (12 cases × ~5 runs, LLM-judged) is a good use of a **workflow**:
   fan the cases out, judge each against this rubric, report the matrix. Trigger it by
   asking for a workflow (or saying "ultracode").
