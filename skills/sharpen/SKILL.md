@@ -2,6 +2,7 @@
 name: sharpen
 description: Rewrite a rough prompt into a sharper one and recommend how to run it — model, effort level, and whether to escalate to a multi-agent workflow. User-invoked — type /sharpen with the prompt to improve.
 disable-model-invocation: true
+argument-hint: "The rough prompt to sharpen, or nothing to use the last one"
 ---
 
 # Sharpen
@@ -14,6 +15,17 @@ the same way each time.
 The prompt to sharpen is whatever the user passes in, or the most recent prompt
 they're pointing at. If nothing is supplied, ask for the prompt (or a description
 of what they were trying to get Claude to do).
+
+## Invocation
+
+The user invokes `/sharpen` with the rough prompt they want improved, or nothing to
+reuse the most recent prompt they're pointing at. Interpret the request and act.
+Examples:
+
+- "/sharpen make the login page look nicer"
+- "/sharpen fix the bug in auth.ts and tell me how to run it"
+- "Sharpen the last thing I asked you to do"
+- "/sharpen" (with no argument — use the most recent prompt in context)
 
 ## Steps
 
@@ -38,11 +50,12 @@ sources before asking for it.
 
 When unresolved blanks would materially change the prompt — especially the
 **referent** (which file / PR / range), the **why**, the **win condition**, or a
-**load-bearing constraint** — reference the [`/grill-with-docs`](../../../../../../.agents/skills/grill-with-docs/SKILL.md)
-skill to interview the user and retain the resulting project context. Ask one focused
-question at a time, following the answer until the ambiguity is resolved, then
-resume sharpening. For a prompt outside a codebase, ask the same focused questions
-directly without creating project docs.
+**load-bearing constraint** — use the [`grilling`](../grilling/SKILL.md) skill to
+interview the user one focused question at a time, and the
+[`domain-modeling`](../domain-modeling/SKILL.md) skill to retain the resulting
+project context (glossary and decisions). Follow each answer until the ambiguity is
+resolved, then resume sharpening. For a prompt outside a codebase, run the same
+focused interview directly without creating project docs.
 
 If a blank is not load-bearing, or the user wants a template instead of an
 interview, leave a `[bracketed blank]` for them to fill. Never invent private
@@ -52,7 +65,7 @@ context.
 and every remaining private-context dependency is bracketed rather than fabricated.
 
 ### 3. Recommend how to run it — model, effort, and whether to escalate
-Apply the decision rules in the running-it reference below, in order: pick the model,
+Apply the decision rules in [`RUNNING_IT.md`](RUNNING_IT.md), in order: pick the model,
 tune the effort (naming a sweep when the level isn't obvious), then make the
 escalate-or-not call.
 
@@ -84,12 +97,30 @@ note; otherwise the rewrite reflects every diagnosed weakness and applicable
 model-specific instruction, without importing irrelevant reference material or
 inventing weaknesses.
 
-### 5. Present
-Show, in this order: the **sharpened prompt** (fenced, ready to copy) · one bullet
-per move you changed, saying what and why · the **run line** — model + effort +
-escalate-or-not call. Lead with the sharpened prompt; keep the rest brief.
+### 5. Present — or execute directly
+**Fast path — run it here.** Carry out the sharpened prompt yourself in this session,
+skipping the presentation, when *all three* hold:
 
-*Done when:* all three are present and the sharpened prompt is first.
+1. **The user wants it done now.** The invocation is an implement-or-fix request the
+   user wants carried out — not a prompt to hand off elsewhere, a design or exploration,
+   or a survey.
+2. **The running model is the one you'd recommend.** This session's model is the step-3
+   model pick.
+3. **The running effort is within ±1 of your pick.** This session's effort sits within
+   one step of the step-3 effort on the `low → medium → high → xhigh → max` ladder.
+
+When all three hold, say in one line that you're running it here because the model and
+effort already match the recommendation, then execute the sharpened prompt from step 4
+directly.
+
+**Otherwise, present** for the user to run elsewhere, in this order: the **sharpened
+prompt** (fenced, ready to copy) · one bullet per move you changed, saying what and why ·
+the **run line** — model + effort + escalate-or-not call. Lead with the sharpened
+prompt; keep the rest brief.
+
+*Done when:* either the sharpened prompt has been executed in this session under a
+one-line rationale (fast path), or all three presentation parts are shown with the
+sharpened prompt first.
 
 ## The five moves — reference
 
@@ -119,50 +150,3 @@ where the method itself is load-bearing.
 pin down? *Fix:* replace the description with 3–5 representative examples in identical
 structure, including the hard case. Watch for accidental regularities the examples
 would teach.
-
-## Running it — reference
-
-For current model IDs, pricing, effort levels, and behavioral specifics, consult the
-`/claude-api` skill — it is the source of truth and stays current. The decision rules
-here are stable.
-
-**Model.** Default to the **daily driver** (Opus 4.8): cheaper, faster, and it handles
-almost everything. Reach for the **heavyweight** (Fable 5) only when the task is hard,
-long-horizon, and well-specified enough to run autonomously, and its higher cost and
-minutes-long turns are acceptable. Stay on the daily driver for anything routine,
-latency-sensitive, interactive, or cyber/bio-adjacent — the heavyweight refuses those.
-
-**Effort — depth within one agent.** Effort dials how hard a single agent thinks; it
-spends thinking tokens and turn count together. Reason *to* a level rather than
-asserting one:
-
-- *Start point.* Default `high`; `xhigh` for coding and agentic work; `max` only when
-  correctness outweighs cost, never reflexively; `low`/`medium` for routine, subagent,
-  or simple tasks. On the heavyweight, `low` already performs very well — often beating
-  older models even at their highest effort — so start lower than instinct; if a task
-  completes correctly but slowly, turn effort *down*.
-- *Sweep when unclear.* The cost/quality curve is not monotonic — higher effort up
-  front often *reduces* total turns and cost on agentic work, while for some tasks a
-  lower level is just as good and faster. When the right level isn't obvious, name a
-  **sweep** of two adjacent candidates to run on the actual task and compare.
-- *Define done.* A high-effort run needs a defined 'done' or full task spec up front,
-  or the deliberation wanders and you pay for thinking you can't use. If the rewrite
-  doesn't pin the win condition, lower the effort or tighten the spec first.
-- *Latency is a separate dial.* Effort affects latency only indirectly, through turn
-  count; the dedicated latency control is fast mode (output tokens/sec). Don't lower
-  effort to chase speed — reach for fast mode instead.
-
-**Escalate to a workflow (ultracode) — breadth across many agents.** After model and
-effort, decide whether one agent is enough or the task should escalate from depth (one
-agent thinking hard) to **breadth** (many independent agents plus verification a single
-context can't give itself). Escalate when the task needs one of:
-
-- *Comprehensiveness* — decompose it and cover the parts in parallel.
-- *Confidence* — independent or adversarial verification before committing.
-- *Scale* — work bigger than one context window: migrations, audits, broad sweeps.
-
-A workflow is opt-in and costly (dozens of agents, many tokens), so recommend it only
-when the scale justifies the spend — never for trivial or quick work. When you do,
-tell the user how to trigger it: include the keyword **ultracode**, or ask for a
-workflow / multi-agent orchestration. When none of the three needs apply, say plainly
-that a single agent at the recommended effort suffices.

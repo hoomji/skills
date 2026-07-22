@@ -24,8 +24,11 @@ A `sharpen` run **passes** a case when, across ~3 runs, it *consistently*:
 4. **Recommends how to run it.** Names a model + an effort level (a **sweep** when
    unclear) + an explicit **escalate-or-not** call, each justified in one line — and
    the recommendation fits the case (see per-case checks).
-5. **Presents in order.** Sharpened prompt first, fenced; then the per-move bullets;
-   then the run line.
+5. **Presents in order — or fast-paths correctly.** By default: sharpened prompt first,
+   fenced; then the per-move bullets; then the run line. When the invocation is an
+   implement/fix request the user wants done now *and* the running model + effort match
+   the recommendation (effort within ±1), the fast path is correct instead: a one-line
+   rationale, then the sharpened task executed in-session — no presentation.
 
 The **set** passes when every positive case passes and no negative/exception case
 regresses (C7, C8).
@@ -52,7 +55,10 @@ Score each dimension pass/fail with a one-line reason:
 - **D3 No over-edit** — voice/intent kept; only move-required changes made.
 - **D4 Run rec sound** — model + effort (+ sweep if unclear) + escalate-or-not, each
   with a one-line why, and consistent with the case's per-case checks.
-- **D5 Presentation** — sharpened prompt first and fenced; move bullets; run line.
+- **D5 Presentation / fast-path** — default: sharpened prompt first and fenced; move
+  bullets; run line. Fast-path exception (implement/fix intent + running model matches +
+  effort within ±1): a one-line rationale then in-session execution, no presentation —
+  score pass. Fast-pathing a hand-off/design/survey, or a model/effort mismatch, fails.
 
 A case passes only if **all five** hold on the majority of runs.
 
