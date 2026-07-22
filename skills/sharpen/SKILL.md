@@ -1,16 +1,16 @@
 ---
 name: sharpen
-description: Rewrite a rough prompt into a sharper one and recommend how to run it — model, effort level, and whether to escalate to a multi-agent workflow. User-invoked — type /sharpen with the prompt to improve.
+description: Rewrite a rough prompt into a sharper one — plus 2–3 adjacent alternatives with a recommendation — and recommend how to run it: model, effort level, and whether to escalate to a multi-agent workflow. User-invoked — type /sharpen with the prompt to improve.
 disable-model-invocation: true
 argument-hint: "The rough prompt to sharpen, or nothing to use the last one"
 ---
 
 # Sharpen
 
-Take a rough prompt and return a sharper one, plus how to run it — model, effort,
-and whether to escalate to a workflow. Apply the **same five moves every run** — the
-rewrite is a fixed process, not improvised, so the same weak prompt gets sharpened
-the same way each time.
+Take a rough prompt and return a sharper one, then branch it into 2–3 adjacent
+alternatives and recommend one, plus how to run it — model, effort, and whether to
+escalate to a workflow. Apply the **same five moves every run** — the rewrite is a fixed
+process, not improvised, so the same weak prompt gets sharpened the same way each time.
 
 The prompt to sharpen is whatever the user passes in, or the most recent prompt
 they're pointing at. If nothing is supplied, ask for the prompt (or a description
@@ -97,30 +97,69 @@ note; otherwise the rewrite reflects every diagnosed weakness and applicable
 model-specific instruction, without importing irrelevant reference material or
 inventing weaknesses.
 
-### 5. Present — or execute directly
-**Fast path — run it here.** Carry out the sharpened prompt yourself in this session,
-skipping the presentation, when *all three* hold:
+### 5. Branch into adjacent prompts
+Using the original prompt, the resolved context from step 2, and the main sharpened
+prompt from step 4, produce 2–3 **adjacent** prompts — each a different reading of what
+the user wants (broader, narrower, or sideways in intent/scope), not a restyling of the
+main one. This step always runs.
+
+The main sharpened prompt stays faithful and untouched — branches are **additional
+options, never edits to it**. When the original intent is genuinely unambiguous, do not
+manufacture divergence: say the intent is narrow and offer the alternatives as honest
+minor scope variations rather than forced forks. Never invent private context to create a
+branch — the same no-fabrication rule as step 2 applies.
+
+Each alternative is a real, **fenced runnable prompt** plus a one-line *"why you'd want
+this"* naming the interpretation it serves. Keep alternatives lightweight — prompt and why
+only, no per-alternative run-line.
+
+Then rank the main prompt and the alternatives **together** and recommend one, with a
+one-line why. Compute the full step-3 run-line (model · effort · escalate) **only for the
+recommended prompt**; if an alternative wins, its run-line may differ from the main's.
+
+*Done when:* 2–3 adjacent prompts are produced (each fenced, each with a one-line why),
+the main rewrite is left unchanged, one prompt is recommended across main + alternatives
+with a one-line why, and a run-line is computed for the recommended prompt. On an
+unambiguous prompt, the alternatives are honestly labeled as minor scope variations rather
+than forced divergence.
+
+### 6. Present — then execute the recommended prompt directly if warranted
+**Always print the prompts.** Whether or not you go on to run anything, first show the
+**main sharpened prompt** (fenced, ready to copy), the 2–3 adjacent options (fenced, each
+with its why), and the recommendation, so the user always has the improved versions in
+hand and can follow along. Never skip this, even on the fast path — the user needs the
+in-progress update before any execution begins.
+
+**Fast path — run it here.** After printing the prompts, carry out the **recommended**
+prompt — the main one *or* an alternative — yourself in this session when *all three* hold:
 
 1. **The user wants it done now.** The invocation is an implement-or-fix request the
    user wants carried out — not a prompt to hand off elsewhere, a design or exploration,
    or a survey.
 2. **The running model is the one you'd recommend.** This session's model is the step-3
-   model pick.
+   model pick for the recommended prompt.
 3. **The running effort is within ±1 of your pick.** This session's effort sits within
    one step of the step-3 effort on the `low → medium → high → xhigh → max` ladder.
 
-When all three hold, say in one line that you're running it here because the model and
-effort already match the recommendation, then execute the sharpened prompt from step 4
-directly.
+When the recommended prompt is an **alternative** (a reinterpretation of intent), the fast
+path *also* requires the recommendation to be **high-confidence**; a low-confidence branch
+win falls back to presenting, not auto-running. Recommending the faithful main prompt
+carries no extra bar.
 
-**Otherwise, present** for the user to run elsewhere, in this order: the **sharpened
-prompt** (fenced, ready to copy) · one bullet per move you changed, saying what and why ·
-the **run line** — model + effort + escalate-or-not call. Lead with the sharpened
-prompt; keep the rest brief.
+When the conditions hold, print everything above, add a one-line note stating which prompt
+you're running and why — the model and effort already match the recommendation, and, for an
+alternative, why it beats the main — then execute that prompt directly.
 
-*Done when:* either the sharpened prompt has been executed in this session under a
-one-line rationale (fast path), or all three presentation parts are shown with the
-sharpened prompt first.
+**Otherwise, present** for the user to run elsewhere, in this order: the **main sharpened
+prompt** (fenced, ready to copy) · the 2–3 adjacent options (fenced, each with its why) ·
+the recommendation plus its **run line** — model + effort + escalate-or-not call · one
+bullet per move you changed, saying what and why. Lead with the main sharpened prompt; keep
+the rest brief.
+
+*Done when:* the main sharpened prompt and the adjacent options have been printed (fenced)
+in every case; and either the recommended prompt was executed in this session under a
+one-line rationale (fast path, with the high-confidence bar met if it was an alternative),
+or the presentation parts are shown with the main sharpened prompt first.
 
 ## The five moves — reference
 
