@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 link_skills() {
   local target_dir="$1"
   mkdir -p "$target_dir"
-  for skill_dir in "$SCRIPT_DIR"/*/; do
+  for skill_dir in "$SCRIPT_DIR"/skills/*/; do
     skill_name="$(basename "$skill_dir")"
     if [ -f "$skill_dir/SKILL.md" ]; then
       ln -sfn "$skill_dir" "$target_dir/$skill_name"
