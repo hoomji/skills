@@ -6,7 +6,7 @@ cases), change one variable at a time, and judge **consistency across runs** —
 that works on one roll isn't a fix.
 
 Run this whenever you change `SKILL.md`, a model reference (`FABLE_5.md` /
-`OPUS_4_8.md`), or the model the skill runs on.
+`OPUS_5.md`), or the model the skill runs on.
 
 ---
 
@@ -116,7 +116,7 @@ defense of Redis), and for a recommendation + main risk; adds/brackets the real 
 **Checks:** flattens `CRITICAL/ALWAYS/NEVER` to a plain rule stated once with a why;
 raises altitude (states the outcome, drops the run→read→fix→re-run choreography); keeps
 any load-bearing bit; **preserves the intent** (tests for new behavior). Daily driver;
-`xhigh`; no escalation.
+`high`/`xhigh`; no escalation.
 
 ### C5 — Show, don't tell
 **Input:** `"Make sure commit messages follow a consistent house style."`
@@ -138,7 +138,7 @@ specific bug.** Daily driver; `high`; no escalation.
 **Targets:** none — this prompt is already explicit, framed, right-altitude.
 **Checks [trap]:** the skill should make **minimal or no** changes and *say so*. **Fail
 if it invents weaknesses, forces a decision-frame/example it doesn't need, or rewrites
-the voice.** Daily driver; `xhigh`; no escalation.
+the voice.** Daily driver; `high`/`xhigh`; no escalation.
 
 ### C8 — Survey is genuinely wanted  **[trap: forced recommendation]**
 **Input:** `"For a blog post, give me the landscape of PoW vs PoS vs PoH — the tradeoffs of each."`

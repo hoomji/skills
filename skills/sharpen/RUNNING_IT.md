@@ -7,7 +7,7 @@ For current model IDs, pricing, effort levels, and behavioral specifics, consult
 `/claude-api` skill — it is the source of truth and stays current. The decision rules
 here are stable.
 
-**Model.** Default to the **daily driver** (Opus 4.8): cheaper, faster, and it handles
+**Model.** Default to the **daily driver** (Opus 5): cheaper, faster, and it handles
 almost everything. Reach for the **heavyweight** (Fable 5) when the task is hard,
 long-horizon, and well-specified enough to run autonomously, and its higher cost and
 minutes-long turns are acceptable. A large unattended batch job — e.g. "migrate all N X
@@ -20,21 +20,29 @@ latency-sensitive, interactive, or cyber/bio-adjacent — the heavyweight refuse
 spends thinking tokens and turn count together. Reason *to* a level rather than
 asserting one:
 
-- *Start point.* Match effort to the *kind* of task, not its apparent size:
-  - `xhigh` for bounded, well-specified **coding/implementation** and agentic work — a
-    short diff is still coding, so don't drop to `low`/`medium` just because the change
-    looks small.
-  - `high` for **diagnostic, analytic, or decision** work, for writing, and for any task
-    whose **win condition can't be pinned** up front (a bug with unknown repro, an
-    open-ended "improve X") — these often read as coding but calibrate to `high`, not `xhigh`.
-  - `max` only when correctness outweighs cost, never reflexively.
-  - `low`/`medium` only for genuinely routine, mechanical, or subagent tasks.
+- *Start point.* **`high` is the default, and the floor for real work.** Move off the
+  floor deliberately, by the *kind* of task rather than its apparent size:
+  - `xhigh` for **demanding** coding and agentic work — long-horizon, multi-file, or
+    tool-heavy runs, and the coordination on a large autonomous job.
+  - `high` — the floor — for bounded, well-specified **coding**, for **diagnostic,
+    analytic, or decision** work, for **writing**, and for any task whose **win condition
+    can't be pinned** up front. A short diff is still coding: a change looking small is
+    not a reason to drop below the floor.
+  - `low`/`medium` for **subagent tasks and non-code routine** — classification, lookups,
+    high-volume mechanical passes. These are the primary cost and latency control, but a
+    code change never qualifies on size alone; go below the floor on evidence that quality
+    holds there, not on the diff looking short.
+  - `max` only when the task justifies unconstrained spend, never reflexively.
 
   Recommend the effort the *task* needs, independent of the effort this session happens to
-  be running at — never lower your pick just to match the current session. On the
-  heavyweight, simple tasks run well at `low` (start lower than instinct there), but a
-  large, long-horizon, autonomous job still warrants `high`/`xhigh` for the coordination;
-  if a task completes correctly but slowly, turn effort *down*.
+  be running at — never lower your pick just to match the current session. An effort level
+  carried over from an older model is a stale default, not a starting point: both models
+  hold quality further down the ladder than their predecessors did. If a task completes
+  correctly but slowly, turn effort *down*.
+- *The pick gates the fast path.* Step 6 compares your recommended effort against the
+  session's within ±1, so a pick below the floor can lock the skill out of work it should
+  simply do. Get the pick right and let the gate follow — reason to the level the task
+  needs, never to the level that unlocks execution.
 - *Sweep when unclear.* The cost/quality curve is not monotonic — higher effort up
   front often *reduces* total turns and cost on agentic work, while for some tasks a
   lower level is just as good and faster. When the right level isn't obvious, name a

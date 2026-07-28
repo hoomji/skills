@@ -77,7 +77,7 @@ escalate-or-not call.
 Once the model is chosen, read exactly one model-specific reference:
 
 - **Fable 5:** [`FABLE_5.md`](FABLE_5.md)
-- **Opus 4.8:** [`OPUS_4_8.md`](OPUS_4_8.md)
+- **Opus 5:** [`OPUS_5.md`](OPUS_5.md)
 
 Identify only the guidance that bears on this prompt; the reference does not license
 unrelated scaffolding.
