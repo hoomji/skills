@@ -62,6 +62,7 @@ Run `./install.sh` again after adding a new skill to link it.
 | Skill                              | Description                                                                                      |
 |------------------------------------|--------------------------------------------------------------------------------------------------|
 | [sharpen](skills/sharpen/SKILL.md) | Rewrite a rough prompt into a sharper one and recommend how to run it (model, effort, workflow). |
+| [writing-great-recurring](skills/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
 
 ## Matt Pocock skills
 
