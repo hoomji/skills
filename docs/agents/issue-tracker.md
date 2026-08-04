@@ -13,6 +13,18 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
+## Close convention
+
+**Integration branch: _(none — an issue closes when its work reaches the default branch)_.**
+
+_Set this to a branch name where an agent loop or long-lived branch collects work that reaches the default branch through one cumulative PR. `closing-completed-prds` reads this flag._
+
+When set to a branch, an issue closes once its work lands **there**, not when it reaches the default branch. The cumulative PR and any scoped PRs off that branch carry already-closed work onward, so an open PR is not a reason to keep the issue open — apply `has-pr` instead (see `triage-labels.md`).
+
+A parent PRD closes when every slice implementing it is closed. Slices do not reliably back-reference their PRD, so rebuild the tree from commit subjects rather than from GitHub's sub-issue links.
+
+Close with evidence: the implementing commits, the ADR recording the decision, and which PR carries the work onward. A bare close leaves no way to tell a delivered PRD from an abandoned one.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_

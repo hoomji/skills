@@ -66,6 +66,8 @@ Run `./install.sh` again after adding a new skill to link it.
 | [unblock-pr](skills/unblock-pr/SKILL.md) | Address every unresolved review thread on a PR and get its CI green. |
 | [triaging-sandcastle-issues](skills/triaging-sandcastle-issues/SKILL.md) | Label unified-request GitHub issues ready-for-agent vs ready-for-human for the Sandcastle agent loop. |
 | [salvage-sandcastle-run](skills/salvage-sandcastle-run/SKILL.md) | Close out a finished, killed, or stalled Sandcastle run — recover uncommitted work, reconcile rubber-stamped closures, get the branch green. |
+| [has-pr-labelling](skills/has-pr-labelling/SKILL.md) | Label the issues an open PR already delivers, so a triage table separates picked-up work from untouched work. |
+| [closing-completed-prds](skills/closing-completed-prds/SKILL.md) | Close the PRDs and SPECs whose implementation has actually landed, and label the ones still in flight. |
 
 ## Matt Pocock skills
 
