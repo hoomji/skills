@@ -63,6 +63,7 @@ Run `./install.sh` again after adding a new skill to link it.
 |------------------------------------|--------------------------------------------------------------------------------------------------|
 | [sharpen](skills/sharpen/SKILL.md) | Rewrite a rough prompt into a sharper one and recommend how to run it (model, effort, workflow). |
 | [writing-great-recurring](skills/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
+| [discovery-sweep](skills/discovery-sweep/SKILL.md) | Keep an agent work queue stocked — backpressure gate, lane sweep, agent-vs-human split, armed filing to a budget, ledger for memory. |
 | [unblock-pr](skills/unblock-pr/SKILL.md) | Address every unresolved review thread on a PR and get its CI green. |
 | [triaging-sandcastle-issues](skills/triaging-sandcastle-issues/SKILL.md) | Label unified-request GitHub issues ready-for-agent vs ready-for-human for the Sandcastle agent loop. |
 | [salvage-sandcastle-run](skills/salvage-sandcastle-run/SKILL.md) | Close out a finished, killed, or stalled Sandcastle run — recover uncommitted work, reconcile rubber-stamped closures, get the branch green. |
