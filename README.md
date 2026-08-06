@@ -11,7 +11,9 @@ chmod +x install.sh
 ./install.sh
 ```
 
-This symlinks the skills into `~/.claude/skills/` (Claude Code) and `~/.agents/skills/` (Codex).
+This symlinks the skills in `skills/` into `~/.claude/skills/` (Claude Code) and `~/.agents/skills/` (Codex).
+
+Also install the Matt Pocock skills plugin (see below) — the engineering skills aren't vendored in this repo anymore, so `install.sh` alone won't provide them.
 
 ## Layout
 
@@ -72,21 +74,57 @@ Run `./install.sh` again after adding a new skill to link it.
 
 ## Matt Pocock skills
 
-Vendored copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills),
-kept here for reference and local tweaks. They're already installed globally, so
-`install.sh` does not link these.
+These used to be vendored copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills),
+committed under `skills/` alongside the personal skills above. As of 2026-08-06 they're
+installed from the **official Claude Code plugin marketplace** instead — the plugin
+tracks upstream releases directly, so there's no vendored snapshot to fall behind.
 
-| Skill                                                                | Description                                                                                     |
-|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| [grill-with-docs](skills/grill-with-docs/SKILL.md)                   | A relentless interview to sharpen a plan or design, creating ADRs and a glossary as it goes.    |
-| [grilling](skills/grilling/SKILL.md)                                 | Grill the user relentlessly about a plan or design to stress-test it before building.           |
-| [domain-modeling](skills/domain-modeling/SKILL.md)                   | Build and sharpen a project's domain model — terminology, ubiquitous language, and ADRs.        |
-| [to-spec](skills/to-spec/SKILL.md)                                   | Turn the current conversation into a spec and publish it to the project issue tracker.          |
-| [to-tickets](skills/to-tickets/SKILL.md)                             | Break a plan, spec, or conversation into tracer-bullet tickets with blocking edges.             |
-| [triage](skills/triage/SKILL.md)                                     | Move issues and external PRs through a state machine of triage roles into agent-ready briefs.   |
-| [implement](skills/implement/SKILL.md)                               | Implement a piece of work based on a spec or set of tickets.                                     |
-| [tdd](skills/tdd/SKILL.md)                                           | Test-driven development — red-green-refactor for features and bugfixes.                         |
-| [code-review](skills/code-review/SKILL.md)                           | Review changes since a fixed point along two axes: repo Standards and originating Spec.         |
-| [wayfinder](skills/wayfinder/SKILL.md)                               | Plan a large chunk of work as a shared map of investigation tickets, resolved one at a time.    |
-| [resolving-merge-conflicts](skills/resolving-merge-conflicts/SKILL.md) | Resolve an in-progress git merge/rebase conflict.                                             |
-| [setup-matt-pocock-skills](skills/setup-matt-pocock-skills/SKILL.md) | Configure a repo for the engineering skills — issue tracker, triage labels, domain doc layout.  |
+**Install (once per machine):**
+
+```bash
+claude plugin marketplace add mattpocock/skills
+claude plugin install mattpocock-skills@mattpocock --scope user
+```
+
+`--scope user` matches how these used to be available globally via symlinks — every
+project on the machine gets them, not just this repo. Run `claude plugin update
+mattpocock-skills` to pick up new releases; a running session needs a restart to see
+the update.
+
+| Skill                       | Description                                                                                    |
+|------------------------------|-------------------------------------------------------------------------------------------------|
+| `mattpocock-skills:grill-with-docs` | A relentless interview to sharpen a plan or design, creating ADRs and a glossary as it goes. |
+| `mattpocock-skills:grilling` | Grill the user relentlessly about a plan or design to stress-test it before building.          |
+| `mattpocock-skills:domain-modeling` | Build and sharpen a project's domain model — terminology, ubiquitous language, and ADRs. |
+| `mattpocock-skills:to-spec` | Turn the current conversation into a spec and publish it to the project issue tracker.          |
+| `mattpocock-skills:to-tickets` | Break a plan, spec, or conversation into tracer-bullet tickets with blocking edges.           |
+| `mattpocock-skills:triage`  | Move issues and external PRs through a state machine of triage roles into agent-ready briefs.   |
+| `mattpocock-skills:implement` | Implement a piece of work based on a spec or set of tickets.                                   |
+| `mattpocock-skills:tdd`     | Test-driven development — red-green-refactor for features and bugfixes.                         |
+| `mattpocock-skills:code-review` | Review changes since a fixed point along two axes: repo Standards and originating Spec.    |
+| `mattpocock-skills:wayfinder` | Plan a large chunk of work as a shared map of investigation tickets, resolved one at a time.   |
+| `mattpocock-skills:resolving-merge-conflicts` | Resolve an in-progress git merge/rebase conflict.                             |
+| `mattpocock-skills:setup-matt-pocock-skills` | Configure a repo for the engineering skills — issue tracker, triage labels, domain doc layout. |
+
+The plugin also ships several skills this repo never vendored (`diagnosing-bugs`,
+`improve-codebase-architecture`, `prototype`, `research`, `codebase-design`, `wizard`,
+and the productivity bucket) — see the [upstream README](https://github.com/mattpocock/skills)
+for the current full list.
+
+**What changed by moving off vendored copies:**
+
+- **Invocation names gained a plugin prefix.** Plugin-provided skills resolve as
+  `mattpocock-skills:<skill-name>`, not the bare name (`triage`, `wayfinder`, …) the
+  vendored copies used. Any doc, skill, or slash-command reference to one of these
+  by bare name needs the prefix — [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md)
+  and [`docs/agents/domain.md`](docs/agents/domain.md) in this repo have already been
+  updated; check any other repo's `CLAUDE.md`/`AGENTS.md` that references them.
+- **The skills no longer travel with a `git clone` of this repo.** They lived as
+  committed files before; now they're a separate machine-level install. A teammate,
+  CI box, or fresh machine that clones this repo does not get them until it also runs
+  the `claude plugin install` command above.
+- **Codex is unaffected but also unhelped.** Codex doesn't consume Claude Code
+  plugins, so `~/.agents/skills/` keeps whatever copies of these skills were already
+  there independently of this repo. This repo's `install.sh` was never the source for
+  Codex's copies of these particular skills, so nothing broke there — but nothing here
+  keeps Codex's copies in sync with upstream either.
