@@ -1,8 +1,10 @@
 # Harness Engineering System
 
-**Date:** 2026-08-11  
-**Status:** Initial skill suite implemented  
-**Primary inspiration:** [OpenAI, “Harness engineering: leveraging Codex in an agent-first world”](https://openai.com/index/harness-engineering/)  
+**Date:** 2026-08-11
+
+**Status:** Initial skill suite implemented
+
+**Primary inspiration:** [OpenAI, “Harness engineering: leveraging Codex in an agent-first world”](https://openai.com/index/harness-engineering/)
 **Target:** A reusable specification plus a family of skills for establishing, operating, and improving an agent-ready software repository
 
 ## Executive summary
