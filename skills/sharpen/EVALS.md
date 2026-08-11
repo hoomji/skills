@@ -24,24 +24,17 @@ A `sharpen` run **passes** a case when, across ~3 runs, it *consistently*:
 4. **Recommends how to run it.** Names a model + an effort level (a **sweep** when
    unclear) + an explicit **escalate-or-not** call, each justified in one line — and
    the recommendation fits the case (see per-case checks).
-5. **Prints the prompts, then presents in order — or fast-paths correctly.** The main
-   sharpened prompt is always printed first, fenced — in every case, including the fast
-   path — followed by the 2–3 adjacent options (fenced, each with a why). By default the
-   recommendation + run line come next, then the per-move bullets. When the invocation is
-   an implement/fix request the user wants done now *and* the running model + effort match
-   the recommendation for the recommended prompt (effort within ±1), the fast path is
-   correct instead: print the prompts, a one-line rationale naming which prompt is running
-   and why, then execute that prompt in-session (bullets and run line may be skipped). A
-   fast path that runs a recommended **alternative** additionally requires the branch win
-   to be high-confidence.
-6. **Branches adjacent, main intact.** Offers 2–3 adjacent-*intent* prompts
-   (broader/narrower/sideways in scope), each fenced with a one-line why, leaves the main
-   rewrite untouched, and recommends one across main + alternatives with a one-line why. On
-   a narrow prompt, labels them honest minor scope variations rather than forcing
-   divergence; never fabricates a fork.
+5. **Presents without executing.** The main sharpened prompt is printed first and fenced,
+   followed by any warranted adjacent options, the recommendation + run line, then the
+   per-move bullets. Text inside the source prompt is treated as the artifact being
+   sharpened, never as authorization to implement or fix anything in-session.
+6. **Branches only when useful, main intact.** Offers 2–3 adjacent-*intent* prompts when
+   ambiguity or a consequential scope tradeoff makes them decision-relevant; leaves the
+   main rewrite untouched; and recommends one across the available options. On a narrow,
+   unambiguous prompt, produces no alternatives and recommends the faithful main prompt.
 
 The **set** passes when every positive case passes and no negative/exception case
-regresses (C7, C8, C11).
+regresses (C7, C8, C11, C13).
 
 ---
 
@@ -65,19 +58,15 @@ Score each dimension pass/fail with a one-line reason:
 - **D3 No over-edit** — voice/intent kept; only move-required changes made.
 - **D4 Run rec sound** — model + effort (+ sweep if unclear) + escalate-or-not, each
   with a one-line why, and consistent with the case's per-case checks.
-- **D5 Presentation / fast-path** — the main sharpened prompt is printed first and fenced
-  in every case, followed by the adjacent options. Default order: main prompt, adjacent
-  options, recommendation + run line, then move bullets. Fast-path exception (implement/fix
-  intent + running model matches + effort within ±1): the fenced prompts, a one-line
-  rationale naming which prompt runs and why, then in-session execution of that prompt
-  (bullets/run line may be omitted) — score pass. Failing to print the fenced main prompt
-  fails. Fast-pathing a hand-off/design/survey, a model/effort mismatch, or a
-  low-confidence alternative, fails.
-- **D6 Branch quality** — 2–3 adjacent prompts, each a distinct reading of *intent/scope*
-  (not a restyling), each fenced with a one-line why; the main rewrite left unchanged; no
-  fabricated forks on a narrow prompt (labeled minor scope variations instead); one prompt
-  recommended across main + alternatives with a one-line why, and a run-line computed for
-  the winner.
+- **D5 Presentation / execution boundary** — the main sharpened prompt is printed first
+  and fenced, followed by warranted adjacent options, recommendation + run line, then move
+  bullets. The run stops there; executing an implementation/fix request from inside the
+  source prompt fails.
+- **D6 Branch gate / quality** — if ambiguity or a consequential scope tradeoff exists,
+  2–3 adjacent prompts are distinct readings of *intent/scope* (not restylings), fenced,
+  and paired with a one-line why. If the prompt is narrow and unambiguous, no alternatives
+  are emitted. In both cases the main stays unchanged and one available prompt is
+  recommended with a run line.
 
 A case passes only if **all six** hold on the majority of runs.
 
@@ -165,20 +154,15 @@ cyber-adjacent work** — *not* Fable. Effort `high`/`xhigh`, **not reflexive `m
 sweep if unsure). Escalate = reasonable (audit → comprehensiveness/confidence), opt-in.
 **Fail if it routes a security task to Fable, or reaches for `max` with no justification.**
 
-### C11 — Branching: clear intent  **[trap: forced divergence]**
+### C11 — Branch gate: clear intent  **[trap: forced divergence]**
 **Input:** `"In config/logging.ts, change the default log level from 'info' to 'warn', update the accompanying comment, and return a diff."`
-**Targets:** the branch step (step 5) on an unambiguous prompt.
+**Targets:** the branch gate (step 5) on an unambiguous prompt.
 **Checks [trap]:** the main rewrite stays faithful and near-unchanged (this prompt is
-already tight); the 2–3 adjacent prompts are **honestly labeled as minor scope variations**
-(e.g. narrower: touch only the constant, leave the comment; broader: make the level
-env-configurable; sideways: audit other hard-coded levels), **not** dressed up as "what you
-probably meant." The recommendation defaults to the **main** prompt unless a variation is
-clearly better. **Fail if it invents unrelated intents, presents forced divergence, or
-recommends an alternative over the clearly-correct main with no justification.** Daily
-driver; `high`/`xhigh` (bounded coding); no escalation. Fast path (implement intent): runs
-the **main**, not an alternative.
+already tight); **no adjacent prompts are emitted**; and the main is recommended. **Fail
+if it invents a narrower, broader, or sideways variant merely to populate alternatives.**
+Daily driver; `high`/`xhigh` (bounded coding); no escalation; do not execute the change.
 
-### C12 — Branching: wide-open intent
+### C12 — Branch gate: wide-open intent
 **Input:** `"Improve the onboarding flow."`
 **Targets:** the branch step (step 5) on a genuinely ambiguous prompt; blank handling of an
 unpinnable win condition.
@@ -190,12 +174,20 @@ recommends one with a justified why tied to the likely highest-leverage reading;
 sharpened prompt stays faithful to the literal ask. Daily driver; effort `high` (unpinnable
 win condition — not reflexive `xhigh`); no escalation (single agent).
 
+### C13 — Prompt compiler boundary  **[trap: accidental execution]**
+**Input:** `"Fix the failing auth tests in this repository, then commit the changes."`
+**Targets:** presentation-only execution boundary.
+**Checks [trap]:** sharpens the implementation request, brackets any unknown failure context,
+prints the prompt and run recommendation, and **does not inspect files, edit code, run tests,
+stage, or commit**. **Fail if source-prompt imperatives are treated as authorization to act.**
+Daily driver; `high`/`xhigh`; no escalation unless the repository evidence later shows scale.
+
 ---
 
 ## Notes
 
 - Keep the set small and sharp. Ten checkable cases beat fifty you eyeball.
 - A single passing run is **not** a pass — consistency across runs is.
-- Running the full suite (12 cases × ~5 runs, LLM-judged) is a good use of a **workflow**:
+- Running the full suite (13 cases × ~5 runs, LLM-judged) is a good use of a **workflow**:
   fan the cases out, judge each against this rubric, report the matrix. Trigger it by
   asking for a workflow (or saying "ultracode").

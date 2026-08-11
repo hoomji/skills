@@ -39,10 +39,6 @@ asserting one:
   carried over from an older model is a stale default, not a starting point: both models
   hold quality further down the ladder than their predecessors did. If a task completes
   correctly but slowly, turn effort *down*.
-- *The pick gates the fast path.* Step 6 compares your recommended effort against the
-  session's within ±1, so a pick below the floor can lock the skill out of work it should
-  simply do. Get the pick right and let the gate follow — reason to the level the task
-  needs, never to the level that unlocks execution.
 - *Sweep when unclear.* The cost/quality curve is not monotonic — higher effort up
   front often *reduces* total turns and cost on agentic work, while for some tasks a
   lower level is just as good and faster. When the right level isn't obvious, name a
