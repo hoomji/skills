@@ -1,0 +1,21 @@
+# Agent guidance
+
+## Repository map
+
+- Product and domain language: `[authoritative path]`
+- Architecture and boundaries: `[authoritative path]`
+- Decisions: `[authoritative path or convention]`
+- Harness capability state: `docs/harness/manifest.yaml`
+
+## Common commands
+
+- Setup: `[exact evidenced command]`
+- Start: `[exact evidenced command]`
+- Focused check: `[exact evidenced command]`
+- Full verification: `[exact evidenced command]`
+
+## Working agreement
+
+Follow the linked sources of truth. Keep changes within the requested scope. Verify the
+acceptance criteria with the narrowest relevant checks, then run the repository gate when
+the environment supports it. Report skipped checks and residual risk.

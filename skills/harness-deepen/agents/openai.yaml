@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Deepen"
+  short_description: "Improve one harness capability plane"
+  default_prompt: "Use $harness-deepen to improve the weakest harness capability blocking a real repository workflow."

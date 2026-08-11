@@ -1,0 +1,15 @@
+version: 1
+owners:
+  harness: "unknown"
+entrypoints:
+  guidance: "AGENTS.md"
+  architecture: "unknown"
+commands:
+  setup: "unknown"
+  start: "unknown"
+  check: "unknown"
+  test: "unknown"
+capabilities: {}
+policies: []
+freshness:
+  review_after_days: 90

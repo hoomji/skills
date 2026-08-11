@@ -1,0 +1,47 @@
+---
+name: harness-review-evidence
+description: Review a software change against its originating spec, repository standards, and claimed verification evidence. Use when a diff or PR needs a harness-aware review, an evidence bundle must be audited, or the user wants product-judgment gaps separated from mechanically repairable defects.
+---
+
+# Harness Review Evidence
+
+Read [`../harness/references/contracts.md`](../harness/references/contracts.md) and
+[`../harness/references/composition.md`](../harness/references/composition.md).
+
+## 1. Recover the review contract
+
+Identify the fixed comparison point, originating spec or issue, acceptance criteria,
+repository guidance, relevant decisions, and claimed evidence. State missing sources
+instead of substituting likely intent.
+
+Completion criterion: standards and spec axes each have an authoritative source or an
+explicitly bounded gap.
+
+## 2. Wrap code review
+
+Use the installed Matt Pocock `code-review` capability for standards and spec review.
+Add harness-specific inspection of the evidence bundle: commands actually run, runtime
+proof, skipped checks, environment limits, and residual risk. Inspect raw outputs when a
+claim is consequential.
+
+Completion criterion: every changed behavior is checked against the spec and every
+material evidence claim is corroborated or marked unsupported.
+
+## 3. Classify findings
+
+Report actionable defects first with tight locations and causal explanations. Separate:
+
+- correctness, security, regression, or spec failures;
+- repository-standard violations;
+- missing or invalid evidence;
+- product/architecture judgments requiring a human;
+- repeated patterns suitable for `harness-capture-learning`.
+
+Completion criterion: each finding states impact, evidence, and the smallest valid repair;
+non-actionable taste is excluded.
+
+## 4. Conclude
+
+State whether the evidence supports completion, which checks remain, and whether autonomy
+may advance for this workflow. A clean review explicitly says no actionable findings were
+found and names residual uncertainty.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Deliver Work"
+  short_description: "Run the evidence-backed change lifecycle"
+  default_prompt: "Use $harness-deliver-work to deliver this repository change through implementation, verification, and review."

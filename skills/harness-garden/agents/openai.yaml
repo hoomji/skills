@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Garden"
+  short_description: "Find harness drift and stale guidance"
+  default_prompt: "Use $harness-garden to run a read-only scan for stale, conflicting, or broken harness artifacts."

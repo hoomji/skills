@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Review Evidence"
+  short_description: "Review changes against spec and proof"
+  default_prompt: "Use $harness-review-evidence to review this change against its spec, repository standards, and evidence bundle."

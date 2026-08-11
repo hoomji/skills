@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Quality Report"
+  short_description: "Report harness capability trends"
+  default_prompt: "Use $harness-quality-report to update an evidence-backed harness capability report."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Expose Runtime"
+  short_description: "Make runtime behavior agent-legible"
+  default_prompt: "Use $harness-expose-runtime to expose one runtime surface for agent inspection and verification."

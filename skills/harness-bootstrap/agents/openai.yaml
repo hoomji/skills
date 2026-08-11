@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Bootstrap"
+  short_description: "Prepare a minimum viable harness"
+  default_prompt: "Use $harness-bootstrap to prepare an unstaged minimum viable harness change set for this repository."

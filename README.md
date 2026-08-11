@@ -71,6 +71,18 @@ Run `./install.sh` again after adding a new skill to link it.
 | [salvage-sandcastle-run](skills/salvage-sandcastle-run/SKILL.md) | Close out a finished, killed, or stalled Sandcastle run — recover uncommitted work, reconcile rubber-stamped closures, get the branch green. |
 | [has-pr-labelling](skills/has-pr-labelling/SKILL.md) | Label the issues an open PR already delivers, so a triage table separates picked-up work from untouched work. |
 | [closing-completed-prds](skills/closing-completed-prds/SKILL.md) | Close the PRDs and SPECs whose implementation has actually landed, and label the ones still in flight. |
+| [harness](skills/harness/SKILL.md) | Route repository harness assessment, setup, operation, and maintenance work. |
+| [harness-assess](skills/harness-assess/SKILL.md) | Produce a read-only, evidence-backed baseline of repository agent readiness. |
+| [harness-bootstrap](skills/harness-bootstrap/SKILL.md) | Prepare an unstaged minimum viable harness change set. |
+| [harness-deepen](skills/harness-deepen/SKILL.md) | Improve one harness capability plane for a real tracer workflow. |
+| [harness-encode-invariant](skills/harness-encode-invariant/SKILL.md) | Turn a repeated correction into a mechanical repository check. |
+| [harness-expose-runtime](skills/harness-expose-runtime/SKILL.md) | Make one runtime surface inspectable and verifiable by agents. |
+| [harness-plan-work](skills/harness-plan-work/SKILL.md) | Create a repository-grounded execution plan with evidence gates. |
+| [harness-deliver-work](skills/harness-deliver-work/SKILL.md) | Deliver a change through specialist implementation, verification, and review skills. |
+| [harness-review-evidence](skills/harness-review-evidence/SKILL.md) | Review a change against its spec, standards, and evidence bundle. |
+| [harness-capture-learning](skills/harness-capture-learning/SKILL.md) | Route repeated agent friction into the narrowest durable improvement. |
+| [harness-garden](skills/harness-garden/SKILL.md) | Find stale, conflicting, broken, or orphaned harness artifacts. |
+| [harness-quality-report](skills/harness-quality-report/SKILL.md) | Report harness capability levels, trends, regressions, and readiness. |
 
 ## Matt Pocock skills
 

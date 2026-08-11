@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Capture Learning"
+  short_description: "Compound repeated agent corrections"
+  default_prompt: "Use $harness-capture-learning to route this repeated correction into the right durable repository layer."

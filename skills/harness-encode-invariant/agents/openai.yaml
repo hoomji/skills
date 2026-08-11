@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Encode Invariant"
+  short_description: "Turn repeated corrections into checks"
+  default_prompt: "Use $harness-encode-invariant to encode a repeated repository rule as a mechanical invariant."
