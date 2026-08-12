@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-11
 
-**Status:** Initial skill suite implemented
+**Status:** Milestones 1–2 complete; Milestone 3 ready for repository trials
 
 **Primary inspiration:** [OpenAI, “Harness engineering: leveraging Codex in an agent-first world”](https://openai.com/index/harness-engineering/)
 **Target:** A reusable specification plus a family of skills for establishing, operating, and improving an agent-ready software repository
@@ -323,30 +323,37 @@ owners:
 entrypoints:
   guidance: AGENTS.md
   architecture: ARCHITECTURE.md
+  tracer: docs/harness/tracer-workflow.md
 commands:
   setup: ./scripts/setup
   start: ./scripts/dev
   check: ./scripts/check
   test: ./scripts/test
+  validate: python3 scripts/harness-validate.py .
 capabilities:
   reproducible_setup:
     status: verified
-    evidence: .github/workflows/ci.yml
+    evidence:
+      - .github/workflows/ci.yml
   runtime_logs:
-    status: partial
-    evidence: docs/operations/observability.md
+    status: documented
+    evidence:
+      - docs/operations/observability.md
   ui_verification:
     status: missing
 policies:
   - id: dependency-direction
     enforcement: ./scripts/check architecture
     owner: platform-team
+    remediation: Run ./scripts/check architecture and repair the reported boundary.
 freshness:
   review_after_days: 90
 ```
 
 Required semantics:
 
+- `entrypoints` names guidance, architecture/domain, and tracer workflow sources;
+- `commands` names setup, start, focused check, full test, and harness validation paths;
 - statuses are `missing`, `documented`, `executable`, `verified`, or `automated`;
 - every verified or automated capability names reproducible evidence;
 - every enforced policy names an owner and remediation path;
@@ -479,7 +486,8 @@ are absent.
 - **Inputs:** approved assessment and selected tracer workflow.
 - **Outputs:** map, manifest, stable command entrypoints, initial docs, validator, and
   change report.
-- **Safety:** preview changes; preserve existing conventions; make incremental commits;
+- **Safety:** preview changes; preserve existing conventions; prepare incremental change
+  groups and a narrow commit plan while leaving the worktree unstaged;
   never overwrite authoritative docs without explicit reconciliation.
 
 #### `harness-deepen`
@@ -562,13 +570,17 @@ remain connectors or MCP tools rather than being simulated inside the plugin.
 ```yaml
 id: feedback.runtime-logs
 plane: feedback
-status: documented
+level: 1
+confidence: high
+scope: credential-free tracer execution on assessed-ref@commit
+required_for_tracer: true
 evidence:
   - docs/operations/observability.md
+present_capability: Runtime logging is documented but has no task-local query path.
 gap: Agents cannot query task-local logs.
 impact: Runtime defects require human reproduction.
 next_capability: Add a read-only log query command for the tracer service.
-risk: low
+risk: R1
 ```
 
 ### Task evidence bundle
@@ -701,17 +713,35 @@ For each repository, evaluate at least:
 - Implement `harness-assess` in read-only mode.
 - Run it on two contrasting repositories and revise the model.
 
+Completion evidence: [`skills/harness-assess/RUNS.md`](../../../skills/harness-assess/RUNS.md)
+compares the initial `unified-request` and `auto-route` runs. The revisions make the
+assessed ref, default-ref divergence, tracer-scoped split scores, stable citations, and
+comparison equivalence explicit.
+
 ### Milestone 2: Minimum viable bootstrap
 
 - Implement `harness-bootstrap` for the root map, stable commands, architecture pointer,
   tracer workflow, validator, and learning ledger.
-- Require preview and narrow commits.
+- Require preview and a narrow commit plan; the skill leaves the change set unstaged.
+
+Completion evidence: the skill requires a reviewed preview and narrow change groups,
+ships templates for every minimum artifact, and includes a zero-dependency
+`harness-validate` asset with behavior tests. [`skills/harness-bootstrap/RUNS.md`](../../../skills/harness-bootstrap/RUNS.md)
+compares successful unstaged trials in `unified-request` and `auto-route`; both
+repository-local validators pass and a read-only second pass is a no-op. The remaining
+cases in [`EVALS.md`](../../../skills/harness-bootstrap/EVALS.md) are broader hardening,
+not blockers for Milestone 3.
 
 ### Milestone 3: Daily lifecycle
 
 - Implement `harness-plan-work`, `harness-review-evidence`, and
   `harness-capture-learning`.
 - Compose existing implementation, debugging, review, and PR skills where available.
+
+Initial implementation evidence: each skill now ships a concrete output contract and a
+static contract test. Their `EVALS.md` files define repository-trial cases and their
+`RUNS.md` files record local validation. Real lifecycle trials remain open before
+Milestone 3 is called complete.
 
 ### Milestone 4: Deepening capabilities
 
@@ -734,7 +764,7 @@ For each repository, evaluate at least:
 | Excessive policy | Encode only high-value, consistently testable invariants; support owned exceptions |
 | Harness maintenance becomes its own product tax | Start from tracer workflows and measure human attention actually saved |
 | Agents game a maturity score | Score planes separately and require reproducible evidence |
-| Existing repos are destructively normalized | Assess first, preview, adapt to conventions, and use incremental commits |
+| Existing repos are destructively normalized | Assess first, preview, adapt to conventions, and use incremental change groups |
 | Skills duplicate specialized workflows | Compose existing skills behind shared contracts |
 | Scheduled cleanup creates noisy churn | Default to read-only reports, small diffs, worktree isolation, and false-positive tracking |
 | Repository truth diverges from production reality | Connect live state through scoped tools and label generated or observed evidence clearly |

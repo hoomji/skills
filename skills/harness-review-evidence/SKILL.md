@@ -12,7 +12,8 @@ Read [`../harness/references/contracts.md`](../harness/references/contracts.md) 
 
 Identify the fixed comparison point, originating spec or issue, acceptance criteria,
 repository guidance, relevant decisions, and claimed evidence. State missing sources
-instead of substituting likely intent.
+instead of substituting likely intent. Freeze the comparison base and record dirty or
+untracked files that are excluded from the review.
 
 Completion criterion: standards and spec axes each have an authoritative source or an
 explicitly bounded gap.
@@ -22,14 +23,16 @@ explicitly bounded gap.
 Use the installed Matt Pocock `code-review` capability for standards and spec review.
 Add harness-specific inspection of the evidence bundle: commands actually run, runtime
 proof, skipped checks, environment limits, and residual risk. Inspect raw outputs when a
-claim is consequential.
+claim is consequential. Treat a named command without retained output as uncorroborated,
+not passed.
 
 Completion criterion: every changed behavior is checked against the spec and every
 material evidence claim is corroborated or marked unsupported.
 
 ## 3. Classify findings
 
-Report actionable defects first with tight locations and causal explanations. Separate:
+Use [`assets/review-report.md.template`](assets/review-report.md.template). Report
+actionable defects first with tight locations and causal explanations. Separate:
 
 - correctness, security, regression, or spec failures;
 - repository-standard violations;
@@ -44,4 +47,9 @@ non-actionable taste is excluded.
 
 State whether the evidence supports completion, which checks remain, and whether autonomy
 may advance for this workflow. A clean review explicitly says no actionable findings were
-found and names residual uncertainty.
+found and names residual uncertainty. Reviewing is R0; repair, comment, push, or PR
+mutation requires the user's corresponding authorization.
+
+Completion criterion: every acceptance criterion has a supported, failed, or unknown
+result; every actionable finding names the smallest repair; product judgment is left to a
+human rather than disguised as a defect.

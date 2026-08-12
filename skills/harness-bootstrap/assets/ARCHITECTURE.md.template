@@ -1,0 +1,20 @@
+# Architecture map
+
+Use this only when the repository has no authoritative architecture or domain entrypoint.
+Replace every prompt below with evidence from the repository before installation.
+
+## System boundary
+
+[What this repository owns, and what it explicitly does not own.]
+
+## Components and dependency direction
+
+[The smallest useful map of components, data/control flow, and allowed dependencies.]
+
+## External systems and runtime state
+
+[Services, stores, queues, credentials, and observable runtime surfaces.]
+
+## Decisions
+
+[Pointers to ADRs or the repository's established decision-record convention.]

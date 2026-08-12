@@ -41,11 +41,13 @@ owners:
 entrypoints:
   guidance: "AGENTS.md"
   architecture: "ARCHITECTURE.md"
+  tracer: "docs/harness/tracer-workflow.md"
 commands:
   setup: "exact command or unknown"
   start: "exact command or unknown"
   check: "exact command or unknown"
   test: "exact command or unknown"
+  validate: "python3 scripts/harness-validate.py ."
 capabilities:
   reproducible_setup:
     status: "documented"
@@ -58,7 +60,10 @@ freshness:
 
 Capability statuses are `missing`, `documented`, `executable`, `verified`, or
 `automated`. Every `verified` or `automated` claim names reproducible evidence. Every
-policy names its enforcement, owner, and remediation path.
+policy names its enforcement, owner, and remediation path. During assessment, an unknown
+command stays `unknown`; a completed minimum bootstrap must resolve setup, check, test,
+and validate to deterministic entrypoints. Start may remain `unknown` only when
+`capabilities.startable_runtime` is `missing` and cites repository evidence.
 
 ## Assessment finding
 
@@ -67,12 +72,15 @@ id: "feedback.runtime-logs"
 plane: "feedback"
 level: 1
 confidence: "high"
+scope: "credential-free tracer execution on assessed-ref@commit"
+required_for_tracer: true
 evidence:
   - "docs/operations/observability.md:12"
+present_capability: "Runtime logging is documented but has no task-local query path."
 gap: "Agents cannot query task-local logs."
 impact: "Runtime defects require human reproduction."
 next_capability: "Add a read-only log query command for the tracer service."
-risk: "low"
+risk: "R1"
 ```
 
 Every factual claim links to a path, command result, or explicit `unknown`. Separate

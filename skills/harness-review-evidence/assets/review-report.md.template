@@ -1,0 +1,44 @@
+# Evidence review: <change>
+
+**Comparison base:** <ref@commit or merge-base>  
+**Originating spec:** <path or issue>  
+**Repository standards:** <paths>  
+**Reviewed scope:** <paths/commits>  
+**Excluded dirty state:** <paths or none>
+
+## Findings
+
+### [P0–P3] <actionable title>
+
+- **Location:** `<path:line>`
+- **Class:** correctness | security | regression | spec | standard | evidence
+- **Impact:** <observable consequence>
+- **Evidence:** <diff, raw output, or source-of-truth conflict>
+- **Smallest repair:** <bounded corrective action>
+
+If no actionable finding exists, state that plainly and continue with residual
+uncertainty.
+
+## Acceptance matrix
+
+| Acceptance criterion | Claimed evidence | Corroboration | Result |
+|---|---|---|---|
+| <Criterion> | <claim> | <raw output/path or unavailable> | supported, failed, or unknown |
+
+## Evidence audit
+
+| Command or runtime proof | Raw evidence inspected | Outcome |
+|---|---|---|
+| `<command>` | yes | pass, fail, skipped, or uncorroborated |
+
+## Human judgment
+
+- <Product or architecture decision that evidence cannot settle, or none>
+
+## Conclusion
+
+- **Completion supported:** yes, no, or unknown
+- **Checks remaining:** <commands or none>
+- **Residual uncertainty:** <limits>
+- **Autonomy recommendation:** <hold or advance, scoped to this workflow>
+- **Capture-learning candidates:** <repeated patterns or none>

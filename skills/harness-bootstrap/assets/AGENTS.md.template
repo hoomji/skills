@@ -6,6 +6,8 @@
 - Architecture and boundaries: `[authoritative path]`
 - Decisions: `[authoritative path or convention]`
 - Harness capability state: `docs/harness/manifest.yaml`
+- Representative workflow: `docs/harness/tracer-workflow.md`
+- Repeated-friction ledger: `docs/harness/learning-ledger.md`
 
 ## Common commands
 
@@ -13,9 +15,11 @@
 - Start: `[exact evidenced command]`
 - Focused check: `[exact evidenced command]`
 - Full verification: `[exact evidenced command]`
+- Harness validation: `[repository-local validator command]`
 
 ## Working agreement
 
 Follow the linked sources of truth. Keep changes within the requested scope. Verify the
 acceptance criteria with the narrowest relevant checks, then run the repository gate when
-the environment supports it. Report skipped checks and residual risk.
+the environment supports it. Follow the representative workflow's evidence contract.
+Report skipped checks and residual risk.

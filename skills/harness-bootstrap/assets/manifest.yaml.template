@@ -1,14 +1,19 @@
+# Replace every "unknown" needed by the tracer. Validation rejects unknown setup,
+# check, and test commands. For a repository with no runtime, start may remain unknown
+# only with an evidenced `capabilities.startable_runtime: {status: missing}` declaration.
 version: 1
 owners:
   harness: "unknown"
 entrypoints:
   guidance: "AGENTS.md"
   architecture: "unknown"
+  tracer: "docs/harness/tracer-workflow.md"
 commands:
   setup: "unknown"
   start: "unknown"
   check: "unknown"
   test: "unknown"
+  validate: "python3 scripts/harness-validate.py ."
 capabilities: {}
 policies: []
 freshness:

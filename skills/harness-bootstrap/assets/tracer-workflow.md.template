@@ -1,0 +1,32 @@
+# Representative workflow
+
+## Outcome
+
+Describe one real change workflow whose success will reveal whether the minimum harness
+is useful.
+
+## Preconditions and boundary
+
+- Required local state:
+- Credentials or services:
+- Maximum risk class:
+- Stop and escalate when:
+
+## Steps
+
+1. Locate the originating goal and authoritative context.
+2. Make the smallest in-scope change.
+3. Run the focused check, then the declared repository gate when supported.
+4. Review the evidence and residual risk before any shared-state action.
+
+## Acceptance criteria
+
+- [Replace with a behavior a maintainer can observe.]
+- [Replace with a repository or runtime boundary that must remain intact.]
+
+## Evidence
+
+- Focused verification: `[exact command and expected signal]`
+- Repository gate: `[exact command or explicit unknown]`
+- Runtime evidence: `[exact surface or not applicable]`
+- Handoff: changed artifacts, results, skipped checks, and residual risks

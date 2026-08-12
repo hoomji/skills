@@ -73,7 +73,7 @@ Run `./install.sh` again after adding a new skill to link it.
 | [closing-completed-prds](skills/closing-completed-prds/SKILL.md) | Close the PRDs and SPECs whose implementation has actually landed, and label the ones still in flight. |
 | [harness](skills/harness/SKILL.md) | Route repository harness assessment, setup, operation, and maintenance work. |
 | [harness-assess](skills/harness-assess/SKILL.md) | Produce a read-only, evidence-backed baseline of repository agent readiness. |
-| [harness-bootstrap](skills/harness-bootstrap/SKILL.md) | Prepare an unstaged minimum viable harness change set. |
+| [harness-bootstrap](skills/harness-bootstrap/SKILL.md) | Preview, validate, and narrowly group a minimum viable harness change set. |
 | [harness-deepen](skills/harness-deepen/SKILL.md) | Improve one harness capability plane for a real tracer workflow. |
 | [harness-encode-invariant](skills/harness-encode-invariant/SKILL.md) | Turn a repeated correction into a mechanical repository check. |
 | [harness-expose-runtime](skills/harness-expose-runtime/SKILL.md) | Make one runtime surface inspectable and verifiable by agents. |

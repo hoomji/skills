@@ -11,6 +11,8 @@ Read [`../harness/references/contracts.md`](../harness/references/contracts.md).
 
 Record the observed behavior, expected behavior, evidence, frequency, impact, and task
 context. Distinguish one-off preference from a repeated or high-impact capability gap.
+Use raw review comments, failed-run output, or intervention records as evidence; do not
+upgrade recollection into a recurrence count.
 
 Completion criterion: the episode is concrete enough that another maintainer could
 recognize its recurrence.
@@ -36,9 +38,22 @@ closure, and review date—or records why no durable change is justified.
 
 ## 4. Record and optionally implement
 
-Append the learning-ledger entry. Implement the improvement only when the user authorized
-that mutation and risk class; otherwise return a proposed patch scope. Link completed
-changes to their evidence and update the manifest when capability level changes.
+Use [`assets/learning-ledger-entry.md.template`](assets/learning-ledger-entry.md.template)
+and append one entry to the repository's existing learning ledger. Record one disposition:
+implemented, proposed, or not encoded. The workflow's maximum class is R1: when the user
+authorized it, make only a directly related reversible local improvement. Hand mechanical
+enforcement, runtime tooling, shared workflow changes, pushes, and external mutations to
+the relevant follow-on skill with the proposed scope and risk class. Link completed local
+changes to their evidence and update the manifest only when evidence supports a
+capability-level change.
+
+Set a concrete review date from `freshness.review_after_days` in the harness manifest.
+When the manifest has no freshness window, use 90 days from the entry date and label that
+as the default. A `not encoded` disposition still gets reviewed when new recurrence
+evidence appears or that date arrives.
 
 Completion criterion: the learning is traceable from episode to disposition without
 duplicating the rule across layers.
+
+Appending the ledger is R1. Stop after the ledger entry and handoff when the improvement
+requires R2–R4 authority.

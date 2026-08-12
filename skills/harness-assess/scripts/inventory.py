@@ -63,7 +63,9 @@ def relative(path: Path, root: Path) -> str:
 def bounded_files(root: Path) -> list[Path]:
     files: list[Path] = []
     for current, dirs, names in os.walk(root, followlinks=False):
-        dirs[:] = sorted(d for d in dirs if d not in EXCLUDED_DIRS and not d.startswith(".cache"))
+        dirs[:] = sorted(
+            d for d in dirs if d not in EXCLUDED_DIRS and not d.startswith(".cache")
+        )
         current_path = Path(current)
         for name in sorted(names):
             path = current_path / name
@@ -89,13 +91,38 @@ def git(root: Path, *args: str) -> str | None:
     return result.stdout.strip() if result.returncode == 0 else None
 
 
+def head_vs_default(root: Path, default_ref: str | None) -> dict[str, int | str] | None:
+    if not default_ref:
+        return None
+    counts = git(root, "rev-list", "--left-right", "--count", f"{default_ref}...HEAD")
+    if not counts:
+        return None
+    try:
+        behind, ahead = (int(value) for value in counts.split())
+    except (TypeError, ValueError):
+        return None
+    if ahead and behind:
+        relation = "diverged"
+    elif ahead:
+        relation = "ahead"
+    elif behind:
+        relation = "behind"
+    else:
+        relation = "equal"
+    return {"ahead": ahead, "behind": behind, "relation": relation}
+
+
 def package_scripts(path: Path) -> dict[str, str]:
     try:
         parsed = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return {}
     scripts = parsed.get("scripts", {})
-    return {str(key): str(value) for key, value in scripts.items()} if isinstance(scripts, dict) else {}
+    return (
+        {str(key): str(value) for key, value in scripts.items()}
+        if isinstance(scripts, dict)
+        else {}
+    )
 
 
 def make_targets(path: Path) -> list[str]:
@@ -131,14 +158,23 @@ def main() -> int:
     hooks = [
         rel
         for rel in rels
-        if Path(rel).name in HOOK_NAMES or rel.startswith(".husky/") or rel.startswith(".codex/hooks")
+        if Path(rel).name in HOOK_NAMES
+        or rel.startswith(".husky/")
+        or rel.startswith(".codex/hooks")
     ]
-    tests = [rel for rel in rels if any(marker in f"/{rel.lower()}" for marker in TEST_MARKERS)]
+    tests = [
+        rel
+        for rel in rels
+        if any(marker in f"/{rel.lower()}" for marker in TEST_MARKERS)
+    ]
     observability = [
         rel
         for rel in rels
         if any(word in Path(rel).name.lower() for word in OBSERVABILITY_WORDS)
-        or any(part.lower() in {"grafana", "observability", "telemetry"} for part in Path(rel).parts)
+        or any(
+            part.lower() in {"grafana", "observability", "telemetry"}
+            for part in Path(rel).parts
+        )
     ]
 
     packages: dict[str, dict[str, str]] = {}
@@ -156,12 +192,36 @@ def main() -> int:
         language_counts[suffix] = language_counts.get(suffix, 0) + 1
 
     status = git(root, "status", "--short")
+    default_remote_ref = git(
+        root,
+        "symbolic-ref",
+        "--quiet",
+        "--short",
+        "refs/remotes/origin/HEAD",
+    )
+    worktrees = git(root, "worktree", "list", "--porcelain")
+    inventory_commands = [
+        "git rev-parse",
+        "git branch --show-current",
+        "git status --short",
+        "git symbolic-ref refs/remotes/origin/HEAD",
+        "git worktree list --porcelain",
+    ]
+    if default_remote_ref:
+        inventory_commands.append("git rev-list --left-right --count <default>...HEAD")
     output: dict[str, Any] = {
         "repository": str(root),
         "git": {
             "branch": git(root, "branch", "--show-current"),
             "head": git(root, "rev-parse", "HEAD"),
             "dirty_entries": status.splitlines() if status else [],
+            "default_remote_ref": default_remote_ref,
+            "head_vs_default": head_vs_default(root, default_remote_ref),
+            "worktree_count": sum(
+                1
+                for line in (worktrees or "").splitlines()
+                if line.startswith("worktree ")
+            ),
         },
         "counts": {
             "files_scanned": len(files),
@@ -178,11 +238,13 @@ def main() -> int:
         "hooks": hooks,
         "observability_candidates": observability[:100],
         "test_samples": tests[:100],
-        "file_extensions": dict(sorted(language_counts.items(), key=lambda item: (-item[1], item[0]))[:20]),
+        "file_extensions": dict(
+            sorted(language_counts.items(), key=lambda item: (-item[1], item[0]))[:20]
+        ),
         "limits": {
             "excluded_directories": sorted(EXCLUDED_DIRS),
             "sample_cap": 100,
-            "commands_executed": ["git rev-parse", "git branch --show-current", "git status --short"],
+            "commands_executed": inventory_commands,
         },
     }
     print(json.dumps(output, indent=2, sort_keys=True))

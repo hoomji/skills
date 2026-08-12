@@ -1,0 +1,17 @@
+### <short recurrence name>
+
+- **Date:** YYYY-MM-DD
+- **Task context:** <issue, PR, run, or workflow>
+- **Observed friction:** <concrete actual behavior>
+- **Expected behavior:** <observable target>
+- **Evidence:** <review comment, raw output, or repository-relative path>
+- **Frequency:** <count and time window, or unknown>
+- **Impact:** <wasted run, defect, delay, or human intervention>
+- **Missing harness plane:** intent | knowledge | execution | feedback | policy | isolation | lifecycle | hygiene | governance | irreducible judgment
+- **Mechanism:** <why the current harness did not prevent, expose, or route it>
+- **Durable layer:** prompt | AGENTS.md | focused doc | skill | script | test/lint/schema/hook/CI | connector/tool | scheduled task | not encoded
+- **Disposition:** implemented | proposed | not encoded
+- **Change or rationale:** <one authoritative home and bounded change, or why encoding would be brittle>
+- **Owner:** <team or person>
+- **Closure evidence:** <command/path, pending, or not applicable>
+- **Review date:** YYYY-MM-DD
