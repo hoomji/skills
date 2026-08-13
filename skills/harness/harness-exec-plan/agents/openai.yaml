@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness ExecPlan"
+  short_description: "Manage living repository execution plans"
+  default_prompt: "Use $harness-exec-plan to create, resume, update, or complete this ExecPlan."

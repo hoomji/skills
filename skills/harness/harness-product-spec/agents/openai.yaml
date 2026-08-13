@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Product Spec"
+  short_description: "Shape repository-local product intent"
+  default_prompt: "Use $harness-product-spec to create or revise this repository product specification."
