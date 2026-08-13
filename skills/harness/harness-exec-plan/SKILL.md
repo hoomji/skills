@@ -12,7 +12,7 @@ contract instead of assuming `docs/exec-plans/`.
 ## 1. Resolve the lifecycle state
 
 Identify whether the task creates, resumes, updates, inspects, completes, or supersedes a
-plan. Read the linked product specification, issue, ADRs, current plan, relevant code, and
+plan. Read the linked product specification, issue, design docs, ADRs, current plan, relevant code, and
 working-tree state. Reconcile the plan with reality before relying on its unchecked items.
 
 Completion criterion: one plan, baseline, lifecycle action, current milestone, dirty-state

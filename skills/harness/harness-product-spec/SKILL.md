@@ -12,7 +12,7 @@ uses another path, follow its map instead of assuming `docs/product-spec/`.
 ## 1. Ground the intent
 
 Read the originating request or issue, canonical domain language, relevant product specs,
-ADRs, and observable current behavior. Separate the user's problem and required behavior
+design docs, ADRs, and observable current behavior. Separate the user's problem and required behavior
 from proposed implementation. Surface contradictory authorities and product decisions that
 only a human can make.
 

@@ -85,6 +85,7 @@ Run `./install.sh` again after adding a new skill to link it.
 | [harness-expose-runtime](skills/harness/harness-expose-runtime/SKILL.md) | Make one runtime surface inspectable and verifiable by agents. |
 | [harness-plan-work](skills/harness/harness-plan-work/SKILL.md) | Create a repository-grounded execution plan with evidence gates. |
 | [harness-product-spec](skills/harness/harness-product-spec/SKILL.md) | Create and maintain repository-local product intent and acceptance contracts. |
+| [harness-design-doc](skills/harness/harness-design-doc/SKILL.md) | Create and maintain indexed, verified design documentation without replacing ADRs. |
 | [harness-exec-plan](skills/harness/harness-exec-plan/SKILL.md) | Manage living ExecPlans from creation through evidence-backed completion. |
 | [harness-reference](skills/harness/harness-reference/SKILL.md) | Curate durable external reference material in a repository knowledge store. |
 | [harness-deliver-work](skills/harness/harness-deliver-work/SKILL.md) | Deliver a change through specialist implementation, verification, and review skills. |

@@ -193,6 +193,7 @@ A record of repeated friction, impact, missing plane, selected durable layer, re
 | Encode an invariant | `harness-encode-invariant` | Enforced rule, tests, remediation, owner, exceptions |
 | Expose runtime state | `harness-expose-runtime` | Scoped inspection path, fixture, boundary, evidence, teardown |
 | Define product intent | `harness-product-spec` | Indexed behavioral contract with acceptance criteria |
+| Maintain design documentation | `harness-design-doc` | Indexed design model with lifecycle and verification status |
 | Plan complex execution | `harness-plan-work`, `harness-exec-plan` | Living plan linked to intent, evidence, risks, decisions |
 | Deliver a change | `harness-deliver-work` | Verified change and evidence bundle |
 | Review evidence | `harness-review-evidence` | Findings against intent, standards, and proof |
@@ -217,11 +218,21 @@ Outcome: the team selects the next improvement using evidence rather than a gene
 
 1. Approve an assessment and tracer workflow.
 2. Preview a narrow change set preserving repository conventions.
-3. Establish or reconcile concise guidance, architecture pointer, deterministic commands, manifest, tracer, validator, and learning ledger.
+3. Establish or reconcile concise guidance, architecture and indexed design-documentation pointers, deterministic commands, manifest, tracer, validator, and learning ledger.
 4. Leave the worktree unstaged for review.
 5. Confirm a second read-only run creates no unnecessary changes.
 
 Outcome: a clean checkout or worktree can discover and exercise the tracer's minimum development loop.
+
+### Maintain design documentation
+
+1. Resolve the governing product spec, architecture map, related ADRs, code, and evidence.
+2. Create or revise an indexed design doc describing rationale, constraints, interfaces, alternatives, and operational implications.
+3. Record owner, lifecycle state, last-verified date, verification evidence, and review trigger.
+4. Keep discrete decisions in ADRs and implementation sequencing in ExecPlans.
+5. Verify links and claims, then update the index without erasing superseded design history.
+
+Outcome: agents can understand how and why a system is designed, while ADRs remain a separate authoritative decision log.
 
 ### Deepen one capability
 
@@ -271,7 +282,7 @@ Outcome: guidance and capability claims remain trustworthy.
 ### FR-2: Repository grounding
 
 - Read applicable repository guidance before acting.
-- Reconcile relevant specs, architecture, ADRs, plans, references, and observable behavior.
+- Reconcile relevant specs, architecture, indexed design docs, ADRs, plans, references, and observable behavior.
 - Surface conflicting authorities rather than silently choosing a tradeoff.
 - Preserve user-owned changes.
 
@@ -303,6 +314,13 @@ Outcome: guidance and capability claims remain trustworthy.
 - Required behavior maps to observable acceptance criteria.
 - Product intent stays separate from implementation sequence and architecture decisions.
 - Historical specs are preserved or explicitly superseded with links.
+
+### FR-6a: Design documentation
+
+- Design documentation is indexed and records state, owner, last verification, evidence, and review trigger.
+- Design docs own system or feature rationale, constraints, interfaces, alternatives, and operational implications.
+- Design docs link product specs, architecture maps, ADRs, plans, and implementation evidence without taking over their authority.
+- ADRs remain separate records of discrete decisions and are never replaced by design-doc history.
 
 ### FR-7: Plans and delivery
 
@@ -359,6 +377,7 @@ Outcome: guidance and capability claims remain trustworthy.
 | Tracer workflow | Prove adoption | workflow, prerequisites, completion evidence, risk |
 | Execution plan | Coordinate delivery | scope, progress, decisions, verification, recovery |
 | Assessment | Report capability | revision, findings, evidence, confidence, next capability |
+| Design document | Explain a system or feature design | state, owner, scope, rationale, constraints, linked ADRs/specs, verification, review trigger |
 | Evidence bundle | Support completion | scope, criteria, commands, evidence, risks |
 | Learning ledger | Preserve friction and response | observation, frequency, impact, layer, owner, closure, review |
 | Reference | Preserve bounded external knowledge | provenance, consumers, summary, inference, freshness |
@@ -380,9 +399,10 @@ Outcome: guidance and capability claims remain trustworthy.
 | Durable navigation and commands | `AGENTS.md` or equivalent map |
 | Detailed stable knowledge | Focused versioned document |
 | Product behavior | Product specification |
-| Architectural choice | ADR or architecture record |
+| Discrete architectural choice and status history | ADR |
 | Multi-step implementation | Execution plan |
 | Repeatable method | Skill |
+| System or feature design | Indexed design document |
 | Deterministic operation | Script or task-runner command |
 | Checkable invariant | Test, lint, schema, hook, or CI gate |
 | Live external state | Scoped connector, MCP server, or tool |
@@ -467,7 +487,7 @@ Assess one tracer workflow without mutation. Record gaps and risk boundaries.
 
 ### Stage 1: Minimum viable map
 
-Reconcile concise guidance, knowledge pointers, stable commands, manifest, tracer, validator, and learning ledger.
+Reconcile concise guidance, architecture and indexed design-documentation pointers, stable commands, manifest, tracer, validator, and learning ledger.
 
 ### Stage 2: Reproducible execution and verification
 
@@ -526,7 +546,7 @@ Lines of code, PR count, prompt length, model runtime, and maturity averages are
 
 ### AC-1: Discoverability
 
-From a clean checkout, an agent can locate product intent, architecture or domain knowledge, common commands, tracer workflow, and risk boundaries from a concise entrypoint.
+From a clean checkout, an agent can locate product intent, architecture or domain knowledge, indexed design documentation, ADRs, common commands, tracer workflow, and risk boundaries from a concise entrypoint.
 
 ### AC-2: Assessment evidence
 
@@ -580,6 +600,10 @@ Core contracts work in two repositories with different languages, validation lay
 
 Every mutating workflow reports changed artifacts, validation, residual risk, and a recovery or disable path proportionate to the action.
 
+### AC-15: Design-document ownership
+
+An indexed design doc exposes lifecycle and verification status, links its governing specs and ADRs, and does not replace the architecture map, ADR decision history, or execution plan.
+
 ## Validation strategy
 
 Evaluate against:
@@ -598,7 +622,7 @@ The initial portability gate uses `Uniblock-dev/unified-request` and `Uniblock-d
 
 - [OpenAI harness engineering](../reference/openai-harness-engineering.md) provides background observations and an operating model.
 - [OpenAI Agents SDK](../reference/openai-agents-sdk.md) provides optional runtime, orchestration, guardrail, tracing, and evaluation context.
-- Repository guidance, domain records, ADRs, behavior, CI, and operational tools remain authoritative for repository-specific facts.
+- Repository guidance, domain records, design docs, ADRs, behavior, CI, and operational tools remain authoritative for repository-specific facts.
 
 ## Risks and mitigations
 
@@ -625,7 +649,7 @@ The initial portability gate uses `Uniblock-dev/unified-request` and `Uniblock-d
 5. Codex is the primary interaction surface; repository guidance remains agent-neutral.
 6. Bootstrap produces an unstaged local change set and does not publish it.
 7. Initial scheduled work is R0 read-only; higher-risk automation is earned per workflow.
-8. Product specs, ADRs, plans, references, and evidence retain separate ownership.
+8. Product specs, design docs, ADRs, plans, references, and evidence retain separate ownership.
 9. Plugin packaging waits for portability across both target repositories.
 10. The OpenAI Agents SDK is an optional integration and does not replace repository-local intent, evidence, or governance.
 
@@ -635,5 +659,5 @@ No unresolved product decision blocks this specification. Implementation choices
 
 ## Change policy
 
-Revise this specification when product outcomes, user journeys, behavioral boundaries, risk rules, shared artifact contracts, or acceptance criteria change. Preserve delivered history through links and lifecycle notes. Put implementation sequencing in an ExecPlan, architectural choices in ADRs, and external facts in references.
+Revise this specification when product outcomes, user journeys, behavioral boundaries, risk rules, shared artifact contracts, or acceptance criteria change. Preserve delivered history through links and lifecycle notes. Put system and feature design in indexed design docs, discrete architectural choices in ADRs, implementation sequencing in an ExecPlan, and external facts in references.
 

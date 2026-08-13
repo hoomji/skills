@@ -4,6 +4,7 @@
 
 - Product and domain language: `[authoritative path]`
 - Architecture and boundaries: `[authoritative path]`
+- Design documentation: `docs/design-docs/index.md`
 - Decisions: `[authoritative path or convention]`
 - Harness capability state: `docs/harness/manifest.yaml`
 - Representative workflow: `docs/harness/tracer-workflow.md`

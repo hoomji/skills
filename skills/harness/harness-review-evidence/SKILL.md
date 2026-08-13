@@ -11,7 +11,7 @@ Read [`../harness/references/contracts.md`](../harness/references/contracts.md) 
 ## 1. Recover the review contract
 
 Identify the fixed comparison point, originating spec or issue, acceptance criteria,
-repository guidance, relevant decisions, and claimed evidence. State missing sources
+repository guidance, relevant design docs and decisions, and claimed evidence. State missing sources
 instead of substituting likely intent. Freeze the comparison base and record dirty or
 untracked files that are excluded from the review.
 
