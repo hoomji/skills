@@ -8,7 +8,7 @@ PyYAML is absent from the available Python runtimes. Repository trials in `EVALS
 remain open, so Milestone 3 is ready for trials, not complete.
 
 Reproduce the contract check with
-`python3 -m unittest discover -s skills/harness-plan-work/tests -v`.
+`python3 -m unittest discover -s skills/harness/harness-plan-work/tests -v`.
 Result: **2/2 passing**.
 
 ## 2026-08-11 — `auto-route` missing-runtime forward test

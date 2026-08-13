@@ -10,13 +10,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 link_skills() {
   local target_dir="$1"
   mkdir -p "$target_dir"
-  for skill_dir in "$SCRIPT_DIR"/skills/*/; do
+  while IFS= read -r -d '' skill_file; do
+    skill_dir="$(dirname "$skill_file")"
     skill_name="$(basename "$skill_dir")"
-    if [ -f "$skill_dir/SKILL.md" ]; then
-      ln -sfn "$skill_dir" "$target_dir/$skill_name"
-      echo "  linked: $skill_name -> $target_dir/$skill_name"
-    fi
-  done
+    ln -sfn "$skill_dir" "$target_dir/$skill_name"
+    echo "  linked: $skill_name -> $target_dir/$skill_name"
+  done < <(find "$SCRIPT_DIR/skills" -type f -name SKILL.md -print0)
 }
 
 echo "Installing skills..."

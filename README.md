@@ -18,10 +18,22 @@ Also install the Matt Pocock skills plugin (see below) — the engineering skill
 ## Layout
 
 ```
-skills/        ← agent skills (one directory per skill, each with a SKILL.md)
+skills/        ← agent skills, grouped into category folders (see below); each
+                 skill is its own directory with a SKILL.md, install.sh links
+                 it by that directory's basename regardless of nesting depth
 prompts/       ← reusable one-off prompts (plain markdown, no frontmatter)
 teachings/     ← course material and learning records
 ```
+
+Category folders under `skills/`:
+
+| Folder | What it groups |
+|---|---|
+| `harness/` | The harness engineering system — assessing, bootstrapping, and maintaining a repo's agent-readiness. |
+| `issue-triage/` | Keeping GitHub issues/PRDs triaged and the agent work queue stocked. |
+| `review/` | PR review, stacking, and rescoping workflows. |
+| `prompting/` | Sharpening prompts and standing up recurring routines. |
+| `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
 
 ## SKILL.md standard
 
@@ -61,28 +73,61 @@ Run `./install.sh` again after adding a new skill to link it.
 
 ## Skills
 
+### harness/
+
 | Skill                              | Description                                                                                      |
 |------------------------------------|--------------------------------------------------------------------------------------------------|
-| [sharpen](skills/sharpen/SKILL.md) | Rewrite a rough prompt into a sharper one and recommend how to run it (model, effort, workflow). |
-| [writing-great-recurring](skills/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
-| [discovery-sweep](skills/discovery-sweep/SKILL.md) | Keep an agent work queue stocked — backpressure gate, lane sweep, agent-vs-human split, armed filing to a budget, ledger for memory. |
-| [unblock-pr](skills/unblock-pr/SKILL.md) | Address every unresolved review thread on a PR and get its CI green. |
-| [triaging-sandcastle-issues](skills/triaging-sandcastle-issues/SKILL.md) | Label unified-request GitHub issues ready-for-agent vs ready-for-human for the Sandcastle agent loop. |
-| [salvage-sandcastle-run](skills/salvage-sandcastle-run/SKILL.md) | Close out a finished, killed, or stalled Sandcastle run — recover uncommitted work, reconcile rubber-stamped closures, get the branch green. |
-| [has-pr-labelling](skills/has-pr-labelling/SKILL.md) | Label the issues an open PR already delivers, so a triage table separates picked-up work from untouched work. |
-| [closing-completed-prds](skills/closing-completed-prds/SKILL.md) | Close the PRDs and SPECs whose implementation has actually landed, and label the ones still in flight. |
-| [harness](skills/harness/SKILL.md) | Route repository harness assessment, setup, operation, and maintenance work. |
-| [harness-assess](skills/harness-assess/SKILL.md) | Produce a read-only, evidence-backed baseline of repository agent readiness. |
-| [harness-bootstrap](skills/harness-bootstrap/SKILL.md) | Preview, validate, and narrowly group a minimum viable harness change set. |
-| [harness-deepen](skills/harness-deepen/SKILL.md) | Improve one harness capability plane for a real tracer workflow. |
-| [harness-encode-invariant](skills/harness-encode-invariant/SKILL.md) | Turn a repeated correction into a mechanical repository check. |
-| [harness-expose-runtime](skills/harness-expose-runtime/SKILL.md) | Make one runtime surface inspectable and verifiable by agents. |
-| [harness-plan-work](skills/harness-plan-work/SKILL.md) | Create a repository-grounded execution plan with evidence gates. |
-| [harness-deliver-work](skills/harness-deliver-work/SKILL.md) | Deliver a change through specialist implementation, verification, and review skills. |
-| [harness-review-evidence](skills/harness-review-evidence/SKILL.md) | Review a change against its spec, standards, and evidence bundle. |
-| [harness-capture-learning](skills/harness-capture-learning/SKILL.md) | Route repeated agent friction into the narrowest durable improvement. |
-| [harness-garden](skills/harness-garden/SKILL.md) | Find stale, conflicting, broken, or orphaned harness artifacts. |
-| [harness-quality-report](skills/harness-quality-report/SKILL.md) | Report harness capability levels, trends, regressions, and readiness. |
+| [harness](skills/harness/harness/SKILL.md) | Route repository harness assessment, setup, operation, and maintenance work. |
+| [harness-assess](skills/harness/harness-assess/SKILL.md) | Produce a read-only, evidence-backed baseline of repository agent readiness. |
+| [harness-bootstrap](skills/harness/harness-bootstrap/SKILL.md) | Preview, validate, and narrowly group a minimum viable harness change set. |
+| [harness-deepen](skills/harness/harness-deepen/SKILL.md) | Improve one harness capability plane for a real tracer workflow. |
+| [harness-encode-invariant](skills/harness/harness-encode-invariant/SKILL.md) | Turn a repeated correction into a mechanical repository check. |
+| [harness-expose-runtime](skills/harness/harness-expose-runtime/SKILL.md) | Make one runtime surface inspectable and verifiable by agents. |
+| [harness-plan-work](skills/harness/harness-plan-work/SKILL.md) | Create a repository-grounded execution plan with evidence gates. |
+| [harness-deliver-work](skills/harness/harness-deliver-work/SKILL.md) | Deliver a change through specialist implementation, verification, and review skills. |
+| [harness-review-evidence](skills/harness/harness-review-evidence/SKILL.md) | Review a change against its spec, standards, and evidence bundle. |
+| [harness-capture-learning](skills/harness/harness-capture-learning/SKILL.md) | Route repeated agent friction into the narrowest durable improvement. |
+| [harness-garden](skills/harness/harness-garden/SKILL.md) | Find stale, conflicting, broken, or orphaned harness artifacts. |
+| [harness-quality-report](skills/harness/harness-quality-report/SKILL.md) | Report harness capability levels, trends, regressions, and readiness. |
+
+### issue-triage/
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [discovery-sweep](skills/issue-triage/discovery-sweep/SKILL.md) | Keep an agent work queue stocked — backpressure gate, lane sweep, agent-vs-human split, armed filing to a budget, ledger for memory. |
+| [triaging-sandcastle-issues](skills/issue-triage/triaging-sandcastle-issues/SKILL.md) | Label unified-request GitHub issues ready-for-agent vs ready-for-human for the Sandcastle agent loop. |
+| [salvage-sandcastle-run](skills/issue-triage/salvage-sandcastle-run/SKILL.md) | Close out a finished, killed, or stalled Sandcastle run — recover uncommitted work, reconcile rubber-stamped closures, get the branch green. |
+| [has-pr-labelling](skills/issue-triage/has-pr-labelling/SKILL.md) | Label the issues an open PR already delivers, so a triage table separates picked-up work from untouched work. |
+| [closing-completed-prds](skills/issue-triage/closing-completed-prds/SKILL.md) | Close the PRDs and SPECs whose implementation has actually landed, and label the ones still in flight. |
+
+### review/
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [unblock-pr](skills/review/unblock-pr/SKILL.md) | Address every unresolved review thread on a PR and get its CI green. |
+| [rescoping-prs](skills/review/rescoping-prs/SKILL.md) | Cut a PR that has grown past its issue back to the commits that deliver it, and give the rest their own PRs. |
+| [stacking-open-prs](skills/review/stacking-open-prs/SKILL.md) | Chain a repo's open PRs into GitHub stacks wherever one genuinely depends on another. |
+
+### prompting/
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [sharpen](skills/prompting/sharpen/SKILL.md) | Rewrite a rough prompt into a sharper one and recommend how to run it (model, effort, workflow). |
+| [writing-great-recurring](skills/prompting/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
+
+### lateral-thinking/
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [lateral](skills/lateral-thinking/lateral/SKILL.md) | Toolkit router — diagnoses why you're stuck and picks the right technique below. |
+| [analogy](skills/lateral-thinking/analogy/SKILL.md) | Forced Analogy — map the problem onto a structurally similar system from a distant domain and transfer its mechanisms back. |
+| [concept-fan](skills/lateral-thinking/concept-fan/SKILL.md) | Concept Fan — climb to the concept the current solution serves, then fan out alternative concepts and implementations. |
+| [inversion](skills/lateral-thinking/inversion/SKILL.md) | Assumption Inversion — flip each unquestioned assumption behind the current approach and see where the flip could be true. |
+| [provocation](skills/lateral-thinking/provocation/SKILL.md) | Provocation (Po) — state something deliberately absurd about the problem and extract useful movement from it. |
+| [random-stimulus](skills/lateral-thinking/random-stimulus/SKILL.md) | Random Stimulus — force-fit an unrelated object or phenomenon onto the problem to break familiar associations. |
+| [scamper](skills/lateral-thinking/scamper/SKILL.md) | SCAMPER — run one existing idea through seven systematic transformations for disciplined variations. |
+| [six-hats](skills/lateral-thinking/six-hats/SKILL.md) | Six Thinking Hats — examine one decision through sequential, non-blended perspectives (facts, feelings, risks, benefits, alternatives, synthesis). |
+| [worst-idea](skills/lateral-thinking/worst-idea/SKILL.md) | Worst Possible Idea — design deliberately terrible solutions, then invert what makes them bad into strong features. |
 
 ## Matt Pocock skills
 

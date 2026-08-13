@@ -8,7 +8,7 @@ PyYAML is absent from the available Python runtimes. Repository trials in `EVALS
 remain open, so the skill's evidence behavior has not yet earned a completion claim.
 
 Reproduce the contract check with
-`python3 -m unittest discover -s skills/harness-review-evidence/tests -v`.
+`python3 -m unittest discover -s skills/harness/harness-review-evidence/tests -v`.
 Result: **2/2 passing**.
 
 ## 2026-08-11 — Milestone 3 self-hosting review

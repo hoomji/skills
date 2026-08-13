@@ -8,7 +8,7 @@ because PyYAML is absent from the available Python runtimes. Repository trials i
 `EVALS.md` remain open, including the important not-encoded case.
 
 Reproduce the contract check with
-`python3 -m unittest discover -s skills/harness-capture-learning/tests -v`.
+`python3 -m unittest discover -s skills/harness/harness-capture-learning/tests -v`.
 Result: **2/2 passing**.
 
 ## 2026-08-11 — one-off preference forward test
