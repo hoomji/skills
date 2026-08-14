@@ -7,7 +7,7 @@ description: Preview and install a minimum viable harness for a software reposit
 
 Prepare a previewed, reviewable change set. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md) before editing.
-Use templates in `assets/` as prompts for adaptation, never as blind replacements.
+Use templates in `assets/` as prompts for adaptation, never as blind replacements. The sole exception is `assets/PLAN.md.template`: copy it byte-for-byte to the target repository root as `PLAN.md`, because it is the canonical ExecPlan instruction file.
 
 ## 1. Gate the bootstrap
 
@@ -28,6 +28,8 @@ Prefer these artifacts, adapting paths to established conventions:
 - `CLAUDE.md`: a small pointer to `AGENTS.md`, plus Claude-only material only when real;
 - `docs/harness/manifest.yaml`: evidenced capability facts;
 - `docs/harness/learning-ledger.md`: empty durable learning contract;
+- `PLAN.md`: the canonical ExecPlan instructions, copied byte-for-byte from
+  `assets/PLAN.md.template`;
 - one existing or new architecture/domain entrypoint;
 - one indexed design-documentation entrypoint, using `docs/design-docs/index.md` by
   default and preserving ADRs as a separate decision log;
@@ -58,7 +60,7 @@ source; `AGENTS.md` remains a map rather than an encyclopedia.
 
 ## 3. Prepare the approved changes
 
-Edit only the previewed files. Reconcile existing `CLAUDE.md` content into generic
+Edit only the previewed files. When `PLAN.md` is absent, copy `assets/PLAN.md.template` to it byte-for-byte. When it already exists, compare it with that template and pause for review rather than overwriting divergent user guidance. Reconcile existing `CLAUDE.md` content into generic
 guidance or a focused linked document before reducing it to a pointer. Keep agent-neutral
 rules in `AGENTS.md`. Never replace an existing architecture or guidance file with a
 template. Copy the validator into a repository-owned path and keep it dependency-free.

@@ -6,7 +6,7 @@ harness-specific inputs and evidence around it instead of rewriting its procedur
 | Need | Preferred capability | Claude Code plugin name |
 |---|---|---|
 | Stress-test a fuzzy goal | `grilling` or `grill-with-docs` | `mattpocock-skills:grilling` or `mattpocock-skills:grill-with-docs` |
-| Establish domain language | `domain-modeling` | `mattpocock-skills:domain-modeling` |
+| Establish domain language and surface consequential trade-offs | `domain-modeling` | `mattpocock-skills:domain-modeling` |
 | Turn discussion into a spec | `to-spec` | `mattpocock-skills:to-spec` |
 | Split work into tracer tickets | `to-tickets` | `mattpocock-skills:to-tickets` |
 | Explore a large unknown area | `wayfinder` | `mattpocock-skills:wayfinder` |
@@ -23,3 +23,11 @@ fallback in the evidence bundle.
 
 The harness skill retains responsibility for repository grounding, prerequisite gates,
 risk boundaries, artifact placement, and evidence reporting.
+
+When `domain-modeling` resolves canonical language, pass the term and its evidenced
+context to `harness-model-domain`. When it surfaces a qualifying architectural decision,
+pass the resolved trade-off to `harness-record-decision`. The specialist owns vocabulary
+challenge, concrete scenarios, code contradictions, and the three-condition ADR threshold;
+the harness skills own repository placement, scope, lifecycle state, authority, links,
+validation, and evidence. `grill-with-docs` may discover terms and decisions, but it does
+not bypass either harness artifact lifecycle.

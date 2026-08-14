@@ -1,6 +1,6 @@
 ---
 name: harness
-description: Route harness-engineering work for repositories. Use when the user wants to assess agent readiness, bootstrap agent guidance, improve repository legibility or enforcement, run an evidence-backed engineering lifecycle, capture repeated corrections, or maintain harness quality.
+description: Route harness-engineering work for repositories. Use when the user wants to assess agent readiness, bootstrap agent guidance, manage domain language or architecture decisions, improve repository legibility or enforcement, run an evidence-backed engineering lifecycle, capture repeated corrections, or maintain harness quality.
 ---
 
 # Harness
@@ -20,8 +20,9 @@ workflow can wrap an installed Matt Pocock engineering skill.
 | Turn a repeated rule into a mechanical check | `harness-encode-invariant` |
 | Make UI, logs, metrics, traces, or runtime state inspectable | `harness-expose-runtime` |
 | Turn a goal into an execution plan | `harness-plan-work` |
-| Create, revise, inspect, or retire product intent | `harness-product-spec` |
-| Create, revise, verify, or retire indexed design documentation | `harness-design-doc` |
+| Create, revise, inspect, or retire product intent | `harness-product-spec` |`n| Create, revise, verify, or retire indexed design documentation | `harness-design-doc` |
+| Create, inspect, revise, or reconcile canonical domain language | `harness-model-domain` |
+| Record, inspect, accept, deprecate, or supersede an architectural decision | `harness-record-decision` |
 | Create, resume, update, or complete a repository ExecPlan | `harness-exec-plan` |
 | Capture, update, inspect, or retire an external reference | `harness-reference` |
 | Implement and verify a repository change | `harness-deliver-work` |

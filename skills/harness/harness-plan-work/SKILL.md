@@ -18,6 +18,12 @@ dirty state, and maximum authorized risk class so the plan cannot silently expan
 Completion criterion: goal, non-goals, current behavior, constraints, and source-of-truth
 paths are explicit; unresolved decisions are visible.
 
+When planning resolves a canonical project-specific term, route it through
+`harness-model-domain` and use it consistently in the plan. When planning resolves a
+choice that is hard to reverse, surprising without context, and the result of a real
+trade-off, route it through `harness-record-decision`. Keep reversible or task-local
+choices in the ExecPlan decision log.
+
 ## 2. Wrap the planning method
 
 Use an installed Matt Pocock capability where it fits:
@@ -42,11 +48,12 @@ creating a plan-shaped document.
 
 ## 3. Build the execution contract
 
-Use [`assets/execution-plan.md.template`](assets/execution-plan.md.template). Adapt its
-headings to repository convention while preserving its contract: ordered milestones,
-observable completion criteria, dependency edges, touchpoints, verification commands,
-runtime evidence, rollback, and escalation points. Include progress and decision logs for
-multi-hour work. Make the first milestone a thin end-to-end tracer where possible.
+Use the shared [`../harness-exec-plan/assets/exec-plan.md.template`](../harness-exec-plan/assets/exec-plan.md.template).
+Adapt its headings to repository convention while preserving its contract: a
+self-contained purpose, progress checklist, discoveries, decision history, retrospective,
+ordered milestones, observable completion criteria, dependency edges, touchpoints,
+verification commands, runtime evidence, rollback, and escalation points. Make the first
+milestone a thin end-to-end tracer where possible.
 
 Planning is R0 unless the user authorized writing a plan file (R1). A plan may describe
 later R2–R4 work, but it must place an explicit human gate before that action.
