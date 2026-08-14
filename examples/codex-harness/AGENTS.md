@@ -8,6 +8,7 @@
 - Design documentation: [`docs/design-docs/index.md`](docs/design-docs/index.md)
 - Decisions: [`docs/adr/index.md`](docs/adr/index.md)
 - Active work: [`docs/exec-plans/active/status-summary.md`](docs/exec-plans/active/status-summary.md)
+- ExecPlan contract: [`PLANS.md`](PLANS.md)
 - Development and operations: [`docs/operations/development.md`](docs/operations/development.md)
 - Harness capability state: [`docs/harness/manifest.yaml`](docs/harness/manifest.yaml)
 - Representative workflow: [`docs/harness/tracer-workflow.md`](docs/harness/tracer-workflow.md)
@@ -26,7 +27,7 @@
 
 ## Working agreement
 
-Read the originating product spec before editing behavior and the relevant indexed design doc before changing system structure. Use the canonical terms in `CONTEXT.md`. Keep dependency direction consistent with `ARCHITECTURE.md`. Record discrete architectural choices in ADRs; do not use design docs as a replacement decision log. For multi-step work, update the active ExecPlan as decisions and evidence change.
+Read the originating product spec before editing behavior and the relevant indexed design doc before changing system structure. Use the canonical terms in `CONTEXT.md`. Keep dependency direction consistent with `ARCHITECTURE.md`. Record discrete architectural choices in ADRs; do not use design docs as a replacement decision log. For multi-step work, create or update an ExecPlan according to `PLANS.md` as decisions and evidence change.
 
 Work within the requested risk boundary. Make the smallest in-scope change, run the focused check, run full verification when supported, and record evidence for every acceptance criterion. Report skipped checks, ambiguous evidence, residual risk, and any action requiring human approval.
 

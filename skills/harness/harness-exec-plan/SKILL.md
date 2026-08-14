@@ -6,7 +6,8 @@ description: Create, resume, maintain, complete, or inspect repository-local Exe
 # Harness ExecPlan
 
 Manage the living execution-plan lifecycle. Read the repository guidance and the ExecPlan
-index and template in full before acting. If the repository maps plans elsewhere, use that
+index and template in full before acting. If the repository has `PLANS.md`, read it in full
+and treat it as the plan-writing contract. If the repository maps plans elsewhere, use that
 contract instead of assuming `docs/exec-plans/`.
 
 ## 1. Resolve the lifecycle state
@@ -22,8 +23,9 @@ boundary, and maximum authorized risk class are explicit.
 
 For a new plan, start from the repository template. For an existing plan, preserve its
 decision history while correcting stale assumptions. Keep purpose, context, milestones,
-exact commands, acceptance, recovery, interfaces, progress, discoveries, decisions, and
-retrospective self-contained. Define repository terms at first use and name precise paths.
+exact commands and expected success signals, acceptance, recovery, interfaces, progress,
+discoveries, decisions, and retrospective self-contained. Define repository terms at first
+use and name precise paths. Do not require chat history or unstated human knowledge.
 
 Use the first milestone as a thin end-to-end tracer where possible. Give every milestone a
 binary completion criterion, narrow verification, rollback path, and escalation boundary.
