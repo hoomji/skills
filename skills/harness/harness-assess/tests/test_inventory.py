@@ -30,7 +30,11 @@ class InventoryTests(unittest.TestCase):
             )
             self.git(root, "switch", "-c", "feature")
             (root / "AGENTS.md").write_text("# Agent map\n", encoding="utf-8")
-            self.git(root, "add", "AGENTS.md")
+            (root / "docs" / "design-docs").mkdir(parents=True)
+            (root / "docs" / "design-docs" / "index.md").write_text(
+                "# Design documentation\n", encoding="utf-8"
+            )
+            self.git(root, "add", "AGENTS.md", "docs/design-docs/index.md")
             self.git(root, "commit", "-m", "branch harness")
 
             result = subprocess.run(
@@ -48,6 +52,10 @@ class InventoryTests(unittest.TestCase):
                 {"ahead": 1, "behind": 0, "relation": "ahead"},
             )
             self.assertEqual(payload["git"]["worktree_count"], 1)
+            self.assertIn(
+                "docs/design-docs/index.md",
+                payload["architecture_and_domain_docs"],
+            )
 
     def test_reports_context_map_as_domain_architecture(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

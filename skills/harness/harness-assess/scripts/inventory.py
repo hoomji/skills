@@ -166,7 +166,9 @@ def main() -> int:
     architecture = [
         rel
         for rel in rels
-        if Path(rel).name in ARCHITECTURE_NAMES or rel.startswith("docs/adr/")
+        if Path(rel).name in ARCHITECTURE_NAMES
+        or rel.startswith("docs/design-docs/")
+        or rel.startswith("docs/adr/")
     ]
     workflows = [rel for rel in rels if rel.startswith(".github/workflows/")]
     hooks = [

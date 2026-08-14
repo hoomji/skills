@@ -82,6 +82,7 @@ class KnowledgeStoreTemplateTests(unittest.TestCase):
             '  guidance: "AGENTS.md"\n'
             '  architecture: "ARCHITECTURE.md"\n'
             '  tracer: "docs/harness/tracer-workflow.md"\n'
+            '  design: "docs/design-docs/index.md"\n'
             f"knowledge_store:\n{stores}\n"
             "commands:\n"
             '  setup: "make setup"\n  start: "make start"\n  check: "make check"\n'

@@ -1,6 +1,6 @@
 ---
 name: harness-bootstrap
-description: Preview and install a minimum viable harness for a software repository. Use after a harness assessment when the user wants AGENTS.md, a thin CLAUDE.md pointer, deterministic command guidance, a YAML harness manifest, an architecture entrypoint, a tracer workflow, validation, or a learning ledger added without overwriting existing conventions.
+description: Preview and install a minimum viable harness for a software repository. Use after a harness assessment when the user wants AGENTS.md, a thin CLAUDE.md pointer, deterministic command guidance, a YAML harness manifest, architecture and indexed design-documentation entrypoints, a tracer workflow, validation, or a learning ledger added without overwriting existing conventions.
 ---
 
 # Harness Bootstrap
@@ -32,6 +32,8 @@ Prefer these artifacts, adapting paths to established conventions:
   `assets/PLAN.md.template`;
 - the knowledge store below, from `assets/knowledge-store/`;
 - one existing or new architecture/domain entrypoint;
+- one indexed design-documentation entrypoint, using `docs/design-docs/index.md` by
+  default and preserving ADRs as a separate decision log;
 - one tracer workflow with acceptance evidence;
 - a repository-local copy of `assets/harness-validate.py`, exposed through the repo's
   existing script or task-runner convention.
@@ -47,8 +49,8 @@ contract, so the lifecycle skills have somewhere to write on their first run:
 
 | Path | Owner skill | Bundled template |
 |---|---|---|
-| `docs/design-docs/index.md` | — | `design-docs-index.md.template` |
-| `docs/design-docs/core-beliefs.md` | — | `core-beliefs.md.template` |
+| `docs/design-docs/index.md` | `harness-design-doc` | `design-docs-index.md.template` |
+| `docs/design-docs/core-beliefs.md` | `harness-design-doc` | `core-beliefs.md.template` |
 | `docs/exec-plans/index.md` | `harness-exec-plan` | `exec-plans-index.md.template` |
 | `docs/exec-plans/active/`, `docs/exec-plans/completed/` | `harness-exec-plan` | tracked with `.gitkeep` |
 | `docs/exec-plans/tech-debt-tracker.md` | `harness-exec-plan` | `tech-debt-tracker.md.template` |
@@ -62,7 +64,9 @@ honest, and a fabricated specification, plan, or reference is not. Migrate exist
 material into a store only when the user approves the move, and prefer the repository's
 established path when one already exists — record that path in `knowledge_store` instead
 of installing a competing directory. Declare every installed index under
-`knowledge_store` in the manifest and advertise each one from `AGENTS.md`.
+`knowledge_store` in the manifest and advertise each one from `AGENTS.md`. The design-doc
+index is both `entrypoints.design` and `knowledge_store.design_docs`: point them at the
+same file rather than installing two indexes.
 
 Before mutation, show:
 

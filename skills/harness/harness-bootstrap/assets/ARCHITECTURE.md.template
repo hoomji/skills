@@ -18,3 +18,8 @@ Replace every prompt below with evidence from the repository before installation
 ## Decisions
 
 [Pointers to ADRs or the repository's established decision-record convention.]
+
+## Design documentation
+
+[Pointer to the indexed design-documentation surface. Design docs explain evolving
+system or feature designs; ADRs remain the decision history.]

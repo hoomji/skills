@@ -5,14 +5,14 @@ appears in the table below exactly once.
 
 Verification status vocabulary:
 
-- `unverified`: written, never checked against current code.
-- `verified`: checked against the named evidence on the recorded date.
-- `stale`: the named evidence no longer holds; treat the document as history.
-- `superseded`: replaced; the successor is linked in the document.
+- `Proposed`: written, never checked against current code.
+- `Verified`: checked against the named evidence on the recorded date.
+- `Stale`: the named evidence no longer holds; treat the document as history.
+- `Superseded`: replaced; the successor is linked in the document.
 
-| Document | Scope | Verification status | Evidence | Owner | Reviewed |
+| Document | Scope | State | Owner | Last verified | Evidence |
 |---|---|---|---|---|---|
-| [Core beliefs](core-beliefs.md) | Agent-first operating principles | unverified | — | [owner] | [YYYY-MM-DD] |
+| [Core beliefs](core-beliefs.md) | Agent-first operating principles | Proposed | [owner] | Unverified | None |
 
 ## Entry contract
 

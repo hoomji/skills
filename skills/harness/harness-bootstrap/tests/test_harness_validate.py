@@ -33,8 +33,10 @@ class HarnessValidateTests(unittest.TestCase):
             (docs / directory).mkdir(parents=True, exist_ok=True)
         (docs / "design-docs" / "index.md").write_text(
             "# Design documents\n\nVerification status vocabulary.\n\n"
-            "| Document | Verification status |\n|---|---|\n"
-            "| [Core beliefs](core-beliefs.md) | unverified |\n",
+            "| Document | State | Owner | Last verified | Evidence |\n"
+            "|---|---|---|---|---|\n"
+            "| [Core beliefs](core-beliefs.md) | Proposed | platform-team | "
+            "Unverified | None |\n",
             encoding="utf-8",
         )
         (docs / "design-docs" / "core-beliefs.md").write_text(
@@ -57,12 +59,12 @@ class HarnessValidateTests(unittest.TestCase):
             encoding="utf-8",
         )
         (docs / "product-specs" / "index.md").write_text(
-            "# Product specifications\n\nStatus vocabulary: draft, delivered.\n\n"
+            "# Product specifications\n\nState vocabulary: Draft, Delivered.\n\n"
             "Write specifications with [the template](template.md).\n",
             encoding="utf-8",
         )
         (docs / "product-specs" / "template.md").write_text(
-            "# [Specification title]\n\n- Status: `draft`\n", encoding="utf-8"
+            "# [Specification title]\n\n- State: `Draft`\n", encoding="utf-8"
         )
         (docs / "references" / "index.md").write_text(
             "# External references\n\n| Reference | Source | Review date |\n|---|---|---|\n",
@@ -96,6 +98,7 @@ class HarnessValidateTests(unittest.TestCase):
 
 - Architecture: [architecture](docs/architecture.md)
 - Tracer: [workflow](docs/harness/tracer-workflow.md)
+- Designs: [design docs](docs/design-docs/index.md)
 
 ## Knowledge store
 
@@ -120,6 +123,14 @@ class HarnessValidateTests(unittest.TestCase):
         )
         (self.root / "docs" / "architecture.md").write_text(
             "# Architecture\n", encoding="utf-8"
+        )
+        (self.root / "docs" / "design-docs").mkdir()
+        (self.root / "docs" / "design-docs" / "index.md").write_text(
+            "# Design documentation\n\n"
+            "| Design | State | Owner | Last verified | Evidence |\n"
+            "| --- | --- | --- | --- | --- |\n"
+            "| None yet | Proposed | platform-team | Unverified | None |\n",
+            encoding="utf-8",
         )
         (self.root / "docs" / "harness" / "tracer-workflow.md").write_text(
             "# Tracer workflow\n\n## Acceptance criteria\n\n- Change works.\n\n"
@@ -171,6 +182,7 @@ entrypoints:
   guidance: \"AGENTS.md\"
   architecture: \"{architecture}\"
   tracer: \"docs/harness/tracer-workflow.md\"
+  design: \"docs/design-docs/index.md\"
 {knowledge_store}commands:
   setup: \"make setup\"
   start: \"{start}\"
@@ -515,6 +527,27 @@ freshness:
         self.assertEqual(result.returncode, 1)
         self.assertIn("store.missing-directory", result.stdout)
         self.assertIn("store.missing-file", result.stdout)
+
+    def test_design_index_requires_lifecycle_and_verification_metadata(self) -> None:
+        (self.root / "docs" / "design-docs" / "index.md").write_text(
+            "# Design documentation\n", encoding="utf-8"
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("design-index.contract", result.stdout)
+        self.assertIn("last verified", result.stdout)
+
+    def test_design_entrypoint_is_required_separately_from_architecture(self) -> None:
+        manifest = self.root / "docs" / "harness" / "manifest.yaml"
+        manifest.write_text(
+            manifest.read_text(encoding="utf-8").replace(
+                '  design: "docs/design-docs/index.md"\n', ""
+            ),
+            encoding="utf-8",
+        )
+        self.assertIn("entrypoints.design", self.run_validator().stdout)
 
 
 if __name__ == "__main__":
