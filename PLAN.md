@@ -56,6 +56,16 @@ Milestones are narrative, not bureaucracy. If you break the work into milestones
 
 Each milestone must be independently verifiable and incrementally implement the overall goal of the execution plan.
 
+## Slices
+
+A slice is one implementation unit sized to a single fresh agent context: the amount an agent can read, change, and verify in one session without running out of room. Cut a milestone into slices only when it exceeds that budget. A milestone whose narrative, the files it names, and its verification output all fit one context needs no slices at all, and adding them is bureaucracy of exactly the kind this document rejects.
+
+Self-containment for a slice is scoped to the slice, not inherited from the plan. The agent executing a slice reads that slice file and the working tree, and nothing else — not this plan, not the sibling slices, not any earlier conversation. Restate the orientation, the repository-relative paths, the terms of art, the baseline revision, and the paths that must not be touched, even where restating repeats the plan word for word. If a slice can only be understood by first reading the plan, it is not yet a slice; finish writing it.
+
+Every slice names exactly one parent milestone, its position in that milestone's order, the slices it depends on, a binary completion criterion, the exact command to run with its working directory and expected output, a rollback path, the highest risk it is permitted to take, and the adjacent work it must not do. That last item matters more than it looks: a defect discovered outside the stated scope is recorded and escalated, not fixed in passing, because a slice that quietly grows stops being one context of work. A milestone is complete when every slice beneath it is done and the milestone's own verification passes; slice criteria never substitute for milestone acceptance.
+
+Keep slices where the repository already maps them, or under `docs/exec-plans/<plan-slug>/slices/M<k>-S<n>-<slug>.md` when it maps them nowhere. Each milestone carries an index of its slices with their titles, paths, and status, so this plan remains the single place that shows what is left. Each slice carries a record of what the executing agent actually ran, discovered, and decided, and that record is folded back into `Progress`, `Surprises & Discoveries`, and `Decision Log` at every stopping point. Slice files follow the same envelope as this plan: no outer code fence, no nested fences, indented blocks for commands and transcripts.
+
 ## Living plans and design decisions
 
 - ExecPlans are living documents. As you make key design decisions, update the plan to record both the decision and the thinking behind it. Record all decisions in the `Decision Log` section.

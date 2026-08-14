@@ -155,6 +155,26 @@ risk: "R1"
 Every factual claim links to a path, command result, or explicit `unknown`. Separate
 absence from undiscovered evidence.
 
+## Implementation slice
+
+A slice is the executable unit below an ExecPlan milestone, sized to one fresh agent
+context. Cut slices only when a milestone exceeds that budget; a milestone that fits one
+context needs none.
+
+Self-containment is scoped to the slice. The executing agent reads the slice file and the
+working tree only — never the parent plan, sibling slices, or chat history — so a slice
+restates the orientation, paths, terms, baseline, and dirty-state boundary it needs. Every
+slice names one parent milestone, its position and dependencies, a binary completion
+criterion, an exact verification command with expected output, a rollback path, a risk
+class, and an explicit out-of-scope list. A milestone completes when its slices are done
+and its own verification passes.
+
+Slices live where the repository maps them, otherwise
+`docs/exec-plans/<plan-slug>/slices/M<k>-S<n>-<slug>.md`. The parent milestone carries the
+slice index; the slice carries an Execution Record that is folded back into the plan's
+progress, discoveries, and decision log at each stopping point. `harness-exec-plan` owns
+slice lifecycle; `harness-deliver-work` accepts a slice as an executable contract.
+
 ## Evidence bundle
 
 Every completed mutating workflow reports:

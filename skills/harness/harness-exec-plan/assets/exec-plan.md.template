@@ -62,6 +62,8 @@ Rollback and recovery: <How to safely retry, revert, or leave the system clean i
 
 Escalate when: <A human decision, missing evidence, source-of-truth conflict, destructive operation, or action beyond the authorized risk class is required.>
 
+Slices: state `None — this milestone fits one agent context` when no split is needed. Otherwise list every slice in execution order as `<id> — <title> — <repository-relative path> — <ready | in progress | blocked | done>`. This index is the single place that shows remaining work within the milestone; each slice file restates its own orientation and is executed without reading this plan.
+
 ### M2 — <Next independently verifiable result>
 
 Repeat the M1 narrative pattern. Each milestone must produce a result that can be proven before later milestones begin. Clearly label any feasibility experiment as `Prototyping`, explain how to observe it, and state the criteria for promoting or discarding it.

@@ -14,6 +14,13 @@ Resolve the originating goal/spec, acceptance criteria, repository guidance, dir
 verification commands, risk ceiling, and required runtime evidence. Use `harness-plan-work`
 first when the change lacks an executable contract.
 
+When the contract is an ExecPlan slice, that file is the whole brief: execute it from the
+slice and the working tree without reading the parent plan or sibling slices. Treat a slice
+that cannot be executed on those terms as an authoring defect and return it to
+`harness-exec-plan` rather than reconstructing the missing context from elsewhere. Respect
+its out-of-scope list — record adjacent defects in the Execution Record and escalate them
+instead of fixing them here.
+
 Completion criterion: scope and done conditions are checkable; user-owned changes and
 unauthorized actions are protected.
 

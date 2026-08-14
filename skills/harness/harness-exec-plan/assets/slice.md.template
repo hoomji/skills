@@ -1,0 +1,66 @@
+# S<n> — <Short, action-oriented description>
+
+This slice is one implementation unit. A fresh agent executes it using this file and the working tree alone, without reading the parent ExecPlan, the other slices, or any chat history. Everything required to succeed is restated below, even where that repeats the plan.
+
+## Slice Header
+
+- Plan: `<repository-relative path to the parent ExecPlan>`
+- Milestone: `M<k> — <milestone title>`
+- Position: slice `<n>` of `<total>` in this milestone; depends on `<earlier slice ids or none>`
+- Baseline: `<commit or branch the slice assumes>`
+- Dirty-state boundary: `<paths the executing agent must not touch>`
+- Risk ceiling: `R<0-4>`
+- Status: `ready` | `in progress` | `blocked` | `done`
+
+## Outcome
+
+State in plain language the observable change this slice produces and how a person sees it. If the slice produces no user-visible change on its own, name the test, log line, query result, or other reproducible signal that proves it landed.
+
+## Orientation
+
+Describe the starting state for a reader with only this file and the working tree. Name every repository-relative path, module, function, command, type, and source of truth this slice touches or depends on. Define every non-ordinary term where it first appears. Embed the reasoning and external knowledge the slice needs in plain language; do not refer the reader to the parent plan, an ADR, a blog, or an earlier discussion for anything required to execute.
+
+Use the repository's canonical domain language. If the correct term is unclear or contradicts the code, stop and escalate rather than inventing a competing name.
+
+## Change
+
+Describe the ordered work in prose. For each file to create or edit, name the repository-relative path, the containing module or function, the intended change, and why it is needed. Keep the change additive and independently verifiable where possible.
+
+## Out of Scope
+
+Name the adjacent work this slice must not do, including the later slices that own it. A defect discovered here that is outside this list is recorded in the Execution Record and escalated, not fixed opportunistically.
+
+## Completion Criterion
+
+<Binary, reproducible outcome. A reader must be able to decide met or not met without judgment.>
+
+## Verification
+
+From `<working directory>`, run:
+
+    <exact command>
+
+Expect:
+
+    <short expected result that distinguishes success from failure>
+
+If runtime proof is unavailable, state why and name the prerequisite required to obtain it.
+
+## Rollback and Recovery
+
+State how to safely retry, revert, or leave the workspace clean if this slice fails halfway. Name the backup or safe fallback before any destructive operation. State which steps can be repeated without drift.
+
+## Escalate When
+
+<A human decision, missing evidence, source-of-truth conflict, accepted-ADR contradiction, destructive operation, or action beyond the stated risk ceiling is required.>
+
+## Execution Record
+
+Appended by the executing agent; the source of truth for what actually happened.
+
+- <YYYY-MM-DD HH:MMZ> Commands run and their real outcomes, marked executed, skipped, or failed.
+- <YYYY-MM-DD HH:MMZ> Discoveries that change the approach, with short evidence.
+- <YYYY-MM-DD HH:MMZ> Decisions made inside this slice and their rationale.
+- <YYYY-MM-DD HH:MMZ> Residual risks, skipped checks, and out-of-scope defects observed.
+
+Fold this record into the parent plan's `Progress`, `Surprises & Discoveries`, and `Decision Log` at the stopping point, then set the status in the Slice Header and in the plan's slice index.
