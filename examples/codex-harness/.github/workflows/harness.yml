@@ -1,0 +1,27 @@
+name: harness
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/codex-harness
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/setup.py
+      - run: python scripts/check.py
+      - run: python scripts/test.py
+      - run: python scripts/harness-validate.py .
+      - run: python scripts/garden.py
+      - run: python scripts/quality_report.py

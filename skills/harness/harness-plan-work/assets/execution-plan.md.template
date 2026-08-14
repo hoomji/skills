@@ -23,6 +23,10 @@
 
 - <Observed behavior or capability, with evidence>
 
+
+## Context and orientation
+
+<Explain the relevant repository areas and define non-obvious terms as if the reader has no prior task or chat context.>
 ## Acceptance evidence
 
 | Acceptance criterion | Planned evidence | Runtime evidence | Status |
@@ -57,3 +61,16 @@
 
 | Date | Decision | Evidence and consequence |
 |---|---|---|
+
+## Surprises and discoveries
+
+| Date | Observation | Evidence and impact |
+|---|---|---|
+
+## Outcomes and retrospective
+
+<At a major milestone or completion, compare the delivered observable behavior and evidence with the goal. Record residual risks, skipped checks, and reusable lessons.>
+
+## Artifacts and notes
+
+<Keep concise command transcripts, links to evidence, or small file-scoped excerpts that let the next contributor verify the current state.>

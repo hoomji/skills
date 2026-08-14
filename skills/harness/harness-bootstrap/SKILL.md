@@ -1,6 +1,6 @@
 ---
 name: harness-bootstrap
-description: Preview and install a minimum viable harness for a software repository. Use after a harness assessment when the user wants AGENTS.md, a thin CLAUDE.md pointer, deterministic command guidance, a YAML harness manifest, an architecture entrypoint, a tracer workflow, validation, or a learning ledger added without overwriting existing conventions.
+description: Preview and install a minimum viable harness for a software repository. Use after a harness assessment when the user wants AGENTS.md, a thin CLAUDE.md pointer, deterministic command guidance, a YAML harness manifest, architecture and indexed design-documentation entrypoints, a tracer workflow, validation, or a learning ledger added without overwriting existing conventions.
 ---
 
 # Harness Bootstrap
@@ -29,6 +29,8 @@ Prefer these artifacts, adapting paths to established conventions:
 - `docs/harness/manifest.yaml`: evidenced capability facts;
 - `docs/harness/learning-ledger.md`: empty durable learning contract;
 - one existing or new architecture/domain entrypoint;
+- one indexed design-documentation entrypoint, using `docs/design-docs/index.md` by
+  default and preserving ADRs as a separate decision log;
 - one tracer workflow with acceptance evidence;
 - a repository-local copy of `assets/harness-validate.py`, exposed through the repo's
   existing script or task-runner convention.

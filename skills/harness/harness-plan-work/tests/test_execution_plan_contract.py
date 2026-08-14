@@ -29,7 +29,10 @@ class ExecutionPlanContractTests(unittest.TestCase):
             "**Rollback:**",
             "**Escalate when:**",
             "## Progress log",
+            "## Surprises and discoveries",
             "## Decision log",
+            "## Outcomes and retrospective",
+            "## Artifacts and notes",
         ):
             with self.subTest(required=required):
                 self.assertIn(required, text)

@@ -8,7 +8,7 @@ artifacts.
 | Plane | Evidence sought |
 |---|---|
 | Intent | Specs, acceptance criteria, plans, decisions |
-| Knowledge | Agent map, architecture, domain language, ADRs, operations docs |
+| Knowledge | Agent map, architecture, domain language, indexed design docs, ADRs, operations docs |
 | Execution | Deterministic setup, start, build, test, seed, and release commands |
 | Feedback | Tests, UI inspection, logs, metrics, traces, performance evidence |
 | Policy | Linters, schemas, structural tests, hooks, CI gates, remediation messages |
@@ -41,6 +41,7 @@ owners:
 entrypoints:
   guidance: "AGENTS.md"
   architecture: "ARCHITECTURE.md"
+  design: "docs/design-docs/index.md"
   tracer: "docs/harness/tracer-workflow.md"
 commands:
   setup: "exact command or unknown"
@@ -112,6 +113,8 @@ Route knowledge to the most enforceable useful layer:
 | One task | Prompt or acceptance criteria |
 | Durable navigation and commands | `AGENTS.md` |
 | Detailed stable knowledge | Focused versioned document |
+| System or feature design, rationale, and verification state | Indexed design document |
+| Discrete architectural decision and status history | ADR |
 | Repeatable method | Skill |
 | Deterministic operation | Script or task-runner command |
 | Checkable invariant | Test, lint, schema, hook, or CI |

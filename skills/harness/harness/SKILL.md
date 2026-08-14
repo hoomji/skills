@@ -21,6 +21,7 @@ workflow can wrap an installed Matt Pocock engineering skill.
 | Make UI, logs, metrics, traces, or runtime state inspectable | `harness-expose-runtime` |
 | Turn a goal into an execution plan | `harness-plan-work` |
 | Create, revise, inspect, or retire product intent | `harness-product-spec` |
+| Create, revise, verify, or retire indexed design documentation | `harness-design-doc` |
 | Create, resume, update, or complete a repository ExecPlan | `harness-exec-plan` |
 | Capture, update, inspect, or retire an external reference | `harness-reference` |
 | Implement and verify a repository change | `harness-deliver-work` |
