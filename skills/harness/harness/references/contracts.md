@@ -8,7 +8,7 @@ artifacts.
 | Plane | Evidence sought |
 |---|---|
 | Intent | Specs, acceptance criteria, plans, decisions |
-| Knowledge | Agent map, architecture, domain language, ADRs, operations docs |
+| Knowledge | Agent map, architecture, domain language, indexed design docs, ADRs, operations docs |
 | Execution | Deterministic setup, start, build, test, seed, and release commands |
 | Feedback | Tests, UI inspection, logs, metrics, traces, performance evidence |
 | Policy | Linters, schemas, structural tests, hooks, CI gates, remediation messages |
@@ -41,7 +41,14 @@ owners:
 entrypoints:
   guidance: "AGENTS.md"
   architecture: "ARCHITECTURE.md"
+  design: "docs/design-docs/index.md"
   tracer: "docs/harness/tracer-workflow.md"
+knowledge_store:
+  design_docs: "docs/design-docs/index.md"
+  exec_plans: "docs/exec-plans/index.md"
+  generated: "docs/generated/index.md"
+  product_specs: "docs/product-specs/index.md"
+  references: "docs/references/index.md"
 commands:
   setup: "exact command or unknown"
   start: "exact command or unknown"
@@ -64,6 +71,41 @@ policy names its enforcement, owner, and remediation path. During assessment, an
 command stays `unknown`; a completed minimum bootstrap must resolve setup, check, test,
 and validate to deterministic entrypoints. Start may remain `unknown` only when
 `capabilities.startable_runtime` is `missing` and cites repository evidence.
+
+## Knowledge store
+
+Durable repository knowledge lives in five stores, each with one index that owns its
+entry contract. `knowledge_store` in the manifest maps every store to its index, so a
+repository that already keeps this material elsewhere records its own paths instead of
+growing a competing directory. Follow the mapped path, never the default below, when the
+two disagree.
+
+| Store | Default index | Holds | Owner skill |
+|---|---|---|---|
+| `design_docs` | `docs/design-docs/index.md` | How and why parts of the system are shaped as they are, catalogued with a verification status and evidence date; `core-beliefs.md` holds the agent-first operating principles | `harness-design-doc` |
+| `exec_plans` | `docs/exec-plans/index.md` | Plans in `active/` or `completed/`, plus `tech-debt-tracker.md` | `harness-exec-plan` |
+| `generated` | `docs/generated/index.md` | Machine-produced documentation, never hand-edited | producing commands |
+| `product_specs` | `docs/product-specs/index.md` | Required user-facing behavior and acceptance criteria | `harness-product-spec` |
+| `references` | `docs/references/index.md` | Version-pinned external material with provenance | `harness-reference` |
+
+The design-doc index is named twice on purpose: `entrypoints.design` makes it a top-level
+entrypoint an agent reads early, and `knowledge_store.design_docs` subjects it to the
+store rules below. Both fields name the same file.
+
+Rules that hold across every store:
+
+- an artifact is authoritative only when its store index lists it; an unlisted file is
+  orphaned, and an indexed file that no longer exists is drift;
+- an artifact belongs to exactly one store and one lifecycle state;
+- every file under the generated store carries a `Do not edit` marker and a
+  `Producing command:` naming a real repository entrypoint in backticks;
+- every reference records `Source:` and `Retrieved:` before its summary;
+- `AGENTS.md` advertises each store index, so depth is reachable without preloading it.
+
+These separations are load-bearing: a product spec owns required behavior, a design
+document owns shape and rationale, an ADR owns a hard-to-reverse architectural decision,
+an ExecPlan owns execution sequence and task-local choices, and the debt tracker owns
+accepted shortcuts. Route a fact to the one that owns it rather than restating it.
 
 ## Domain context
 
@@ -139,6 +181,8 @@ Route knowledge to the most enforceable useful layer:
 | One task | Prompt or acceptance criteria |
 | Durable navigation and commands | `AGENTS.md` |
 | Detailed stable knowledge | Focused versioned document |
+| System or feature design, rationale, and verification state | Indexed design document |
+| Discrete architectural decision and status history | ADR |
 | Repeatable method | Skill |
 | Deterministic operation | Script or task-runner command |
 | Checkable invariant | Test, lint, schema, hook, or CI |

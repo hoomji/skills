@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Design Doc"
+  short_description: "Manage indexed, verified design documentation"
+  default_prompt: "Use $harness-design-doc to create or revise an indexed repository design document."

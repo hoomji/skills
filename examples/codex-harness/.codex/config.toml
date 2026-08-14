@@ -1,0 +1,7 @@
+# Example only. Keep repository policy in AGENTS.md and docs; use this file for
+# Codex-specific project configuration that is safe to share.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[project]
+name = "codex-harness-example"

@@ -1,0 +1,84 @@
+version: 1
+owners:
+  harness: "Example maintainers"
+entrypoints:
+  guidance: "AGENTS.md"
+  architecture: "ARCHITECTURE.md"
+  design: "docs/design-docs/index.md"
+  tracer: "docs/harness/tracer-workflow.md"
+knowledge_store:
+  design_docs: "docs/design-docs/index.md"
+  exec_plans: "docs/exec-plans/index.md"
+  generated: "docs/generated/index.md"
+  product_specs: "docs/product-specs/index.md"
+  references: "docs/references/index.md"
+commands:
+  setup: "python scripts/setup.py"
+  start: "python scripts/start.py"
+  check: "python scripts/check.py"
+  test: "python scripts/test.py"
+  validate: "python scripts/harness-validate.py ."
+capabilities:
+  product_intent:
+    status: "verified"
+    evidence:
+      - "docs/product-specs/status-summary.md"
+  repository_map:
+    status: "verified"
+    evidence:
+      - "AGENTS.md"
+  design_knowledge:
+    status: "verified"
+    evidence:
+      - "docs/design-docs/index.md"
+  architecture_boundary:
+    status: "verified"
+    evidence:
+      - "command: python scripts/check.py"
+  reproducible_setup:
+    status: "verified"
+    evidence:
+      - "command: python scripts/setup.py"
+  startable_runtime:
+    status: "verified"
+    evidence:
+      - "command: python scripts/start.py"
+  behavior_verification:
+    status: "verified"
+    evidence:
+      - "command: python scripts/test.py"
+  harness_validation:
+    status: "automated"
+    evidence:
+      - ".github/workflows/harness.yml"
+  task_isolation:
+    status: "documented"
+    evidence:
+      - "docs/operations/isolation.md"
+  runtime_observability:
+    status: "verified"
+    evidence:
+      - "tests/test_app.py"
+  evidence_review:
+    status: "documented"
+    evidence:
+      - "docs/harness/evidence-template.md"
+  harness_hygiene:
+    status: "executable"
+    evidence:
+      - "scripts/garden.py"
+  autonomy_governance:
+    status: "documented"
+    evidence:
+      - "docs/harness/governance.md"
+policies:
+  - id: "domain-dependency-direction"
+    enforcement: "python scripts/check.py"
+    owner: "Example maintainers"
+    remediation: "Remove imports from scripts or tests in src/status_summary.py; keep adapters outside the pure domain module."
+  - id: "harness-contract-consistency"
+    enforcement: "python scripts/harness-validate.py ."
+    owner: "Example maintainers"
+    remediation: "Follow the reported diagnostic and align guidance, manifest facts, paths, evidence, and ledger fields."
+freshness:
+  review_after_days: 90

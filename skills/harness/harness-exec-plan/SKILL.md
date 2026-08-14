@@ -7,8 +7,10 @@ description: Create, resume, maintain, complete, or inspect self-contained repos
 
 Manage the living execution-plan lifecycle. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md), repository
-guidance, and the repository's ExecPlan index in full before acting. If the repository maps
-plans elsewhere, use that contract instead of assuming `docs/exec-plans/`.
+guidance, and the repository's ExecPlan index in full before acting. Resolve the store from
+`knowledge_store.exec_plans` in the harness manifest; if the repository maps plans
+elsewhere, use that contract instead of assuming `docs/exec-plans/` with its `index.md`,
+`active/`, `completed/`, and `tech-debt-tracker.md`.
 
 ## 1. Resolve the lifecycle state
 

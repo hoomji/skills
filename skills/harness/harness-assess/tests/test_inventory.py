@@ -30,7 +30,11 @@ class InventoryTests(unittest.TestCase):
             )
             self.git(root, "switch", "-c", "feature")
             (root / "AGENTS.md").write_text("# Agent map\n", encoding="utf-8")
-            self.git(root, "add", "AGENTS.md")
+            (root / "docs" / "design-docs").mkdir(parents=True)
+            (root / "docs" / "design-docs" / "index.md").write_text(
+                "# Design documentation\n", encoding="utf-8"
+            )
+            self.git(root, "add", "AGENTS.md", "docs/design-docs/index.md")
             self.git(root, "commit", "-m", "branch harness")
 
             result = subprocess.run(
@@ -48,6 +52,60 @@ class InventoryTests(unittest.TestCase):
                 {"ahead": 1, "behind": 0, "relation": "ahead"},
             )
             self.assertEqual(payload["git"]["worktree_count"], 1)
+            self.assertIn(
+                "docs/design-docs/index.md",
+                payload["architecture_and_domain_docs"],
+            )
+
+    def test_reports_context_map_as_domain_architecture(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "CONTEXT-MAP.md").write_text(
+                "# Context Map\n", encoding="utf-8"
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(INVENTORY), str(root)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = json.loads(result.stdout)
+
+            self.assertIn(
+                "CONTEXT-MAP.md", payload["architecture_and_domain_docs"]
+            )
+
+    def test_reports_knowledge_stores_and_walks_generated_documentation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs" / "generated").mkdir(parents=True)
+            (root / "docs" / "generated" / "index.md").write_text(
+                "# Generated\n", encoding="utf-8"
+            )
+            (root / "docs" / "generated" / "db-schema.md").write_text(
+                "# Schema\n", encoding="utf-8"
+            )
+            # Build output of the same name stays excluded.
+            (root / "src" / "generated").mkdir(parents=True)
+            (root / "src" / "generated" / "client.ts").write_text(
+                "export {};\n", encoding="utf-8"
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(INVENTORY), str(root)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = json.loads(result.stdout)
+
+            stores = payload["knowledge_store"]
+            self.assertTrue(stores["generated"]["index_present"])
+            self.assertEqual(stores["generated"]["files"], 2)
+            self.assertFalse(stores["references"]["index_present"])
+            self.assertEqual(stores["references"]["files"], 0)
+            self.assertEqual(payload["file_extensions"].get(".ts"), None)
 
     def test_reports_context_map_as_domain_architecture(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
