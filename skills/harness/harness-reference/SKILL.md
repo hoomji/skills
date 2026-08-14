@@ -6,8 +6,9 @@ description: Capture, update, inspect, or retire durable external reference mate
 # Harness Reference
 
 Curate the repository's external-knowledge surface. Read the repository guidance and the
-references index in full before changing it. If the repository maps references elsewhere,
-follow that contract instead of assuming `docs/references/`.
+references index in full before changing it. Resolve the store from
+`knowledge_store.references` in the harness manifest; if the repository maps references
+elsewhere, follow that contract instead of assuming `docs/references/index.md`.
 
 ## 1. Prove local capture is warranted
 

@@ -24,6 +24,12 @@ Check:
 - conflicting or duplicated sources of truth;
 - stale ownership, review dates, exceptions, and manifest evidence;
 - active plans with no progress, completed plans left active, and orphaned debt;
+- knowledge stores whose index and directory disagree: unlisted files, indexed files that
+  no longer exist, artifacts in two stores, and plans in two lifecycle states;
+- design documents whose verification evidence no longer holds, and references past their
+  review date or pinned to a version the repository no longer uses;
+- generated artifacts whose producing command is gone, or whose content no longer matches
+  what regeneration would produce;
 - repeated workarounds or learning-ledger entries without disposition;
 - skills whose triggers, references, or scripts no longer match the repository;
 - broken `CONTEXT-MAP.md` links, terms owned by multiple contexts, stale avoided

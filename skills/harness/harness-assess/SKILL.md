@@ -30,8 +30,9 @@ python3 <skill-dir>/scripts/inventory.py <repository-root>
 ```
 
 Use its JSON as a lead, not a verdict. Inspect the actual root guidance, build manifests,
-task runner, CI, architecture/domain docs, representative tests, observability setup,
-hooks, and worktree/background conventions. Follow pointers that materially affect a
+task runner, CI, architecture/domain docs, knowledge-store indexes and whether their
+entries still resolve, representative tests, observability setup, hooks, and
+worktree/background conventions. Follow pointers that materially affect a
 plane. Check whether the assessed ref contains the same harness entrypoints as the local
 default ref when both exist. Exclude dependencies, generated trees, caches, unrelated
 worktrees, and secrets.

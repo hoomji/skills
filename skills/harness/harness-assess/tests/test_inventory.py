@@ -68,6 +68,37 @@ class InventoryTests(unittest.TestCase):
                 "CONTEXT-MAP.md", payload["architecture_and_domain_docs"]
             )
 
+    def test_reports_knowledge_stores_and_walks_generated_documentation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs" / "generated").mkdir(parents=True)
+            (root / "docs" / "generated" / "index.md").write_text(
+                "# Generated\n", encoding="utf-8"
+            )
+            (root / "docs" / "generated" / "db-schema.md").write_text(
+                "# Schema\n", encoding="utf-8"
+            )
+            # Build output of the same name stays excluded.
+            (root / "src" / "generated").mkdir(parents=True)
+            (root / "src" / "generated" / "client.ts").write_text(
+                "export {};\n", encoding="utf-8"
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(INVENTORY), str(root)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = json.loads(result.stdout)
+
+            stores = payload["knowledge_store"]
+            self.assertTrue(stores["generated"]["index_present"])
+            self.assertEqual(stores["generated"]["files"], 2)
+            self.assertFalse(stores["references"]["index_present"])
+            self.assertEqual(stores["references"]["files"], 0)
+            self.assertEqual(payload["file_extensions"].get(".ts"), None)
+
     @staticmethod
     def git(root: Path, *args: str) -> None:
         subprocess.run(

@@ -42,6 +42,12 @@ entrypoints:
   guidance: "AGENTS.md"
   architecture: "ARCHITECTURE.md"
   tracer: "docs/harness/tracer-workflow.md"
+knowledge_store:
+  design_docs: "docs/design-docs/index.md"
+  exec_plans: "docs/exec-plans/index.md"
+  generated: "docs/generated/index.md"
+  product_specs: "docs/product-specs/index.md"
+  references: "docs/references/index.md"
 commands:
   setup: "exact command or unknown"
   start: "exact command or unknown"
@@ -64,6 +70,37 @@ policy names its enforcement, owner, and remediation path. During assessment, an
 command stays `unknown`; a completed minimum bootstrap must resolve setup, check, test,
 and validate to deterministic entrypoints. Start may remain `unknown` only when
 `capabilities.startable_runtime` is `missing` and cites repository evidence.
+
+## Knowledge store
+
+Durable repository knowledge lives in five stores, each with one index that owns its
+entry contract. `knowledge_store` in the manifest maps every store to its index, so a
+repository that already keeps this material elsewhere records its own paths instead of
+growing a competing directory. Follow the mapped path, never the default below, when the
+two disagree.
+
+| Store | Default index | Holds | Owner skill |
+|---|---|---|---|
+| `design_docs` | `docs/design-docs/index.md` | How and why parts of the system are shaped as they are, catalogued with a verification status and evidence date; `core-beliefs.md` holds the agent-first operating principles | — |
+| `exec_plans` | `docs/exec-plans/index.md` | Plans in `active/` or `completed/`, plus `tech-debt-tracker.md` | `harness-exec-plan` |
+| `generated` | `docs/generated/index.md` | Machine-produced documentation, never hand-edited | producing commands |
+| `product_specs` | `docs/product-specs/index.md` | Required user-facing behavior and acceptance criteria | `harness-product-spec` |
+| `references` | `docs/references/index.md` | Version-pinned external material with provenance | `harness-reference` |
+
+Rules that hold across every store:
+
+- an artifact is authoritative only when its store index lists it; an unlisted file is
+  orphaned, and an indexed file that no longer exists is drift;
+- an artifact belongs to exactly one store and one lifecycle state;
+- every file under the generated store carries a `Do not edit` marker and a
+  `Producing command:` naming a real repository entrypoint in backticks;
+- every reference records `Source:` and `Retrieved:` before its summary;
+- `AGENTS.md` advertises each store index, so depth is reachable without preloading it.
+
+These separations are load-bearing: a product spec owns required behavior, a design
+document owns shape and rationale, an ADR owns a hard-to-reverse architectural decision,
+an ExecPlan owns execution sequence and task-local choices, and the debt tracker owns
+accepted shortcuts. Route a fact to the one that owns it rather than restating it.
 
 ## Domain context
 

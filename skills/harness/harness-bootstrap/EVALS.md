@@ -18,6 +18,16 @@ any write, and the repository-local validator after the approved files are prepa
    remediation-focused output.
 6. A second run is a no-op when the minimum harness is already correct.
 7. The skill stops at R1 and leaves all changes unstaged.
+8. All five knowledge stores are installed with their indexes, declared under
+   `knowledge_store`, and advertised in `AGENTS.md`. Stores are installed empty; no
+   specification, plan, design document, or reference is fabricated to fill one.
+9. A repository that already keeps this material elsewhere has its own path recorded in
+   `knowledge_store`, and its existing index is left unedited with missing entry-contract
+   sections reported as findings.
+10. The validator detects an orphaned store artifact, an index entry that no longer
+    resolves, a plan in two lifecycle states, a generated file without a `Do not edit` and
+    `Producing command:` header, a producing command that is not a real entrypoint, and a
+    reference without `Source:` and `Retrieved:`.
 
 ## Repository matrix
 

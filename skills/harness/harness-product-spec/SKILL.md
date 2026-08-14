@@ -1,13 +1,16 @@
 ---
 name: harness-product-spec
-description: Create, revise, inspect, or retire repository-local product specifications that define user problems, outcomes, behavioral boundaries, and acceptance criteria separately from implementation. Use when product intent belongs under docs/product-spec, a product-facing change lacks an authoritative specification, or an existing specification must be reconciled with issues, ADRs, code, and delivery evidence.
+description: Create, revise, inspect, or retire repository-local product specifications that define user problems, outcomes, behavioral boundaries, and acceptance criteria separately from implementation. Use when product intent belongs under docs/product-specs, a product-facing change lacks an authoritative specification, or an existing specification must be reconciled with issues, ADRs, code, and delivery evidence.
 ---
 
 # Harness Product Spec
 
-Operate on the repository's product-intent surface. Read the repository guidance and the
-product-spec index and template in full before changing an artifact. If the repository
-uses another path, follow its map instead of assuming `docs/product-spec/`.
+Operate on the repository's product-intent surface. Read
+[`../harness/references/contracts.md`](../harness/references/contracts.md), the
+repository guidance, and the product-spec index and template in full before changing an
+artifact. Resolve the store from `knowledge_store.product_specs` in the harness manifest;
+follow the repository's map instead of assuming `docs/product-specs/index.md` and
+`docs/product-specs/template.md`.
 
 ## 1. Ground the intent
 

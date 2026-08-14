@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -9,8 +10,80 @@ from pathlib import Path
 
 VALIDATOR = Path(__file__).parents[1] / "assets" / "harness-validate.py"
 
+KNOWLEDGE_STORE_BLOCK = """knowledge_store:
+  design_docs: "docs/design-docs/index.md"
+  exec_plans: "docs/exec-plans/index.md"
+  generated: "docs/generated/index.md"
+  product_specs: "docs/product-specs/index.md"
+  references: "docs/references/index.md"
+"""
+
 
 class HarnessValidateTests(unittest.TestCase):
+    def write_knowledge_store(self) -> None:
+        docs = self.root / "docs"
+        for directory in (
+            "design-docs",
+            "exec-plans/active",
+            "exec-plans/completed",
+            "generated",
+            "product-specs",
+            "references",
+        ):
+            (docs / directory).mkdir(parents=True, exist_ok=True)
+        (docs / "design-docs" / "index.md").write_text(
+            "# Design documents\n\nVerification status vocabulary.\n\n"
+            "| Document | Verification status |\n|---|---|\n"
+            "| [Core beliefs](core-beliefs.md) | unverified |\n",
+            encoding="utf-8",
+        )
+        (docs / "design-docs" / "core-beliefs.md").write_text(
+            "# Core beliefs\n\nEvidence outranks assertion.\n", encoding="utf-8"
+        )
+        (docs / "exec-plans" / "index.md").write_text(
+            "# Execution plans\n\n## Active\n\n_None._\n\n## Completed\n\n_None._\n\n"
+            "Debt lives in [the tracker](tech-debt-tracker.md).\n",
+            encoding="utf-8",
+        )
+        (docs / "exec-plans" / "tech-debt-tracker.md").write_text(
+            "# Technical debt tracker\n\n_No recorded debt._\n", encoding="utf-8"
+        )
+        for lifecycle in ("active", "completed"):
+            (docs / "exec-plans" / lifecycle / ".gitkeep").write_text(
+                "", encoding="utf-8"
+            )
+        (docs / "generated" / "index.md").write_text(
+            "# Generated documentation\n\n| Artifact | Producing command |\n|---|---|\n",
+            encoding="utf-8",
+        )
+        (docs / "product-specs" / "index.md").write_text(
+            "# Product specifications\n\nStatus vocabulary: draft, delivered.\n\n"
+            "Write specifications with [the template](template.md).\n",
+            encoding="utf-8",
+        )
+        (docs / "product-specs" / "template.md").write_text(
+            "# [Specification title]\n\n- Status: `draft`\n", encoding="utf-8"
+        )
+        (docs / "references" / "index.md").write_text(
+            "# External references\n\n| Reference | Source | Review date |\n|---|---|---|\n",
+            encoding="utf-8",
+        )
+
+    def add_generated_artifact(self, command: str = "make docs") -> Path:
+        path = self.root / "docs" / "generated" / "db-schema.md"
+        path.write_text(
+            f"<!-- Do not edit. Generated file. -->\n"
+            f"<!-- Producing command: `{command}` -->\n\n# Database schema\n",
+            encoding="utf-8",
+        )
+        index = self.root / "docs" / "generated" / "index.md"
+        index.write_text(
+            index.read_text(encoding="utf-8")
+            + "| [Database schema](db-schema.md) | `make docs` |\n",
+            encoding="utf-8",
+        )
+        return path
+
     def setUp(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory()
         self.workspace = Path(self.temp_dir.name)
@@ -23,6 +96,14 @@ class HarnessValidateTests(unittest.TestCase):
 
 - Architecture: [architecture](docs/architecture.md)
 - Tracer: [workflow](docs/harness/tracer-workflow.md)
+
+## Knowledge store
+
+- Design: `docs/design-docs/index.md`
+- Plans: `docs/exec-plans/index.md`
+- Generated: `docs/generated/index.md`
+- Product: `docs/product-specs/index.md`
+- References: `docs/references/index.md`
 
 ## Commands
 
@@ -51,9 +132,11 @@ class HarnessValidateTests(unittest.TestCase):
             encoding="utf-8",
         )
         (self.root / "Makefile").write_text(
-            "setup:\n\t@true\n\nstart:\n\t@true\n\ncheck:\n\t@true\n\ntest:\n\t@true\n",
+            "setup:\n\t@true\n\nstart:\n\t@true\n\ncheck:\n\t@true\n\n"
+            "test:\n\t@true\n\ndocs:\n\t@true\n",
             encoding="utf-8",
         )
+        self.write_knowledge_store()
         (self.root / "scripts" / "harness-validate.py").write_text(
             "# repository-local validator placeholder used only as path evidence\n",
             encoding="utf-8",
@@ -70,6 +153,7 @@ class HarnessValidateTests(unittest.TestCase):
         check: str = "make check",
         start: str = "make start",
         capability: str | None = None,
+        knowledge_store: str = KNOWLEDGE_STORE_BLOCK,
     ) -> None:
         capability_block = (
             capability
@@ -87,7 +171,7 @@ entrypoints:
   guidance: \"AGENTS.md\"
   architecture: \"{architecture}\"
   tracer: \"docs/harness/tracer-workflow.md\"
-commands:
+{knowledge_store}commands:
   setup: \"make setup\"
   start: \"{start}\"
   check: \"{check}\"
@@ -271,6 +355,166 @@ freshness:
         self.assertEqual(result.returncode, 1)
         self.assertIn("commands.test", result.stdout)
         self.assertIn("AGENTS.md", result.stdout)
+
+    def test_generated_artifact_with_provenance_and_real_producer_passes(self) -> None:
+        self.add_generated_artifact()
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_undeclared_knowledge_store_is_rejected(self) -> None:
+        self.write_manifest(
+            knowledge_store=KNOWLEDGE_STORE_BLOCK.replace(
+                '  references: "docs/references/index.md"\n', ""
+            )
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("knowledge_store.references is not declared", result.stdout)
+
+    def test_missing_knowledge_store_block_is_rejected(self) -> None:
+        self.write_manifest(knowledge_store="")
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("knowledge-store.type", result.stdout)
+        self.assertIn("product_specs", result.stdout)
+
+    def test_store_index_must_be_advertised_in_agent_map(self) -> None:
+        agents = (self.root / "AGENTS.md").read_text(encoding="utf-8")
+        (self.root / "AGENTS.md").write_text(
+            agents.replace("`docs/references/index.md`", "`somewhere else`"),
+            encoding="utf-8",
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("guidance.knowledge-store", result.stdout)
+        self.assertIn("references", result.stdout)
+
+    def test_store_index_missing_its_contract_sections_is_rejected(self) -> None:
+        (self.root / "docs" / "exec-plans" / "index.md").write_text(
+            "# Execution plans\n\nDebt lives in [the tracker](tech-debt-tracker.md).\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.index-contract", result.stdout)
+        self.assertIn("Active, Completed", result.stdout)
+
+    def test_orphaned_store_artifact_is_rejected(self) -> None:
+        (self.root / "docs" / "product-specs" / "checkout.md").write_text(
+            "# Checkout\n", encoding="utf-8"
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.unlisted", result.stdout)
+        self.assertIn("docs/product-specs/checkout.md", result.stdout)
+
+    def test_generated_artifact_without_provenance_header_is_rejected(self) -> None:
+        artifact = self.add_generated_artifact()
+        artifact.write_text("# Database schema\n", encoding="utf-8")
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.provenance", result.stdout)
+        self.assertIn("Do not edit", result.stdout)
+
+    def test_generated_artifact_with_broken_producer_is_rejected(self) -> None:
+        self.add_generated_artifact(command="make missing-docs")
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("producing command", result.stdout)
+        self.assertIn("make target 'missing-docs'", result.stdout)
+
+    def test_reference_without_source_and_retrieval_date_is_rejected(self) -> None:
+        (self.root / "docs" / "references" / "protocol.md").write_text(
+            "# Protocol notes\n\nSummary only.\n", encoding="utf-8"
+        )
+        index = self.root / "docs" / "references" / "index.md"
+        index.write_text(
+            index.read_text(encoding="utf-8") + "| [Protocol](protocol.md) | — |\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.provenance", result.stdout)
+        self.assertIn("Source:, Retrieved:", result.stdout)
+
+    def test_reference_provenance_may_use_markdown_emphasis(self) -> None:
+        (self.root / "docs" / "references" / "protocol.md").write_text(
+            "# Protocol notes\n\n- **Source**: [Spec](https://example.invalid/spec)\n"
+            "- **Retrieved**: 2026-08-14\n",
+            encoding="utf-8",
+        )
+        index = self.root / "docs" / "references" / "index.md"
+        index.write_text(
+            index.read_text(encoding="utf-8")
+            + "| [Protocol](protocol.md) | Source | 2026-08-14 |\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_plan_in_two_lifecycle_states_is_rejected(self) -> None:
+        plans = self.root / "docs" / "exec-plans"
+        body = "# Plan\n"
+        for lifecycle in ("active", "completed"):
+            (plans / lifecycle / "2026-08-14-tracer.md").write_text(
+                body, encoding="utf-8"
+            )
+        index = plans / "index.md"
+        index.write_text(
+            index.read_text(encoding="utf-8")
+            + "- [Active](active/2026-08-14-tracer.md)\n"
+            + "- [Completed](completed/2026-08-14-tracer.md)\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.lifecycle-duplicate", result.stdout)
+
+    def test_plan_outside_a_lifecycle_directory_is_rejected(self) -> None:
+        plans = self.root / "docs" / "exec-plans"
+        (plans / "2026-08-14-tracer.md").write_text("# Plan\n", encoding="utf-8")
+        index = plans / "index.md"
+        index.write_text(
+            index.read_text(encoding="utf-8") + "- [Plan](2026-08-14-tracer.md)\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.location", result.stdout)
+
+    def test_missing_lifecycle_directory_and_debt_tracker_are_rejected(self) -> None:
+        shutil.rmtree(self.root / "docs" / "exec-plans" / "completed")
+        (self.root / "docs" / "exec-plans" / "tech-debt-tracker.md").unlink()
+
+        result = self.run_validator()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("store.missing-directory", result.stdout)
+        self.assertIn("store.missing-file", result.stdout)
 
 
 if __name__ == "__main__":
