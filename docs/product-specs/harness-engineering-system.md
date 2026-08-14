@@ -620,8 +620,8 @@ The initial portability gate uses `Uniblock-dev/unified-request` and `Uniblock-d
 
 ## Dependencies and sources
 
-- [OpenAI harness engineering](../reference/openai-harness-engineering.md) provides background observations and an operating model.
-- [OpenAI Agents SDK](../reference/openai-agents-sdk.md) provides optional runtime, orchestration, guardrail, tracing, and evaluation context.
+- [OpenAI harness engineering](../references/openai-harness-engineering.md) provides background observations and an operating model.
+- [OpenAI Agents SDK](../references/openai-agents-sdk.md) provides optional runtime, orchestration, guardrail, tracing, and evaluation context.
 - Repository guidance, domain records, design docs, ADRs, behavior, CI, and operational tools remain authoritative for repository-specific facts.
 
 ## Risks and mitigations

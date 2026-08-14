@@ -29,6 +29,7 @@ LEDGER_MARKERS = (
     "Closure evidence",
     "Review date",
 )
+PRODUCER_PATTERN = re.compile(r"Producing command:\s*`([^`]+)`")
 
 
 class YamlSubsetError(ValueError):
@@ -40,6 +41,47 @@ class Token:
     indent: int
     text: str
     line: int
+
+
+@dataclass(frozen=True)
+class StoreSpec:
+    """Structural contract for one knowledge store declared in the manifest."""
+
+    key: str
+    index_markers: tuple[str, ...] = ()
+    member_markers: tuple[str, ...] = ()
+    member_suffixes: tuple[str, ...] | None = (".md",)
+    required_files: tuple[str, ...] = ()
+    required_dirs: tuple[str, ...] = ()
+    root_allowlist: tuple[str, ...] | None = None
+    check_producer: bool = False
+
+
+KNOWLEDGE_STORES = (
+    # The design index also passes through the entrypoints.design contract, which already
+    # enforces its state, owner, last-verified, and evidence fields.
+    StoreSpec(key="design_docs"),
+    StoreSpec(
+        key="exec_plans",
+        index_markers=("Active", "Completed"),
+        required_files=("tech-debt-tracker.md",),
+        required_dirs=("active", "completed"),
+        root_allowlist=("tech-debt-tracker.md",),
+    ),
+    StoreSpec(
+        key="generated",
+        index_markers=("Producing command",),
+        member_markers=("Do not edit", "Producing command:"),
+        member_suffixes=None,
+        check_producer=True,
+    ),
+    StoreSpec(key="product_specs", index_markers=("State",)),
+    StoreSpec(
+        key="references",
+        index_markers=("Source", "Review"),
+        member_markers=("Source:", "Retrieved:"),
+    ),
+)
 
 
 def unquoted_characters(text: str) -> Iterator[tuple[int, str]]:
@@ -378,17 +420,24 @@ def validate_command(
     )
 
 
-def validate_markdown_links(path: Path, root: Path, errors: list[str]) -> None:
+def local_links(path: Path) -> Iterator[tuple[str, Path]]:
+    """Yield each repository-local Markdown link as (raw target, resolved path)."""
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return
-    for target in re.findall(r"\[[^]]*\]\(([^)]+)\)", text):
-        target = target.strip().strip("<>").split("#", 1)[0]
+    for raw in re.findall(r"\[[^]]*\]\(([^)]+)\)", text):
+        target = raw.strip().strip("<>").split("#", 1)[0]
         if not target or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", target):
             continue
         linked = Path(target)
-        resolved = (linked if linked.is_absolute() else path.parent / linked).resolve()
+        yield target, (
+            linked if linked.is_absolute() else path.parent / linked
+        ).resolve()
+
+
+def validate_markdown_links(path: Path, root: Path, errors: list[str]) -> None:
+    for target, resolved in local_links(path):
         try:
             resolved.relative_to(root.resolve())
         except ValueError:
@@ -406,6 +455,199 @@ def validate_markdown_links(path: Path, root: Path, errors: list[str]) -> None:
                 f"{path.relative_to(root)} contains broken link {target!r}.",
                 "Fix or remove the stale pointer.",
             )
+
+
+def missing_markers(text: str, markers: tuple[str, ...]) -> list[str]:
+    """Report absent markers, ignoring Markdown emphasis and letter case."""
+    haystack = re.sub(r"[*_`]", "", text).casefold()
+    return [
+        marker
+        for marker in markers
+        if re.sub(r"[*_`]", "", marker).casefold() not in haystack
+    ]
+
+
+def store_members(index: Path, spec: StoreSpec) -> list[Path]:
+    """Return the artifact files a store index is responsible for cataloguing."""
+    members: list[Path] = []
+    for path in sorted(index.parent.rglob("*")):
+        try:
+            if not path.is_file() or path.is_symlink() or path == index:
+                continue
+        except OSError:
+            continue
+        if path.name == ".gitkeep":
+            continue
+        if spec.member_suffixes and path.suffix.lower() not in spec.member_suffixes:
+            continue
+        members.append(path)
+    return members
+
+
+def validate_store_member(
+    root: Path,
+    spec: StoreSpec,
+    index: Path,
+    member: Path,
+    linked: set[Path],
+    errors: list[str],
+    warnings: list[str],
+) -> None:
+    label = member.relative_to(root).as_posix()
+    if member.resolve() not in linked:
+        add_error(
+            errors,
+            "store.unlisted",
+            f"{label} is not listed in {index.relative_to(root).as_posix()}.",
+            "Add the artifact to its store index, or remove the orphaned file.",
+        )
+    if spec.root_allowlist is not None and member.parent == index.parent:
+        if member.name not in spec.root_allowlist:
+            add_error(
+                errors,
+                "store.location",
+                f"{label} sits at the store root instead of a lifecycle directory.",
+                f"Move it into one of {list(spec.required_dirs)}, or record it as a store-root file.",
+            )
+    if not spec.member_markers and not spec.check_producer:
+        return
+    try:
+        text = member.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        add_error(
+            errors,
+            "store.unreadable",
+            f"{label} cannot be read as UTF-8 text but requires a provenance header.",
+            "Store binary output outside the documentation knowledge store.",
+        )
+        return
+    missing = missing_markers(text, spec.member_markers)
+    if missing:
+        add_error(
+            errors,
+            "store.provenance",
+            f"{label} is missing required markers: {', '.join(missing)}.",
+            f"Restore the entry contract recorded in {index.relative_to(root).as_posix()}.",
+        )
+    if not spec.check_producer or "Producing command:" not in text:
+        return
+    match = PRODUCER_PATTERN.search(text)
+    if not match:
+        add_error(
+            errors,
+            "store.producer",
+            f"{label} does not name its producing command in backticks.",
+            "Write the header as 'Producing command: `<exact command>`'.",
+        )
+        return
+    validate_command(
+        root, f"{label} producing command", match.group(1), errors, warnings
+    )
+
+
+def validate_store(
+    root: Path,
+    spec: StoreSpec,
+    index: Path,
+    errors: list[str],
+    warnings: list[str],
+) -> None:
+    label = index.relative_to(root).as_posix()
+    validate_markdown_links(index, root, errors)
+    try:
+        index_text = index.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        index_text = ""
+    missing = missing_markers(index_text, spec.index_markers)
+    if missing:
+        add_error(
+            errors,
+            "store.index-contract",
+            f"{label} is missing required sections: {', '.join(missing)}.",
+            "Restore the store index contract from the bundled knowledge-store template.",
+        )
+    for name in spec.required_files:
+        if not (index.parent / name).is_file():
+            add_error(
+                errors,
+                "store.missing-file",
+                f"{index.parent.relative_to(root).as_posix()}/{name} is absent.",
+                "Add the bundled template for this store file.",
+            )
+    for name in spec.required_dirs:
+        if not (index.parent / name).is_dir():
+            add_error(
+                errors,
+                "store.missing-directory",
+                f"{index.parent.relative_to(root).as_posix()}/{name}/ is absent.",
+                "Create the lifecycle directory, keeping it tracked with a .gitkeep file.",
+            )
+
+    lifecycle: dict[str, set[str]] = {}
+    for name in spec.required_dirs:
+        directory = index.parent / name
+        lifecycle[name] = (
+            {path.name for path in directory.glob("*.md")}
+            if directory.is_dir()
+            else set()
+        )
+    for name, names in lifecycle.items():
+        for other, other_names in lifecycle.items():
+            if other <= name:
+                continue
+            for duplicate in sorted(names & other_names):
+                add_error(
+                    errors,
+                    "store.lifecycle-duplicate",
+                    f"{duplicate} exists in both {name}/ and {other}/ of {index.parent.relative_to(root).as_posix()}.",
+                    "Keep each artifact in exactly one lifecycle directory.",
+                )
+
+    linked = {resolved for _, resolved in local_links(index)}
+    for member in store_members(index, spec):
+        validate_store_member(root, spec, index, member, linked, errors, warnings)
+
+
+def validate_knowledge_store(
+    root: Path,
+    manifest: dict[str, Any],
+    guidance: Path | None,
+    guidance_text: str,
+    errors: list[str],
+    warnings: list[str],
+) -> None:
+    declared = manifest.get("knowledge_store")
+    if not isinstance(declared, dict):
+        add_error(
+            errors,
+            "knowledge-store.type",
+            "knowledge_store must be a mapping of store name to index path.",
+            f"Declare {[spec.key for spec in KNOWLEDGE_STORES]} using the bundled manifest template.",
+        )
+        return
+    specs = {spec.key: spec for spec in KNOWLEDGE_STORES}
+    for key in specs:
+        if key not in declared:
+            add_error(
+                errors,
+                "knowledge-store.missing",
+                f"knowledge_store.{key} is not declared.",
+                "Install the store index from the bundled knowledge-store templates and declare its path.",
+            )
+    for key, value in declared.items():
+        index = repository_path(root, value, f"knowledge_store.{key}", errors)
+        if index is None:
+            continue
+        if guidance and isinstance(value, str) and value not in guidance_text:
+            add_error(
+                errors,
+                "guidance.knowledge-store",
+                f"knowledge_store.{key} is not advertised in {guidance.relative_to(root)}.",
+                "Point the shared agent map at every knowledge store so agents can find it.",
+            )
+        spec = specs.get(key)
+        if spec:
+            validate_store(root, spec, index, errors, warnings)
 
 
 def validate_manifest(root: Path, manifest: Any) -> tuple[list[str], list[str]]:
@@ -612,6 +854,8 @@ def validate_manifest(root: Path, manifest: Any) -> tuple[list[str], list[str]]:
                         continue
                     evidence_path = re.sub(r":\d+(?:-\d+)?$", "", item)
                     repository_path(root, evidence_path, f"{label}.evidence", errors)
+
+    validate_knowledge_store(root, manifest, guidance, guidance_text, errors, warnings)
 
     policies = manifest.get("policies")
     if not isinstance(policies, list):

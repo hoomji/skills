@@ -84,7 +84,8 @@ Run `./install.sh` again after adding a new skill to link it.
 | [harness-encode-invariant](skills/harness/harness-encode-invariant/SKILL.md) | Turn a repeated correction into a mechanical repository check. |
 | [harness-expose-runtime](skills/harness/harness-expose-runtime/SKILL.md) | Make one runtime surface inspectable and verifiable by agents. |
 | [harness-plan-work](skills/harness/harness-plan-work/SKILL.md) | Create a repository-grounded execution plan with evidence gates. |
-| [harness-product-spec](skills/harness/harness-product-spec/SKILL.md) | Create and maintain repository-local product intent and acceptance contracts. |`n| [harness-design-doc](skills/harness/harness-design-doc/SKILL.md) | Create and maintain indexed, verified design documentation without replacing ADRs. |
+| [harness-product-spec](skills/harness/harness-product-spec/SKILL.md) | Create and maintain repository-local product intent and acceptance contracts. |
+| [harness-design-doc](skills/harness/harness-design-doc/SKILL.md) | Create and maintain indexed, verified design documentation without replacing ADRs. |
 | [harness-model-domain](skills/harness/harness-model-domain/SKILL.md) | Maintain canonical repository domain language in CONTEXT.md and context maps. |
 | [harness-record-decision](skills/harness/harness-record-decision/SKILL.md) | Record and maintain consequential architecture decisions without rewriting history. |
 | [harness-exec-plan](skills/harness/harness-exec-plan/SKILL.md) | Create and maintain self-contained living ExecPlans through evidence-backed completion. |

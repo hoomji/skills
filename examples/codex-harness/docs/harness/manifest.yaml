@@ -6,6 +6,12 @@ entrypoints:
   architecture: "ARCHITECTURE.md"
   design: "docs/design-docs/index.md"
   tracer: "docs/harness/tracer-workflow.md"
+knowledge_store:
+  design_docs: "docs/design-docs/index.md"
+  exec_plans: "docs/exec-plans/index.md"
+  generated: "docs/generated/index.md"
+  product_specs: "docs/product-specs/index.md"
+  references: "docs/references/index.md"
 commands:
   setup: "python scripts/setup.py"
   start: "python scripts/start.py"

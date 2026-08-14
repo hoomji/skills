@@ -4,11 +4,25 @@
 
 - Product and domain language: `[authoritative path]`
 - Architecture and boundaries: `[authoritative path]`
-- Design documentation: `docs/design-docs/index.md`
 - Decisions: `[authoritative path or convention]`
 - Harness capability state: `docs/harness/manifest.yaml`
 - Representative workflow: `docs/harness/tracer-workflow.md`
 - Repeated-friction ledger: `docs/harness/learning-ledger.md`
+
+## Knowledge store
+
+Start here, then follow the index that owns the question. Each store's index states its
+own entry contract; nothing in these directories is authoritative unless its index lists
+it.
+
+- Required product behavior: `docs/product-specs/index.md`
+- Design documentation and verification status: `docs/design-docs/index.md`
+- Agent-first operating principles: `docs/design-docs/core-beliefs.md`
+- Active and completed execution plans: `docs/exec-plans/index.md`
+- Accepted technical debt: `docs/exec-plans/tech-debt-tracker.md`
+- ExecPlan authoring instructions: `PLAN.md`
+- External reference material: `docs/references/index.md`
+- Generated documentation, never hand-edited: `docs/generated/index.md`
 
 ## Common commands
 

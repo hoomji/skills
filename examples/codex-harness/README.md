@@ -85,4 +85,4 @@ All scripts use the Python standard library. `start.py` performs a finite self-c
 
 ## Source boundary
 
-This is a repository-authored interpretation and example. OpenAI's article is background evidence, not a claim that this exact layout is OpenAI's internal repository. See [`docs/references/README.md`](docs/references/README.md) for provenance.
+This is a repository-authored interpretation and example. OpenAI's article is background evidence, not a claim that this exact layout is OpenAI's internal repository. See [`docs/references/index.md`](docs/references/index.md) for provenance.

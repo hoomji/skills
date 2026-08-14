@@ -31,6 +31,16 @@ EXCLUDED_DIRS = {
     "__pycache__",
 }
 
+KNOWLEDGE_STORE_DEFAULTS = {
+    "design_docs": "docs/design-docs/index.md",
+    "exec_plans": "docs/exec-plans/index.md",
+    "generated": "docs/generated/index.md",
+    "product_specs": "docs/product-specs/index.md",
+    "references": "docs/references/index.md",
+}
+# Walked despite the EXCLUDED_DIRS name match: this is documentation, not build output.
+INCLUDED_PATHS = {"docs/generated"}
+
 GUIDANCE_NAMES = {"AGENTS.md", "CLAUDE.md"}
 BUILD_NAMES = {
     "package.json",
@@ -63,10 +73,14 @@ def relative(path: Path, root: Path) -> str:
 def bounded_files(root: Path) -> list[Path]:
     files: list[Path] = []
     for current, dirs, names in os.walk(root, followlinks=False):
-        dirs[:] = sorted(
-            d for d in dirs if d not in EXCLUDED_DIRS and not d.startswith(".cache")
-        )
         current_path = Path(current)
+        prefix = current_path.relative_to(root).as_posix()
+        dirs[:] = sorted(
+            d
+            for d in dirs
+            if (f"{prefix}/{d}" if prefix != "." else d) in INCLUDED_PATHS
+            or (d not in EXCLUDED_DIRS and not d.startswith(".cache"))
+        )
         for name in sorted(names):
             path = current_path / name
             try:
@@ -193,6 +207,18 @@ def main() -> int:
         suffix = path.suffix.lower() or "[none]"
         language_counts[suffix] = language_counts.get(suffix, 0) + 1
 
+    present = set(rels)
+    knowledge_store = {
+        key: {
+            "default_index": index,
+            "index_present": index in present,
+            "files": sum(
+                1 for rel in rels if rel.startswith(f"{index.rsplit('/', 1)[0]}/")
+            ),
+        }
+        for key, index in KNOWLEDGE_STORE_DEFAULTS.items()
+    }
+
     status = git(root, "status", "--short")
     default_remote_ref = git(
         root,
@@ -238,6 +264,7 @@ def main() -> int:
         "architecture_and_domain_docs": architecture[:100],
         "ci_workflows": workflows,
         "hooks": hooks,
+        "knowledge_store": knowledge_store,
         "observability_candidates": observability[:100],
         "test_samples": tests[:100],
         "file_extensions": dict(
@@ -245,6 +272,7 @@ def main() -> int:
         ),
         "limits": {
             "excluded_directories": sorted(EXCLUDED_DIRS),
+            "included_paths": sorted(INCLUDED_PATHS),
             "sample_cap": 100,
             "commands_executed": inventory_commands,
         },
