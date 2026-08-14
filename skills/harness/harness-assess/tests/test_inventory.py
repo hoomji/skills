@@ -49,6 +49,25 @@ class InventoryTests(unittest.TestCase):
             )
             self.assertEqual(payload["git"]["worktree_count"], 1)
 
+    def test_reports_context_map_as_domain_architecture(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "CONTEXT-MAP.md").write_text(
+                "# Context Map\n", encoding="utf-8"
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(INVENTORY), str(root)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = json.loads(result.stdout)
+
+            self.assertIn(
+                "CONTEXT-MAP.md", payload["architecture_and_domain_docs"]
+            )
+
     @staticmethod
     def git(root: Path, *args: str) -> None:
         subprocess.run(

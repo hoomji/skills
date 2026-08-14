@@ -17,6 +17,14 @@ first when the change lacks an executable contract.
 Completion criterion: scope and done conditions are checkable; user-owned changes and
 unauthorized actions are protected.
 
+Read the relevant domain glossary and use its canonical terms in code, tests, and handoff
+evidence. Route a newly resolved meaning or contradiction through `harness-model-domain`;
+do not silently let implementation invent a competing vocabulary.
+
+Read ADRs relevant to the touched boundary. If delivery would contradict an accepted
+decision, stop that implementation path and route the trade-off through
+`harness-record-decision`; do not silently treat the code change as supersession.
+
 ## 2. Select the specialist
 
 Wrap the installed Matt Pocock skill matching the work:

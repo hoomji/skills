@@ -43,7 +43,7 @@ BUILD_NAMES = {
     "docker-compose.yml",
     "docker-compose.yaml",
 }
-ARCHITECTURE_NAMES = {"ARCHITECTURE.md", "CONTEXT.md", "DESIGN.md"}
+ARCHITECTURE_NAMES = {"ARCHITECTURE.md", "CONTEXT.md", "CONTEXT-MAP.md", "DESIGN.md"}
 HOOK_NAMES = {"hooks.json", ".pre-commit-config.yaml", ".pre-commit-config.yml"}
 TEST_MARKERS = ("/test/", "/tests/", ".spec.", ".test.")
 OBSERVABILITY_WORDS = (

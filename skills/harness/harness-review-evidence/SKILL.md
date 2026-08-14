@@ -29,6 +29,14 @@ not passed.
 Completion criterion: every changed behavior is checked against the spec and every
 material evidence claim is corroborated or marked unsupported.
 
+Treat contradictory meanings or avoided synonyms from the relevant domain glossary as a
+finding. If the implementation intentionally changes the domain model, require
+`harness-model-domain` to reconcile the canonical language and affected consumers.
+
+Treat an unexplained contradiction with an accepted ADR as a finding. A change may depart
+from the decision only when an authoritative source reopens it and
+`harness-record-decision` records the resulting lifecycle transition.
+
 ## 3. Classify findings
 
 Use [`assets/review-report.md.template`](assets/review-report.md.template). Report

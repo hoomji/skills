@@ -65,6 +65,33 @@ command stays `unknown`; a completed minimum bootstrap must resolve setup, check
 and validate to deterministic entrypoints. Start may remain `unknown` only when
 `capabilities.startable_runtime` is `missing` and cites repository evidence.
 
+## Domain context
+
+Follow the repository's established domain-document convention. When none exists, use one
+root `CONTEXT.md` and create it lazily after the first term is resolved. Treat an existing
+`CONTEXT-MAP.md` as the authority for multi-context layout; keep domain relationships in
+the map and each owned term in exactly one context glossary.
+
+`CONTEXT.md` is a living glossary of current, project-specific language. It is not a spec,
+implementation guide, decision log, or scratch pad. Prefer one canonical term, a one- or
+two-sentence definition of what it is, and meaningful rejected synonyms under `_Avoid_`.
+Edit obsolete meanings in place; use repository history and ADRs for historical rationale.
+Route consequential boundary choices to `harness-record-decision`.
+
+## Decision records
+
+Follow the repository's established architecture-decision convention. When none exists,
+use `docs/adr/NNNN-short-slug.md` and create it lazily. Record a decision as an ADR only
+when it is hard to reverse, surprising without context, and the result of a real
+trade-off. A product spec owns required behavior; an ExecPlan decision log owns
+task-local execution choices; an ADR owns durable architectural rationale.
+
+Preserve accepted history. Represent a changed decision with a superseding ADR and
+bidirectional predecessor/successor links instead of rewriting the old record. Treat
+`proposed`, `accepted`, `deprecated`, and `superseded by ADR-NNNN` as the fallback status
+vocabulary when the repository does not define one. Documentation is not enforcement:
+route checkable architectural boundaries to `harness-encode-invariant`.
+
 ## Assessment finding
 
 ```yaml

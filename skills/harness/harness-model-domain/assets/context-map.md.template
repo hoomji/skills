@@ -1,0 +1,9 @@
+# Context Map
+
+## Contexts
+
+- [<Context name>](<relative-path>/CONTEXT.md) - <what this context owns>
+
+## Relationships
+
+- **<Source> -> <Target>**: <the domain-level relationship or exchanged concept>
