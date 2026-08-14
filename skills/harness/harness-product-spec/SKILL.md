@@ -19,6 +19,10 @@ only a human can make.
 Completion criterion: the user, problem, outcome, non-goals, constraints, and authoritative
 sources are explicit; every unresolved product judgment has an owner or escalation.
 
+When the specification resolves a new project-specific term or changes an existing
+meaning, route it through `harness-model-domain` and write the specification using the
+canonical language.
+
 ## 2. Choose the artifact action
 
 Select exactly one primary action:
@@ -29,7 +33,8 @@ Select exactly one primary action:
 - mark a specification delivered or superseded with evidence and successor links.
 
 Preserve historical engineering specifications unless the repository explicitly defines a
-migration. Keep implementation sequence in an ExecPlan and architectural choices in ADRs.
+migration. Keep implementation sequence in an ExecPlan and route qualifying architectural
+choices through `harness-record-decision`.
 
 Completion criterion: one authoritative product-spec path and lifecycle state are resolved,
 with overlapping artifacts linked or dispositioned.

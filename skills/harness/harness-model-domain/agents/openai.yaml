@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Model Domain"
+  short_description: "Maintain canonical repository domain language"
+  default_prompt: "Use $harness-model-domain to create or reconcile this repository domain glossary."

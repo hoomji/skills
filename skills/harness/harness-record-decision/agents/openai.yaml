@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Record Decision"
+  short_description: "Record consequential architecture decisions"
+  default_prompt: "Use $harness-record-decision to record or update this repository decision as an ADR."

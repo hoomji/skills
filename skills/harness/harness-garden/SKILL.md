@@ -23,11 +23,14 @@ Check:
 - advertised commands that no longer exist or disagree with CI;
 - conflicting or duplicated sources of truth;
 - stale ownership, review dates, exceptions, and manifest evidence;
-- stale design-doc verification, index metadata, or divergence from linked code and ADRs;
 - active plans with no progress, completed plans left active, and orphaned debt;
 - repeated workarounds or learning-ledger entries without disposition;
 - skills whose triggers, references, or scripts no longer match the repository;
-- declared architecture, design, or policy that enforcement no longer covers.
+- broken `CONTEXT-MAP.md` links, terms owned by multiple contexts, stale avoided
+  synonyms, or code and guidance that use contradictory meanings;
+- ADRs with broken predecessor/successor links, conflicting accepted decisions, or
+  implementation and guidance that silently drifted from the recorded choice;
+- declared architecture or policy that enforcement no longer covers.
 
 Treat age as a prompt to verify, not proof of staleness.
 

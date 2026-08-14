@@ -1,0 +1,98 @@
+# <Short, action-oriented description>
+
+This ExecPlan is a living document. Keep `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` current as work proceeds. Follow the repository's ExecPlan guidance at `<repository-relative path>`.
+
+## Purpose / Big Picture
+
+Explain in plain language what a person can do after this change that they could not do before, why that outcome matters, and how they can see it working.
+
+## Progress
+
+- [ ] (<YYYY-MM-DD HH:MMZ>) <Incomplete, granular next action.>
+- [ ] (<YYYY-MM-DD HH:MMZ>) <Partially complete action: completed: ...; remaining: ...>
+
+Add a timestamped entry at every stopping point. This checklist must state the actual state of the work, not the originally intended sequence.
+
+## Surprises & Discoveries
+
+- Observation: <Unexpected behavior, constraint, bug, or insight.>
+  Evidence: <Short command result, test result, or repository path.>
+
+Record an entry when a discovery changes the approach. State `None yet` until that happens.
+
+## Decision Log
+
+- Decision: <Choice made.>
+  Rationale: <Why this choice best serves the goal and constraints.>
+  Date/Author: <YYYY-MM-DD / name>
+
+Record decisions as they are made; do not rely on chat history.
+
+## Outcomes & Retrospective
+
+At each completed major milestone and at completion, compare the observable outcome against the Purpose / Big Picture. State achieved behavior, remaining gaps, skipped checks, residual risks, and lessons learned. State `Not started` while work remains.
+
+## Context and Orientation
+
+Describe the starting state for a reader with only this file and the working tree. Name every relevant repository-relative path, module, function, command, source of truth, baseline revision, dirty-state boundary, and non-obvious term. Explain how the named parts fit together. Embed necessary external knowledge in plain language instead of referring to a blog or undocumented prior discussion.
+
+## Acceptance Evidence
+
+For each user-visible acceptance criterion, name the exact command, interaction, or observation that proves it. Explain the expected output, HTTP response, screen state, test result, or other result that distinguishes success from failure. If runtime proof is unavailable, state why and name the prerequisite required to obtain it.
+
+## Milestones
+
+### M1 — <Thin end-to-end tracer>
+
+Explain the goal, the smallest new observable result, and why this is the first safe slice. Name its dependency edges and exact touchpoints.
+
+Describe the ordered work in prose. Specify each file to create or edit, the containing module or function, the intended change, and the reason it is needed. Define unfamiliar terms as they appear.
+
+Completion criterion: <Binary, reproducible outcome.>
+
+Verification: From `<working directory>`, run:
+
+    <exact command>
+
+Expect:
+
+    <short expected result>
+
+Rollback and recovery: <How to safely retry, revert, or leave the system clean if this milestone fails.>
+
+Escalate when: <A human decision, missing evidence, source-of-truth conflict, destructive operation, or action beyond the authorized risk class is required.>
+
+### M2 — <Next independently verifiable result>
+
+Repeat the M1 narrative pattern. Each milestone must produce a result that can be proven before later milestones begin. Clearly label any feasibility experiment as `Prototyping`, explain how to observe it, and state the criteria for promoting or discarding it.
+
+## Plan of Work
+
+Summarize the whole sequence in prose, including how milestones fit together, which changes are additive, and how parallel paths or migrations are kept safe. Do not leave key technical or product decisions for the executing agent to infer.
+
+## Concrete Steps
+
+List each command in execution order, its working directory, and the expected short result. As work proceeds, replace planned commands with the commands actually run and mark checks as executed, skipped, or failed.
+
+    cd <repository root>
+    <exact command>
+
+## Validation and Acceptance
+
+Describe the complete human-verifiable scenario: setup or start commands, inputs or navigation, expected behavior, relevant automated tests, and expected test output. Explain how the evidence proves behavior rather than merely that code compiles.
+
+## Idempotence and Recovery
+
+State which steps can safely be repeated. For every operation that can fail halfway, state how to retry or recover. For migrations, deletions, or other destructive operations, state the backup or safe fallback before the action. Keep workspace and test data clean after completion.
+
+## Artifacts and Notes
+
+Include only concise evidence necessary to restart or validate the plan, such as short command transcripts, focused diffs, or small excerpts. Indent commands and excerpts instead of adding nested fenced blocks.
+
+## Interfaces and Dependencies
+
+Name the libraries, modules, services, interfaces, types, function signatures, and external dependencies that must exist or change. Explain why each is needed and how it interacts with the repository's existing code.
+
+## Revision Note
+
+<YYYY-MM-DD HH:MMZ> — Created or revised this plan because <reason>. When revising, update every affected section above and preserve the earlier decision history.
