@@ -119,6 +119,7 @@ Run `./install.sh` again after adding a new skill to link it.
 | Skill                              | Description                                                                                      |
 |------------------------------------|--------------------------------------------------------------------------------------------------|
 | [sharpen](skills/prompting/sharpen/SKILL.md) | Rewrite a rough prompt into a sharper one and recommend how to run it (model, effort, workflow). |
+| [team-prompt](skills/prompting/team-prompt/SKILL.md) | Compile work into a lead prompt that spawns and steers a Claude Code agent team — team-or-not gate, owned work pieces, self-contained spawn briefs. |
 | [writing-great-recurring](skills/prompting/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
 
 ### lateral-thinking/
