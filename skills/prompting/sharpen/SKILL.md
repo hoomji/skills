@@ -70,7 +70,7 @@ question posed alongside the deliverable rather than blocking it.
 ### 3. Recommend how to run it — model, effort, and whether to escalate
 Apply the decision rules in [`RUNNING_IT.md`](RUNNING_IT.md), in order: pick the model,
 tune the effort (naming a sweep when the level isn't obvious), then make the
-escalate-or-not call.
+escalate-or-not call — no agents, subagents, a team, or a workflow.
 
 Once the model is chosen, read exactly one model-specific reference:
 
@@ -82,8 +82,9 @@ unrelated scaffolding.
 
 *Done when:* one model is named with a one-line why; a starting effort level is named
 (or a candidate sweep when unclear), each with a one-line why; and the escalate call
-is explicit — either a workflow with the justifying need and how to trigger it, or a
-plain statement that a single agent at the recommended effort suffices. The matching
+is explicit — either a named shape (subagents, a team, or a workflow) with the justifying
+need, how to trigger it, and the prompt-writing skill to reach for, or a plain statement
+that a single agent at the recommended effort suffices. The matching
 model reference has been read and its relevant guidance identified.
 
 ### 4. Rewrite

@@ -38,7 +38,8 @@ to reach them individually. Three outcomes:
   hypotheses that should argue, new modules with separate owners, cross-layer work.
 - **Subagents** — parallel work where only the result matters and the lead should
   receive it directly. Cheaper, and an orchestration flow that waits on results stalls
-  on teammates, which only report that they went idle.
+  on teammates, which only report that they went idle. Use the `subagent-prompt` skill
+  instead.
 - **One session** — sequential steps, same-file edits, or a dependency chain.
 
 State the call and its one-line why. When the answer is subagents or one session, say

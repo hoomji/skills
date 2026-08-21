@@ -50,17 +50,38 @@ asserting one:
   count; the dedicated latency control is fast mode (output tokens/sec). Don't lower
   effort to chase speed — reach for fast mode instead.
 
-**Escalate to a workflow (ultracode) — breadth across many agents.** After model and
-effort, decide whether one agent is enough or the task should escalate from depth (one
-agent thinking hard) to **breadth** (many independent agents plus verification a single
-context can't give itself). Escalate when the task needs one of:
+**Escalate — breadth across many agents.** After model and effort, decide whether one
+agent is enough or the task should escalate from depth (one agent thinking hard) to
+**breadth** (many agents plus verification a single context can't give itself). Escalate
+only when the task needs one of:
 
 - *Comprehensiveness* — decompose it and cover the parts in parallel.
 - *Confidence* — independent or adversarial verification before committing.
 - *Scale* — work bigger than one context window: migrations, audits, broad sweeps.
 
-A workflow is opt-in and costly (dozens of agents, many tokens), so recommend it only
-when the scale justifies the spend — never for trivial or quick work. When you do,
-tell the user how to trigger it: include the keyword **ultracode**, or ask for a
-workflow / multi-agent orchestration. When none of the three needs apply, say plainly
-that a single agent at the recommended effort suffices.
+**Default to no agents.** Sequential steps, a dependency chain, same-file edits, and
+anything a single session can hold are all one-agent work — the briefing cost of handing
+context to a fresh agent is real, and paying it for a job the current session already
+understands is a loss. Say plainly that a single agent at the recommended effort
+suffices, and stop there. Coordination overhead is the cost that escalation has to
+outweigh, so name a shape below only when one of the three needs above actually applies.
+
+When it does, pick the shape by how the parallel workers relate to each other and to the
+user:
+
+- **Subagents** — the pieces are independent and only the *results* matter: parallel
+  search, research, per-item review or edits, or work whose intermediate reading would
+  drown the lead's context. Workers report to the lead and never talk to each other. Point
+  the user at the `subagent-prompt` skill to write the dispatch prompt.
+- **A team** — the workers must **argue with each other** (competing hypotheses, multi-lens
+  review that should cross-examine) or the user wants to message, redirect, or halt one
+  individually. Costlier than subagents and experimental; point the user at the
+  `team-prompt` skill.
+- **A workflow (ultracode)** — the fan-out should be *deterministic and large*: fixed
+  stages, loops, adversarial verification passes, dozens of agents over a migration or
+  audit. Opt-in and expensive, so recommend it only when the scale justifies the spend.
+  Tell the user how to trigger it: include the keyword **ultracode**, or ask for a
+  workflow / multi-agent orchestration.
+
+Both prompt-writing skills are user-invoked, so name the skill for the user to type
+rather than promising to run it.
