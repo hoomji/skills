@@ -31,6 +31,7 @@ Category folders under `skills/`:
 |---|---|
 | `harness/` | The harness engineering system — assessing, bootstrapping, and maintaining a repo's agent-readiness. |
 | `issue-triage/` | Keeping GitHub issues/PRDs triaged and the agent work queue stocked. |
+| `implementation/` | Getting a change written safely — checking what moved under the branch before building on it. |
 | `review/` | PR review, stacking, and rescoping workflows. |
 | `prompting/` | Sharpening prompts and standing up recurring routines. |
 | `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
@@ -105,6 +106,12 @@ Run `./install.sh` again after adding a new skill to link it.
 | [salvage-sandcastle-run](skills/issue-triage/salvage-sandcastle-run/SKILL.md) | Close out a finished, killed, or stalled Sandcastle run — recover uncommitted work, reconcile rubber-stamped closures, get the branch green. |
 | [has-pr-labelling](skills/issue-triage/has-pr-labelling/SKILL.md) | Label the issues an open PR already delivers, so a triage table separates picked-up work from untouched work. |
 | [closing-completed-prds](skills/issue-triage/closing-completed-prds/SKILL.md) | Close the PRDs and SPECs whose implementation has actually landed, and label the ones still in flight. |
+
+### implementation/
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [refreshing-the-base](skills/implementation/refreshing-the-base/SKILL.md) | Measure what moved on the integration branch since the branch was cut, and settle every counter-decision before writing code. |
 
 ### review/
 
