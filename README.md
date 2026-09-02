@@ -35,6 +35,7 @@ Category folders under `skills/`:
 | `review/` | PR review, stacking, and rescoping workflows. |
 | `prompting/` | Sharpening prompts and standing up recurring routines. |
 | `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
+| `projects/` | Skills tied to one tool or project rather than a general workflow. |
 
 ## SKILL.md standard
 
@@ -143,6 +144,12 @@ Run `./install.sh` again after adding a new skill to link it.
 | [scamper](skills/lateral-thinking/scamper/SKILL.md) | SCAMPER — run one existing idea through seven systematic transformations for disciplined variations. |
 | [six-hats](skills/lateral-thinking/six-hats/SKILL.md) | Six Thinking Hats — examine one decision through sequential, non-blended perspectives (facts, feelings, risks, benefits, alternatives, synthesis). |
 | [worst-idea](skills/lateral-thinking/worst-idea/SKILL.md) | Worst Possible Idea — design deliberately terrible solutions, then invert what makes them bad into strong features. |
+
+### projects/
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [gc-city-audit](skills/projects/gc-city-audit/SKILL.md) | Audit a Gas City (`gc`) city and repair its drift across autonomy, context, efficiency, and config sediment. |
 
 ## Matt Pocock skills
 
