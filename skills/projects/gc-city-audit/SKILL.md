@@ -1,6 +1,6 @@
 ---
 name: gc-city-audit
-description: Audit a Gas City (`gc`) city and repair its drift — autonomy (wake orders, lane caps, merge policy), context (window knobs, hooks, prompt weight), efficiency (provider pins, idle sessions, store and log growth), config sediment. Use when the user asks to audit, tune, health-check or improve a city, when a mayor stalls or stops waking, or after an owner instruction changes lanes or caps.
+description: Audit a Gas City (`gc`) city and repair its drift — autonomy (wake orders, lane caps, merge policy), context (window knobs, hooks, prompt weight), efficiency (provider pins, idle sessions, store and log growth), config sediment. Use when the user asks to audit, tune, health-check or improve a city, when a mayor stalls or stops waking, or after an owner instruction changes lanes or caps, when dolt burns CPU with an empty processlist, or when swap reads full with RAM free.
 ---
 
 # Gas City audit
@@ -40,7 +40,12 @@ that cannot run is UNKNOWN with the error text, never a silent PASS.
   auto-spawn for routed beads and breach caps silently; count sessions, not slings.
 - Merge policy: `[[github.pr_monitor]].merge_queue`, repair route, and whether anything
   can create repair beads for PRs the owner does not author.
-- Stranded work: detached worktree HEADs and unpushed branch tips in each rig.
+- Supervisor throttle: `supervisor.fs_pressure.skipped_tick` in `.gc/events.jsonl`, with the
+  cascade it heads — `session.stranded`, then `bead.dead_assignee_reopened`. Nothing else
+  surfaces this, and every other probe stays green while it runs.
+- Stranded work: detached worktree HEADs and unpushed branch tips in each rig. A bead reading
+  `open` with empty metadata is not idle work — check its **step** beads and the lane's pane
+  before re-dispatching, and check the remote before believing any report of completion.
 
 **Context** — does each session see what it needs and hand off before it drowns?
 - Window knobs: `GC_CONTEXT_*` in `.gc/settings.json` against the model each lane
