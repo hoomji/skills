@@ -150,6 +150,14 @@ Run `./install.sh` again after adding a new skill to link it.
 | Skill                              | Description                                                                                      |
 |------------------------------------|--------------------------------------------------------------------------------------------------|
 | [gc-city-audit](skills/projects/gc-city-audit/SKILL.md) | Audit a Gas City (`gc`) city and repair its drift across autonomy, context, efficiency, and config sediment. |
+| [gc-city-cleanup](skills/projects/gc-city-cleanup/SKILL.md) | Clean up a stopped or calm Gas City across every host — leftover processes, runtime-dir growth, the jsonl-archive push loop, rig worktrees on Ryzen/Dell/GTX, a dirty shared checkout, and gc doctor flags — measured by a before/after register. Use after `gc stop`, when the user asks to clean up the city, when disk or `.gc/runtime` has grown, or when `gc doctor` shows failures that a restart did not clear. |
+| [gc-dolt-disk-reclaim](skills/projects/gc-dolt-disk-reclaim/SKILL.md) | Reclaim disk from a Gas City Dolt database whose orphaned oldgen chunks scheduled compaction skips, by running gc dolt compact --gc-only against the live server. |
+| [gc-duplicate-dispatch](skills/projects/gc-duplicate-dispatch/SKILL.md) | Find and settle work beads carrying more than one molecule root or input convoy, so two lanes never run one job. Use before slinging a bead that may already be in flight, when provider quota burns faster than the lane count explains, when two lanes commit to one branch, or when a sling reports success and nothing ever attaches. |
+| [gc-host-health](skills/projects/gc-host-health/SKILL.md) | Diagnose CPU and swap health on a Gas City host — runaway child processes, stale swap, swappiness tuning, and agent memory footprint. |
+| [gc-mail-backlog](skills/projects/gc-mail-backlog/SKILL.md) | Clear a Gas City unread-mail backlog by harvesting its signal before archiving the residue. |
+| [gc-reclaim-register](skills/projects/gc-reclaim-register/SKILL.md) | Record a Gas City reclaim as a six-row before/after register — open beads, hot-list payload, molecule step beads, molecule roots, unread mail, host health — and keep a size drop from being reported as health. |
+| [gc-session-churn](skills/projects/gc-session-churn/SKILL.md) | Identify and recover from short-lived codex sessions that discard uncommitted work. The reconciler aggressively retires pool slots, causing session churn where 46% of sessions die under 5 minutes. Stranded sessions trigger bead.dead_assignee_reopened, abandoning work in progress. Watch for session.stranded and session.drain_acked_with_assigned_work. |
+| [gc-store-reclaim](skills/projects/gc-store-reclaim/SKILL.md) | Diagnose a slow or erroring Gas City bead store and reclaim it by clearing husk molecules. |
 
 ## Matt Pocock skills
 
