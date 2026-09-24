@@ -11,7 +11,7 @@ Reference for step 2 of [`hill-climbing`](SKILL.md) and step 3 of [`perf-baselin
 | Operation counts | wrap the expensive primitives for the duration of the run (`JSON.parse`, `JSON.stringify`, `TextEncoder.encode`, `new Headers`, `RegExp.prototype.exec`) and count calls | When a call-count total is flat but the work per call moved |
 | Allocation count | `--trace-gc` scavenge count, or `v8.getHeapStatistics().total_allocated_bytes` deltas under `--predictable` | GC-driven jank, string churn (the UTF-16 case: one non-Latin-1 character makes the whole string two-byte) |
 
-`--predictable` removes the concurrent recompiler and the sampler; `--single-threaded` removes worker threads. Warm the code first (run the input a fixed number of times, discarded), then count a fixed number of iterations, so JIT tier-up lands before the counted window.
+Run call counting under `--no-opt --no-maglev`. Optimised code does not increment the invocation counters precise coverage reads, so a batch long enough to tier up undercounts by however much of it ran optimised: measured on Gateway-LLM, 50 requests counted 25,484 then 24,291 then 26,082 under default flags and 26,151 five times in five with both tiers off. Have the lab refuse to count without the flags, so a hand run cannot produce a number that reads as a win. `--predictable` and `--single-threaded` remove the concurrent recompiler, the sampler and worker threads for instruction counting. Warm the code first (run the input a fixed number of times, discarded), then count a fixed number of iterations.
 
 ## Browsers
 
