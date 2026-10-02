@@ -37,6 +37,7 @@ Category folders under `skills/`:
 | `performance/` | Making a user journey faster: baseline, the measure/ship/judge loop, and the ratchet that holds the win. |
 | `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
 | `projects/` | Skills tied to one tool or project rather than a general workflow. |
+| `verification/` | Proving a change works on the real artifact: a project-local verify skill and its feature map, its maintenance pass, a decision trail, blast radius, and the verification principles (from pstack, MIT). |
 
 ## SKILL.md standard
 
@@ -143,6 +144,18 @@ flow audit that produced these is [`docs/assessments/2026-09-24-hill-climbing-fl
 | [hill-climbing](skills/performance/hill-climbing/SKILL.md) | The loop that makes one user journey faster: identify, measure (deterministic lab + field signal), decide, ship behind a typed flag, judge, continue or close. |
 | [perf-baseline](skills/performance/perf-baseline/SKILL.md) | Write down how fast a repo's journeys are today, build the deterministic lab that fills the rows, check the counts in. |
 | [perf-ratchet](skills/performance/perf-ratchet/SKILL.md) | Lock in a measured win: a checked-in ceiling per journey, a rise is red, a fall lowers the ceiling in the same PR. |
+
+### verification/
+
+From [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT, licence kept in `skills/verification/LICENSE-pstack`), rewritten for Claude Code.
+
+| Skill | Use it when |
+|---|---|
+| [verification-principles](skills/verification/verification-principles/SKILL.md) | Model-invoked index over six principles: prove it works, sequence verifiable units, test behavior not implementation, fix root causes, build the lever, encode lessons in structure. |
+| [create-verification-skill](skills/verification/create-verification-skill/SKILL.md) | A repo has no scripted way to drive the real app; generates `.claude/skills/verify-<app>/` with a feature map. |
+| [maintain-verification-skill](skills/verification/maintain-verification-skill/SKILL.md) | The feature map has drifted; source wave plus one live pass, at most one PR of proven corrections. |
+| [show-me-your-work](skills/verification/show-me-your-work/SKILL.md) | Long or unattended work needs a reviewable decision trail (one TSV row per decision, `scripts/log.sh`). |
+| [blast-radius](skills/verification/blast-radius/SKILL.md) | A small diff you do not trust; find the one fact it is safe because of and prove it by running code. |
 
 ### lateral-thinking/
 
