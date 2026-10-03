@@ -143,6 +143,7 @@ From [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack)
 | [maintain-verification-skill](skills/verification/maintain-verification-skill/SKILL.md) | The feature map has drifted; source wave plus one live pass, at most one PR of proven corrections. |
 | [show-me-your-work](skills/verification/show-me-your-work/SKILL.md) | Long or unattended work needs a reviewable decision trail (one TSV row per decision, `scripts/log.sh`). |
 | [blast-radius](skills/verification/blast-radius/SKILL.md) | A small diff you do not trust; find the one fact it is safe because of and prove it by running code. |
+| [auditing-tests](skills/verification/auditing-tests/SKILL.md) | A test is red, written, or under review; asks whether a plausible wrong implementation would still pass it, proved by a targeted mutation. |
 
 ### lateral-thinking/
 
