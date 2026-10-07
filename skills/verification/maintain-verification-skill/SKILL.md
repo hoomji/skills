@@ -24,7 +24,13 @@ Only edit the verification skill's own directory (its SKILL.md, features/, and a
 
 0. **Locate the target.** Find the verification skill to maintain: the project-local skill whose body has launch/drive sections and a feature map (usually `.claude/skills/verify-*/`). Several candidates → ask which one; none → stop and point at `/create-verification-skill` instead of inventing a target.
 
-1. **Index hygiene.** Read the feature map README and glob its sibling files. Fix missing, extra, duplicate, or dead entries. Lightweight; no generated inventory.
+1. **Index hygiene.** Run the linter from the repo root and fix every finding it prints:
+
+   ```bash
+   <this skill's dir>/scripts/verify-map.py <verify-dir> check --repo-root .
+   ```
+
+   Exit `0` is clean, `1` is findings, `3` means the directory is not a verification skill; `--json` gives a machine-readable report and `list` prints the feature index. It covers dead and unindexed entries, duplicate links, the four feature H2s and their order, empty sections, and helper scripts the skill names that the repo no longer ships. Done when it exits `0`.
 
 2. **Source wave.** One read-only subagent per feature file, launched concurrently. Each explains "how does this user-facing feature work?" from source, flags likely doc drift with citations, and returns one concise live-verification recipe. Children never drive the app and never edit files. Return shape: feature summary / source entry points / likely drift or none / one recipe.
 
