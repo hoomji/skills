@@ -158,6 +158,7 @@ Run `./install.sh` again after adding a new skill to link it.
 | [gc-reclaim-register](skills/projects/gc-reclaim-register/SKILL.md) | Record a Gas City reclaim as a six-row before/after register — open beads, hot-list payload, molecule step beads, molecule roots, unread mail, host health — and keep a size drop from being reported as health. |
 | [gc-session-churn](skills/projects/gc-session-churn/SKILL.md) | Identify and recover from short-lived codex sessions that discard uncommitted work. The reconciler aggressively retires pool slots, causing session churn where 46% of sessions die under 5 minutes. Stranded sessions trigger bead.dead_assignee_reopened, abandoning work in progress. Watch for session.stranded and session.drain_acked_with_assigned_work. |
 | [gc-store-reclaim](skills/projects/gc-store-reclaim/SKILL.md) | Diagnose a slow or erroring Gas City bead store and reclaim it by clearing husk molecules. |
+| [verify-agent-context](skills/projects/verify-agent-context/SKILL.md) | Verify a Gas City's agent context — mayor and seat prompts, seat memory copies, the mayor's memory — against the live city; the target `/maintain-verification-skill` keeps honest. |
 
 ## Matt Pocock skills
 
