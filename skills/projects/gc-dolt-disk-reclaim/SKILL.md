@@ -1,6 +1,6 @@
 ---
 name: gc-dolt-disk-reclaim
-description: Reclaim disk from a Gas City Dolt database whose orphaned oldgen chunks scheduled compaction skips, by running gc dolt compact --gc-only against the live server. Use when .beads/dolt has grown, when the compactor log says below_threshold ... skip, when DOLT_GC fails with "SaveHashes ... context canceled", or when a compact cannot resolve the runtime port.
+description: Reclaim disk from a Gas City Dolt database whose orphaned oldgen chunks scheduled compaction skips, by running gc dolt compact --gc-only against the live server. Use when .beads/dolt has grown past 2 GB with the store otherwise healthy, when the compactor log says below_threshold ... skip, when DOLT_GC fails with "SaveHashes ... context canceled", or when a compact cannot resolve the runtime port. Slow or failing gc bd is gc-store-reclaim.
 ---
 
 # Reclaiming Dolt disk with `--gc-only`
