@@ -149,6 +149,7 @@ Run `./install.sh` again after adding a new skill to link it.
 
 | Skill                              | Description                                                                                      |
 |------------------------------------|--------------------------------------------------------------------------------------------------|
+| [gc-board-and-memory-prune](skills/projects/gc-board-and-memory-prune/SKILL.md) | Prune a Gas City city's work beads and the mayor's memory of sediment, then mail the owner a review digest. |
 | [gc-city-audit](skills/projects/gc-city-audit/SKILL.md) | Audit a Gas City (`gc`) city and repair its drift across autonomy, context, efficiency, and config sediment. |
 | [gc-city-cleanup](skills/projects/gc-city-cleanup/SKILL.md) | Clean up a stopped or calm Gas City across every host — leftover processes, runtime-dir growth, the jsonl-archive push loop, rig worktrees on Ryzen/Dell/GTX, a dirty shared checkout, and gc doctor flags — measured by a before/after register. Use after `gc stop`, when the user asks to clean up the city, when disk or `.gc/runtime` has grown, or when `gc doctor` shows failures that a restart did not clear. |
 | [gc-dolt-disk-reclaim](skills/projects/gc-dolt-disk-reclaim/SKILL.md) | Reclaim disk from a Gas City Dolt database whose orphaned oldgen chunks scheduled compaction skips, by running gc dolt compact --gc-only against the live server. |
