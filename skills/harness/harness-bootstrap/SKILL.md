@@ -1,9 +1,18 @@
 ---
 name: harness-bootstrap
-description: Preview and install a minimum viable harness for a software repository. Use after a harness assessment when the user wants AGENTS.md, a thin CLAUDE.md pointer, deterministic command guidance, a YAML harness manifest, architecture and indexed design-documentation entrypoints, a tracer workflow, validation, or a learning ledger added without overwriting existing conventions.
+disable-model-invocation: true
+description: User-invoked only. Preview and install a minimum viable harness for a software repository. Use after a harness assessment when the user wants AGENTS.md, a thin CLAUDE.md pointer, deterministic command guidance, a YAML harness manifest, architecture and indexed design-documentation entrypoints, a tracer workflow, validation, or a learning ledger added without overwriting existing conventions.
 ---
 
 # Harness Bootstrap
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-bootstrap` in Codex or `/harness-bootstrap` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Prepare a previewed, reviewable change set. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md) before editing.

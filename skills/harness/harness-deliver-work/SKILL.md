@@ -1,9 +1,18 @@
 ---
 name: harness-deliver-work
-description: Deliver a repository change through baseline, implementation, verification, and evidence-backed review. Use when the user wants an existing spec, issue, or plan implemented using the repository harness while composing installed debugging, TDD, implementation, merge-conflict, and review skills.
+disable-model-invocation: true
+description: User-invoked only. Deliver a repository change through baseline, implementation, verification, and evidence-backed review. Use when the user wants an existing spec, issue, or plan implemented using the repository harness while composing installed debugging, TDD, implementation, merge-conflict, and review skills.
 ---
 
 # Harness Deliver Work
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-deliver-work` in Codex or `/harness-deliver-work` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md) and
 [`../harness/references/composition.md`](../harness/references/composition.md).

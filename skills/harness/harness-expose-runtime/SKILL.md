@@ -1,9 +1,18 @@
 ---
 name: harness-expose-runtime
-description: Make one runtime surface directly inspectable and verifiable by coding agents. Use when agents cannot reproduce or prove UI behavior, query task-local logs, inspect metrics or traces, check performance, observe database state, or safely exercise an external API during engineering work.
+disable-model-invocation: true
+description: User-invoked only. Make one runtime surface directly inspectable and verifiable by coding agents. Use when agents cannot reproduce or prove UI behavior, query task-local logs, inspect metrics or traces, check performance, observe database state, or safely exercise an external API during engineering work.
 ---
 
 # Harness Expose Runtime
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-expose-runtime` in Codex or `/harness-expose-runtime` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md). Expose one
 surface that closes one concrete feedback loop.

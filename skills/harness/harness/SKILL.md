@@ -1,9 +1,18 @@
 ---
 name: harness
-description: Route harness-engineering work for repositories. Use when the user wants to assess agent readiness, bootstrap agent guidance, manage domain language or architecture decisions, improve repository legibility or enforcement, run an evidence-backed engineering lifecycle, capture repeated corrections, or maintain harness quality.
+disable-model-invocation: true
+description: User-invoked only. Route harness-engineering work for repositories. Use when the user wants to assess agent readiness, bootstrap agent guidance, manage domain language or architecture decisions, improve repository legibility or enforcement, run an evidence-backed engineering lifecycle, capture repeated corrections, or maintain harness quality.
 ---
 
 # Harness
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness` in Codex or `/harness` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Choose the narrowest harness skill that completes the requested job. Read
 [`references/contracts.md`](references/contracts.md) when the task creates or consumes

@@ -1,9 +1,18 @@
 ---
 name: harness-quality-report
-description: Produce or update an evidence-backed harness capability report. Use when the user wants maturity levels by plane, trends between assessments, regressions, unknowns, autonomy readiness, human-intervention patterns, or a prioritized harness investment report without collapsing readiness into one score.
+disable-model-invocation: true
+description: User-invoked only. Produce or update an evidence-backed harness capability report. Use when the user wants maturity levels by plane, trends between assessments, regressions, unknowns, autonomy readiness, human-intervention patterns, or a prioritized harness investment report without collapsing readiness into one score.
 ---
 
 # Harness Quality Report
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-quality-report` in Codex or `/harness-quality-report` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md). Use current
 evidence; invoke `harness-assess` when the baseline is missing or stale.

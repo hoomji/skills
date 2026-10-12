@@ -1,9 +1,18 @@
 ---
 name: harness-capture-learning
-description: Turn repeated agent friction, review corrections, failed runs, or human interventions into the narrowest durable repository improvement. Use when the same mistake recurs, a workflow needed hidden knowledge, or feedback should compound into guidance, documentation, a skill, a script, enforcement, tooling, or an explicit decision not to encode.
+disable-model-invocation: true
+description: User-invoked only. Turn repeated agent friction, review corrections, failed runs, or human interventions into the narrowest durable repository improvement. Use when the same mistake recurs, a workflow needed hidden knowledge, or feedback should compound into guidance, documentation, a skill, a script, enforcement, tooling, or an explicit decision not to encode.
 ---
 
 # Harness Capture Learning
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-capture-learning` in Codex or `/harness-capture-learning` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md).
 

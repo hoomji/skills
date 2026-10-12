@@ -1,9 +1,18 @@
 ---
 name: harness-model-domain
-description: Create, inspect, revise, or reconcile repository domain glossaries in CONTEXT.md and multi-context maps. Use when project terminology is vague, overloaded, inconsistent with code, missing from the canonical glossary, duplicated across contexts, or needs to be updated without mixing in specifications, implementation details, or architecture decisions.
+disable-model-invocation: true
+description: User-invoked only. Create, inspect, revise, or reconcile repository domain glossaries in CONTEXT.md and multi-context maps. Use when project terminology is vague, overloaded, inconsistent with code, missing from the canonical glossary, duplicated across contexts, or needs to be updated without mixing in specifications, implementation details, or architecture decisions.
 ---
 
 # Harness Model Domain
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-model-domain` in Codex or `/harness-model-domain` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Maintain the repository's canonical domain language. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md),

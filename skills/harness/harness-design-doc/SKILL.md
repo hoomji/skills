@@ -1,9 +1,18 @@
 ---
 name: harness-design-doc
-description: Create, revise, inspect, verify, or retire indexed repository design documentation under docs/design-docs or the repository's established equivalent. Use when a system or feature design needs durable rationale, constraints, interfaces, alternatives, or verification status without collapsing that material into product specs, ARCHITECTURE.md, ADRs, or execution plans.
+disable-model-invocation: true
+description: User-invoked only. Create, revise, inspect, verify, or retire indexed repository design documentation under docs/design-docs or the repository's established equivalent. Use when a system or feature design needs durable rationale, constraints, interfaces, alternatives, or verification status without collapsing that material into product specs, ARCHITECTURE.md, ADRs, or execution plans.
 ---
 
 # Harness Design Doc
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-design-doc` in Codex or `/harness-design-doc` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Operate on the repository's design-knowledge surface. Read the repository guidance,
 design-doc index, relevant product specs, `ARCHITECTURE.md`, ADRs, ExecPlans, code, and

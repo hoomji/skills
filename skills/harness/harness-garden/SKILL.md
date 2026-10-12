@@ -1,9 +1,18 @@
 ---
 name: harness-garden
-description: Read-only repository harness gardening for stale, conflicting, broken, duplicated, or orphaned agent-facing artifacts. Use when the user wants to audit AGENTS.md pointers, commands, docs, plans, manifest claims, exceptions, hooks, skills, learning-ledger items, or architecture drift; use fix mode only when explicitly requested.
+disable-model-invocation: true
+description: User-invoked only. Read-only repository harness gardening for stale, conflicting, broken, duplicated, or orphaned agent-facing artifacts. Use when the user wants to audit AGENTS.md pointers, commands, docs, plans, manifest claims, exceptions, hooks, skills, learning-ledger items, or architecture drift; use fix mode only when explicitly requested.
 ---
 
 # Harness Garden
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-garden` in Codex or `/harness-garden` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md). Default to
 R0 report mode.

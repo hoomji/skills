@@ -1,9 +1,18 @@
 ---
 name: harness-exec-plan
-description: Create, resume, maintain, complete, or inspect self-contained repository ExecPlans. Use when multi-milestone work must survive beyond chat context, a novice agent must be able to restart it, or plan state must be reconciled with implementation and acceptance evidence.
+disable-model-invocation: true
+description: User-invoked only. Create, resume, maintain, complete, or inspect self-contained repository ExecPlans. Use when multi-milestone work must survive beyond chat context, a novice agent must be able to restart it, or plan state must be reconciled with implementation and acceptance evidence.
 ---
 
 # Harness ExecPlan
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-exec-plan` in Codex or `/harness-exec-plan` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Manage the living execution-plan lifecycle. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md), repository

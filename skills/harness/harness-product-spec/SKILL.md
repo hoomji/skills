@@ -1,9 +1,18 @@
 ---
 name: harness-product-spec
-description: Create, revise, inspect, or retire repository-local product specifications that define user problems, outcomes, behavioral boundaries, and acceptance criteria separately from implementation. Use when product intent belongs under docs/product-specs, a product-facing change lacks an authoritative specification, or an existing specification must be reconciled with issues, ADRs, code, and delivery evidence.
+disable-model-invocation: true
+description: User-invoked only. Create, revise, inspect, or retire repository-local product specifications that define user problems, outcomes, behavioral boundaries, and acceptance criteria separately from implementation. Use when product intent belongs under docs/product-specs, a product-facing change lacks an authoritative specification, or an existing specification must be reconciled with issues, ADRs, code, and delivery evidence.
 ---
 
 # Harness Product Spec
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-product-spec` in Codex or `/harness-product-spec` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Operate on the repository's product-intent surface. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md), the

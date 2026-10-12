@@ -1,9 +1,18 @@
 ---
 name: harness-deepen
-description: Improve one evidenced harness capability plane in a repository. Use when an assessment identifies a specific weakness in intent, knowledge, execution, feedback, policy, isolation, lifecycle, hygiene, or governance and the user wants a narrow, verified improvement rather than a full bootstrap.
+disable-model-invocation: true
+description: User-invoked only. Improve one evidenced harness capability plane in a repository. Use when an assessment identifies a specific weakness in intent, knowledge, execution, feedback, policy, isolation, lifecycle, hygiene, or governance and the user wants a narrow, verified improvement rather than a full bootstrap.
 ---
 
 # Harness Deepen
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-deepen` in Codex or `/harness-deepen` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md). Improve one
 plane for one real tracer workflow.

@@ -2,3 +2,6 @@ interface:
   display_name: "Harness Assess"
   short_description: "Audit repository agent readiness"
   default_prompt: "Use $harness-assess to produce a read-only, evidence-backed harness assessment of this repository."
+
+policy:
+  allow_implicit_invocation: false
