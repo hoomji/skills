@@ -1,9 +1,18 @@
 ---
 name: harness-review-evidence
-description: Review a software change against its originating spec, repository standards, and claimed verification evidence. Use when a diff or PR needs a harness-aware review, an evidence bundle must be audited, or the user wants product-judgment gaps separated from mechanically repairable defects.
+disable-model-invocation: true
+description: User-invoked only. Review a software change against its originating spec, repository standards, and claimed verification evidence. Use when a diff or PR needs a harness-aware review, an evidence bundle must be audited, or the user wants product-judgment gaps separated from mechanically repairable defects.
 ---
 
 # Harness Review Evidence
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-review-evidence` in Codex or `/harness-review-evidence` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md) and
 [`../harness/references/composition.md`](../harness/references/composition.md).

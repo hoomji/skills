@@ -1,9 +1,18 @@
 ---
 name: harness-encode-invariant
-description: Convert a repeated repository correction or architectural rule into mechanical enforcement. Use when review feedback recurs, an ADR or boundary needs executable protection, or the user wants a custom lint, structural test, schema, hook, or CI gate with actionable remediation.
+disable-model-invocation: true
+description: User-invoked only. Convert a repeated repository correction or architectural rule into mechanical enforcement. Use when review feedback recurs, an ADR or boundary needs executable protection, or the user wants a custom lint, structural test, schema, hook, or CI gate with actionable remediation.
 ---
 
 # Harness Encode Invariant
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-encode-invariant` in Codex or `/harness-encode-invariant` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md). Encode
 high-value boundaries, not personal taste.

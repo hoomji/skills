@@ -1,9 +1,18 @@
 ---
 name: harness-plan-work
-description: Create a repository-grounded execution plan with acceptance evidence and autonomy boundaries. Use when a software goal is multi-step, ambiguous, likely to span hours, crosses harness planes, or needs a durable plan that agents can execute without relying on chat context.
+disable-model-invocation: true
+description: User-invoked only. Create a repository-grounded execution plan with acceptance evidence and autonomy boundaries. Use when a software goal is multi-step, ambiguous, likely to span hours, crosses harness planes, or needs a durable plan that agents can execute without relying on chat context.
 ---
 
 # Harness Plan Work
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-plan-work` in Codex or `/harness-plan-work` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Read [`../harness/references/contracts.md`](../harness/references/contracts.md) and
 [`../harness/references/composition.md`](../harness/references/composition.md).

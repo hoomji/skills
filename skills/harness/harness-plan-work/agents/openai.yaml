@@ -2,3 +2,6 @@ interface:
   display_name: "Harness Plan Work"
   short_description: "Create evidence-backed execution plans"
   default_prompt: "Use $harness-plan-work to turn this goal into a repository-grounded execution plan."
+
+policy:
+  allow_implicit_invocation: false

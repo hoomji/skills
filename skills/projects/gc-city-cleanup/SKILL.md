@@ -1,7 +1,9 @@
 ---
 name: gc-city-cleanup
-description: Clean up a stopped or calm Gas City across every host — leftover processes, runtime-dir growth, the jsonl-archive push loop, rig worktrees on Ryzen/Dell/GTX, a dirty shared checkout, and gc doctor flags — measured by a before/after register. Use after `gc stop`, when the user asks to clean up the city, when disk or `.gc/runtime` has grown, or when `gc doctor` shows failures that a restart did not clear.
+description: Clean up a stopped or calm Gas City across every host — leftover processes, runtime-dir growth, the jsonl-archive push loop, rig worktrees on Ryzen/Dell/GTX, a dirty shared checkout, and gc doctor flags — measured by a before/after register. Use after `gc stop`, when the user asks to clean up the city's hosts or runtime, when disk or `.gc/runtime` has grown, or when `gc doctor` shows failures that a restart did not clear.
 ---
+
+Work beads and the mayor's memory are pruned by [`gc-board-and-memory-prune`](../gc-board-and-memory-prune/SKILL.md), not here.
 
 # City cleanup
 
@@ -42,12 +44,14 @@ probe value, never silence.
 
 - `session-reconciler-trace/segments/<yyyy>/<mm>/<dd>/` — day folders; `head.json` names only
   the current segment, so folders older than two days are droppable (859 MB → 219 MB).
-- `packs/core/jsonl-archive/` — a git repo the daemon pushes every 15 minutes. `gc doctor`
-  saying "N consecutive push failure(s) … non-fast-forward" means an abandoned interactive
-  rebase inside it (`.git/rebase-merge` present, a 200 MB `patch`). Every commit is a full
-  snapshot, so local is always freshest: `git rebase --abort`, then
-  `git merge -X ours origin/main`, then let the next export push. The doctor counter resets
-  only after that push succeeds.
+- `packs/core/jsonl-archive/` — a git repo the daemon commits to every 15 minutes. Since
+  2026-10-09 it is local-only: `gl.jsonl` passed GitHub's 100 MiB file cap, the rejected pushes
+  OOM'd the host, and `origin` was renamed `github-over-100mb` (restore it only once the archive
+  keeps files under 100 MiB). Its growth is loose objects, about 170 MB per export, because
+  `git gc --auto` never fires under the default `gc.auto`. Fix: `git config gc.auto 200`,
+  `pack.threads 1`, `pack.windowMemory 256m`, then one `git gc --prune=now`; check with
+  `git count-objects -vH`. An abandoned interactive rebase (`.git/rebase-merge` present) is
+  cleared with `git rebase --abort`; every commit is a full snapshot, so local is freshest.
 
 **Rig worktrees on a remote host** run through `dispatch/<host>.sh sh '<script>'`. Two traps:
 skip `du` per worktree on Dell (its load makes the wrapper die mid-script with no error), and
@@ -83,7 +87,7 @@ owner; state the owner beside each flag in the report instead of retrying it.
 | `provider-catalog-local-readiness` (claude, antigravity) | by design | role agents pin flash providers |
 | `order-firing-current`, `agent-sessions`, `orphan-sessions` | `gc start` | clear within minutes of a restart |
 | `nudge-unconfirmed` | owner (denied here) | `find .gc/sessions -name nudge-unconfirmed.log ! -newermt <today> -delete`; today's two belong to live sessions |
-| `jsonl-archive` | step 2 runtime repair | counter resets on the next successful export |
+| `jsonl-archive` | step 2 runtime repair | push failures are expected while origin is renamed local-only |
 | `order-tracking-retention` | already set | `[beads.policies.order_tracking].delete_after_close = "24h"` |
 
 Done when every flag in the final doctor run carries an owner, `--fix` has run once, and the

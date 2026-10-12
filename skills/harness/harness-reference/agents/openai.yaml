@@ -2,3 +2,6 @@ interface:
   display_name: "Harness Reference"
   short_description: "Curate durable repository references"
   default_prompt: "Use $harness-reference to capture or maintain this external reference in the repository."
+
+policy:
+  allow_implicit_invocation: false

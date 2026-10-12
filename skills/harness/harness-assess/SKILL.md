@@ -1,9 +1,18 @@
 ---
 name: harness-assess
-description: Read-only harness assessment for software repositories. Use when the user asks whether a repo is agent-ready, wants a harness-engineering baseline, needs gaps ranked before setup, or wants evidence for improving AGENTS.md, commands, tests, observability, architecture enforcement, isolation, maintenance, or autonomy.
+disable-model-invocation: true
+description: User-invoked only. Read-only harness assessment for software repositories. Use when the user asks whether a repo is agent-ready, wants a harness-engineering baseline, needs gaps ranked before setup, or wants evidence for improving AGENTS.md, commands, tests, observability, architecture enforcement, isolation, maintenance, or autonomy.
 ---
 
 # Harness Assess
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-assess` in Codex or `/harness-assess` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Produce an evidence-backed baseline without changing repository or external state. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md) before scoring.

@@ -1,9 +1,18 @@
 ---
 name: harness-record-decision
-description: Create, inspect, accept, deprecate, or supersede repository architecture decision records (ADRs). Use when a consequential technical or boundary choice is hard to reverse, surprising without context, and resolves a real trade-off; when a plan or implementation conflicts with an existing ADR; or when decision history must be reconciled without rewriting it.
+disable-model-invocation: true
+description: User-invoked only. Create, inspect, accept, deprecate, or supersede repository architecture decision records (ADRs). Use when a consequential technical or boundary choice is hard to reverse, surprising without context, and resolves a real trade-off; when a plan or implementation conflicts with an existing ADR; or when decision history must be reconciled without rewriting it.
 ---
 
 # Harness Record Decision
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-record-decision` in Codex or `/harness-record-decision` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Manage the repository's durable decision history. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md), repository

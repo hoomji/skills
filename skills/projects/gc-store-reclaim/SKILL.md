@@ -1,6 +1,6 @@
 ---
 name: gc-store-reclaim
-description: Diagnose a slow or erroring Gas City bead store and reclaim it by clearing husk molecules. Use when gc bd writes fail with "invalid connection" or i/o timeout, when gc bd list or gc status is slow (>1s) or reports Live rows 0, when the .beads/dolt directory has grown, or when open-bead counts look inflated by workflow step beads (gc.root_bead_id).
+description: Diagnose a slow or erroring Gas City bead store and reclaim it by clearing husk molecules. Use when gc bd writes fail with "invalid connection" or i/o timeout, when gc bd list or gc status is slow (>1s) or reports Live rows 0, or when open-bead counts look inflated by workflow step beads (gc.root_bead_id). Disk size alone is gc-dolt-disk-reclaim.
 ---
 
 # Reclaiming a Gas City bead store

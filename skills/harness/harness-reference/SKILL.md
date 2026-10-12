@@ -1,9 +1,18 @@
 ---
 name: harness-reference
-description: Capture, update, inspect, or retire durable external reference material in a repository knowledge store. Use when agents need version-pinned API notes, protocol or standard excerpts, provider behavior evidence, or another external source under docs/references without depending on browser context, private conversations, or human memory.
+disable-model-invocation: true
+description: User-invoked only. Capture, update, inspect, or retire durable external reference material in a repository knowledge store. Use when agents need version-pinned API notes, protocol or standard excerpts, provider behavior evidence, or another external source under docs/references without depending on browser context, private conversations, or human memory.
 ---
 
 # Harness Reference
+
+## Invocation
+
+Run only when the user explicitly invokes this skill by name (for example,
+`$harness-reference` in Codex or `/harness-reference` in Claude Code). A matching task or a reference from another skill is not an
+invocation. References to other harness skills below are recommendations; run
+those skills only when the user explicitly invokes them as well. Continue the
+authorized task directly when a recommended skill has not been invoked.
 
 Curate the repository's external-knowledge surface. Read the repository guidance and the
 references index in full before changing it. Resolve the store from
