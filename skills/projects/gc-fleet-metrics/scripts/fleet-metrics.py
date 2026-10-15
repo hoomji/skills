@@ -17,7 +17,7 @@ Sources (all local, Ryzen):
 $ is re-priced from city.toml [[pricing]] via dispatch/prices.py; a model with no rate is UNPRICED, never $0.
 A source that cannot be read, or whose newest row is older than the window end, is flagged in `coverage`.
 """
-import argparse, collections, datetime as dt, glob, gzip, json, os, re, subprocess, sys, time
+import argparse, ast, collections, datetime as dt, glob, gzip, json, os, re, subprocess, sys, time
 from pathlib import Path
 
 CITY = Path(os.environ.get("GC_CITY", "/home/coolhenrylinux/city"))
@@ -43,7 +43,22 @@ STALL_VERBS = ("QUEUED", "QUEUE-FULL", "REQUEUED", "LAUNCH-STALL", "FAIR-WAIT", 
 STALL_EVENTS = ("session.stranded", "session.idle_killed", "session.draining", "session.crashed",
                 "session.drain_acked_with_assigned_work", "session.demand_claim_divergence",
                 "bead.dead_assignee_reopened", "bead.claim_rejected", "order.failed")
-HOSTS = ("ryzen", "dell", "gtx")
+
+
+def fleet_hosts():
+    """dispatch/fleet.py HOSTS, parsed like gc-top does, so a new node (hailey) is counted
+    without an edit here; the three original hosts if fleet.py cannot be read."""
+    try:
+        for n in ast.parse((CITY / "dispatch/fleet.py").read_text()).body:
+            if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "HOSTS" for t in n.targets):
+                return tuple(k.value for k in n.value.keys)
+    except (OSError, SyntaxError, AttributeError):
+        pass
+    return ("ryzen", "dell", "gtx")
+
+
+HOSTS = fleet_hosts()
+
 DONE = ("PASS", "ALREADY-FIXED")
 LOW_N = 20
 ROUTED = re.compile(r"^(\S+Z) ROUTED (\S+) -> (\w+)/\S*?run([0-9a-f]{20})\b")
@@ -120,7 +135,9 @@ def route_lines():
         except OSError:
             continue
         with fh:
-            yield from fh
+            # A crash mid-append leaves NUL padding glued to the next line.
+            for line in fh:
+                yield line.replace("\x00", "")
 
 
 def parse_route(since, until, jobs):
@@ -291,7 +308,8 @@ def nodes_table(since, until, jobs, receipts, grades, launch):
                                     "state": j.get("state"), "title": (j.get("title") or "")[:70]})
     out = {}
     for h, n in N.items():
-        if not n["filed"]:
+        # Every fleet host keeps a row, idle ones too, so a node that stopped taking work shows.
+        if not n["filed"] and h == "unplaced":
             continue
         got = sum(n["receipts"].values())
         graded = sum(v for k, v in n["grades"].items() if k != "UNGRADED")
