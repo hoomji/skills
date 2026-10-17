@@ -34,6 +34,7 @@ Category folders under `skills/`:
 | `implementation/` | Getting a change written safely — checking what moved under the branch before building on it. |
 | `review/` | PR review, stacking, and rescoping workflows. |
 | `prompting/` | Sharpening prompts and standing up recurring routines. |
+| `performance/` | Making a user journey faster: baseline, the measure/ship/judge loop, and the ratchet that holds the win. |
 | `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
 | `projects/` | Skills tied to one tool or project rather than a general workflow. |
 
@@ -130,6 +131,18 @@ Run `./install.sh` again after adding a new skill to link it.
 | [team-prompt](skills/prompting/team-prompt/SKILL.md) | Compile work into a lead prompt that spawns and steers a Claude Code agent team — team-or-not gate, owned work pieces, self-contained spawn briefs. |
 | [subagent-prompt](skills/prompting/subagent-prompt/SKILL.md) | Compile work into a dispatch prompt that fans it out to subagents — subagents-or-not gate, independent pieces, briefs with a return contract. |
 | [writing-great-recurring](skills/prompting/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
+
+### performance/
+
+Packaged from Anthropic's "How We Made claude.ai 3x Faster in Two Weeks" (captured in
+[`docs/references/anthropic-claude-ai-faster.md`](docs/references/anthropic-claude-ai-faster.md); the
+flow audit that produced these is [`docs/assessments/2026-09-24-hill-climbing-flow-audit.md`](docs/assessments/2026-09-24-hill-climbing-flow-audit.md)).
+
+| Skill                              | Description                                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| [hill-climbing](skills/performance/hill-climbing/SKILL.md) | The loop that makes one user journey faster: identify, measure (deterministic lab + field signal), decide, ship behind a typed flag, judge, continue or close. |
+| [perf-baseline](skills/performance/perf-baseline/SKILL.md) | Write down how fast a repo's journeys are today, build the deterministic lab that fills the rows, check the counts in. |
+| [perf-ratchet](skills/performance/perf-ratchet/SKILL.md) | Lock in a measured win: a checked-in ceiling per journey, a rise is red, a fall lowers the ceiling in the same PR. |
 
 ### lateral-thinking/
 
