@@ -1,6 +1,6 @@
 # backlog-curator
 
-The backlog-curator seat (Codex, `agents/backlog-curator/`) proposes restocks and stale-bead
+The backlog-curator seat (`agents/backlog-curator/`; provider in its `agent.toml`) proposes restocks and stale-bead
 closures to the mayor by mail and files nothing. It wakes on `backlog-curator-pass` for a
 daily sweep, a thin ready queue or stale in-progress leases.
 

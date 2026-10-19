@@ -5,8 +5,9 @@ description: Verify a Gas City's agent context — the mayor and delegated-seat 
 
 # Verify agent context
 
-The "app" is the context five agents load when they wake: the mayor (`agents/mayor/`) and the
-four delegated seats (`ci-controller`, `fleet-watcher`, `receipt-grader`, `backlog-curator`),
+The "app" is the context six agents load when they wake: the mayor (`agents/mayor/`) and the
+five delegated seats (`ci-controller`, `fleet-watcher`, `receipt-grader`, `backlog-curator`,
+`review-queue`),
 each a prompt template plus a memory index, and the mayor's memory dir (`.claude-memory/`).
 A user of this context is the agent: what it reads on wake, and whether every fact it reads
 still holds in the city. Drift is a prompt or memory that names a path, script, flag, order or
@@ -27,9 +28,10 @@ Ready when `gc status` exits 0.
 
 `.claude/skills/verify-agent-context/scripts/context.py doctor` — one line per finding, exit 1
 on any, `doctor: clean` and exit 0 otherwise. It checks: `gc status`; `gc prime --strict <agent>`
-renders for all five agents; every backticked repo path in each prompt and in
+renders for all six agents; every backticked repo path in each prompt and in
 `docs/delegated-seats.md` exists (bare script names resolve under `dispatch/`,
-`orders/scripts/`, `docs/`, `agents/*/`; `docs/...` also resolves in the gc docs corpus at
+`orders/scripts/`, `docs/`, `agents/*/`, `dispatch/ledgers/`, `.gc/runtime/wall-ci/` and the
+gitbutler radar dir; switch files whose absence is normal, like `wall.off`, are skipped; `docs/...` also resolves in the gc docs corpus at
 `~/.cache/gascity-docs/`); `dispatch/seat_memory_sync.py check` is in step; the mayor's
 MEMORY.md lists exactly the files on disk, every `[[link]]` and every plain name after
 `See`/`Related:` resolves to a memory, doc or skill, and every frontmatter parses as YAML with
