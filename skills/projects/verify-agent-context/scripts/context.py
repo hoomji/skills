@@ -10,6 +10,11 @@
                                      every backticked path in <file>: `ok` or `MISS`; `<x>`
                                      placeholders match by glob; --also adds a root (a product repo)
   context.py memory                  mayor-memory index, [[link]], See/Related name and frontmatter checks
+  context.py skills                  every skill the agents load: frontmatter, name/dir agreement, untriggered
+                                     city-owned skills, backticked refs, and every skill script compiles
+  context.py hooks                   hook files: event names, block and command shape, duplicate matchers
+                                     (gc collapses them), named scripts exist and compile, and the
+                                     owner override survived gc's render into .gc/settings.json
   context.py seat-memory <seat>      that seat's lines from seat_memory_sync.py check; exit 1 on any
   context.py last-pass <seat>        the seat's newest closed pass bead, and whether its prompt,
                                      nudge or formula changed after it closed (prompt_newer)
@@ -22,6 +27,7 @@ import datetime as dt
 import glob
 import json
 import os
+import py_compile
 import re
 import subprocess
 import sys
@@ -48,6 +54,20 @@ BARE_GLOBS = ('agents/*/{}', 'agents/*/memory/{}', '.gc/runtime/fleet/{}', '.gc/
 # Switch files whose absence is the normal state: a prompt names them as the condition that ends a mode.
 SENTINELS = ('.gc/runtime/wall-ci/wall.off', '.gc/runtime/wall-e2e/off')
 GC_DOCS = Path.home() / '.cache' / 'gascity-docs'
+# Provider skill sinks gc fills from packs (docs/guides/capabilities-for-coding-agent-users.md:58)
+# plus role-level skills. A pack skill lives in `<binding>.<name>/` with the bare name in its
+# frontmatter, so the dir must equal the name or end in `.<name>`.
+SKILL_ROOTS = ('.claude/skills', '.agents/skills', '.opencode/skills', '.gemini/skills', 'agents/*/skills')
+SKILL_SKIP_DIRS = {'node_modules', '.git', '__pycache__', '.venv'}
+# The hook files the agents load: the owner override gc reads, and the two files it renders from it.
+HOOK_FILES = ('hooks/claude.json', '.claude/settings.json', '.gc/settings.json', '.codex/hooks.json')
+HOOK_OVERRIDE, HOOK_RENDERED = 'hooks/claude.json', '.gc/settings.json'
+HOOK_EVENTS = {'PreToolUse', 'PostToolUse', 'PostToolUseFailure', 'PermissionRequest', 'Notification',
+               'UserPromptSubmit', 'Stop', 'StopFailure', 'SubagentStart', 'SubagentStop', 'PreCompact',
+               'SessionStart', 'SessionEnd', 'TeammateIdle', 'TaskCompleted', 'ConfigChange',
+               'WorktreeCreate', 'WorktreeRemove', 'Elicitation', 'ElicitationResult', 'InstructionsLoaded'}
+HOOK_TYPES = {'command', 'prompt', 'agent', 'http'}
+HOOK_SCRIPT_RE = re.compile(r'(?<![\w/.$-])([\w$./~-]+\.(?:sh|py))(?![\w/.-])')
 
 
 def sh(*cmd, cwd=None):
@@ -126,6 +146,188 @@ def memory_findings(city):
     return found
 
 
+def compile_error(path):
+    """First line of the syntax error in a .py or .sh file, or None. Nothing is written."""
+    path = Path(path)
+    if path.suffix == '.py':
+        try:
+            compile(path.read_text(errors='replace'), str(path), 'exec')
+        except SyntaxError as e:
+            return f'line {e.lineno}: {e.msg}'
+        return None
+    if path.suffix == '.sh':
+        code, _, err = sh('bash', '-n', str(path))
+        return (err.strip().splitlines() or ['bash -n failed'])[-1] if code else None
+    return None
+
+
+def always_on_text(city):
+    """Everything an agent reads on wake without asking: prompts, memory indexes and bodies, and
+    the hook override (its skillOverrides block lists the user-invoked skills)."""
+    paths = [*city.glob('agents/*/prompt.template.md'), *city.glob('agents/*/memory/*.md'),
+             *memory_dir(city).glob('*.md'), city / HOOK_OVERRIDE]
+    return '\n'.join(p.read_text(errors='replace') for p in paths if p.is_file())
+
+
+def skill_dirs(city):
+    """(root, dir) for every skill directory under the provider sinks, symlinks included."""
+    out = []
+    for pattern in SKILL_ROOTS:
+        for root in sorted(city.glob(pattern)):
+            for d in sorted(root.iterdir()):
+                if (d / 'SKILL.md').is_file():
+                    out.append((root.relative_to(city), d))
+    return out
+
+
+def skill_scripts(city):
+    """Every .py and .sh under a skill, once per real file (three sinks link one pack skill)."""
+    seen, out = set(), []
+    for _, d in skill_dirs(city):
+        for dirpath, dirnames, filenames in os.walk(d, followlinks=True):
+            dirnames[:] = [n for n in dirnames if n not in SKILL_SKIP_DIRS]
+            for fn in sorted(filenames):
+                p = Path(dirpath) / fn
+                if p.suffix in ('.py', '.sh') and p.resolve() not in seen:
+                    seen.add(p.resolve())
+                    out.append(p)
+    return out
+
+
+def rel_label(city, path):
+    try:
+        return str(Path(path).relative_to(city))
+    except ValueError:
+        return str(path)
+
+
+def skill_findings(city):
+    """Frontmatter, name/dir agreement and scripts for every skill; triggers and backticked refs
+    for the city-owned ones (a symlinked skill is a pack's: gc owns its body and its triggers).
+    A skill is triggered when always-on text names it, its description carries a `when` clause
+    (the description is itself always-on), or it is user-invoked (disable-model-invocation)."""
+    found, text = [], None
+    for root, d in skill_dirs(city):
+        label = f'skill: {root}/{d.name}'
+        body = (d / 'SKILL.md').read_text(errors='replace')
+        fm = FM_RE.match(body)
+        if not fm:
+            found.append(f'{label} has no frontmatter')
+            continue
+        try:
+            meta = yaml.safe_load(fm.group(1)) or {}
+        except yaml.YAMLError as e:
+            found.append(f'{label} frontmatter is invalid YAML ({str(e).splitlines()[0]})')
+            continue
+        name, desc = str(meta.get('name') or ''), str(meta.get('description') or '')
+        if not name or not desc:
+            found.append(f'{label} frontmatter lacks name or description')
+            continue
+        if not (d.name == name or d.name.endswith('.' + name)):
+            found.append(f'{label} frontmatter name {name} does not match its directory')
+        if d.is_symlink():
+            continue
+        if text is None:
+            text = always_on_text(city)
+        if not (meta.get('disable-model-invocation') is True or re.search(r'\bwhen(ever)?\b', desc, re.I)
+                or name in text or d.name in text):
+            found.append(f'{label} is untriggered: no always-on text names it, its description has no '
+                         f'"when" clause and it is not user-invoked')
+        # A bare `plan.md` in a skill body is usually an artifact the skill writes; only rooted
+        # paths and script names are claims about the city.
+        for ref, ok in refs(city, d / 'SKILL.md', [d]):
+            if not ok and ('/' in ref or ref.endswith(('.py', '.sh'))):
+                found.append(f'{label} SKILL.md names missing {ref}')
+    for p in skill_scripts(city):
+        err = compile_error(p)
+        if err:
+            found.append(f'skill: {rel_label(city, p)} does not compile: {err}')
+    return found
+
+
+def hook_script(city, token):
+    """The file a hook command names, or None when the token cannot be resolved without a shell."""
+    if token.startswith(('$HOME/', '~/')):
+        return Path.home() / token.split('/', 1)[1]
+    if '$' in token:
+        return None
+    return Path(token) if token.startswith('/') else city / token
+
+
+def hook_commands(blocks):
+    return {h.get('command') for b in blocks if isinstance(b, dict)
+            for h in (b.get('hooks') or []) if isinstance(h, dict) and h.get('type') == 'command'}
+
+
+def hook_findings(city):
+    """Shape of every hook file the agents load, the scripts its commands name, duplicate matchers
+    (gc merges hook blocks by matcher, so the later block replaces the earlier), and whether every
+    command in the owner override survived gc's render into .gc/settings.json."""
+    found, loaded = [], {}
+    for rel in HOOK_FILES:
+        path = city / rel
+        if not path.is_file():
+            continue
+        try:
+            data = json.loads(path.read_text())
+        except json.JSONDecodeError as e:
+            found.append(f'hooks: {rel} is invalid JSON ({e})')
+            continue
+        hooks = data.get('hooks') if isinstance(data, dict) else None
+        if hooks is None:
+            continue
+        if not isinstance(hooks, dict):
+            found.append(f'hooks: {rel} "hooks" is not an object')
+            continue
+        loaded[rel] = hooks
+        for event, blocks in hooks.items():
+            if event not in HOOK_EVENTS:
+                found.append(f'hooks: {rel} {event} is not a hook event')
+            if not isinstance(blocks, list):
+                found.append(f'hooks: {rel} {event} is not a list of blocks')
+                continue
+            matchers = []
+            for i, block in enumerate(blocks):
+                if not isinstance(block, dict) or not isinstance(block.get('hooks'), list):
+                    found.append(f'hooks: {rel} {event}[{i}] has no "hooks" list')
+                    continue
+                matcher = block.get('matcher', '')
+                if not isinstance(matcher, str):
+                    found.append(f'hooks: {rel} {event}[{i}] matcher is not a string')
+                    matcher = str(matcher)
+                matchers.append(matcher)
+                for j, hook in enumerate(block['hooks']):
+                    where = f'{rel} {event}[{i}].hooks[{j}]'
+                    kind = hook.get('type') if isinstance(hook, dict) else None
+                    if kind not in HOOK_TYPES:
+                        found.append(f'hooks: {where} type is not one of {", ".join(sorted(HOOK_TYPES))}')
+                        continue
+                    key = {'command': 'command', 'prompt': 'prompt', 'agent': 'prompt', 'http': 'url'}[kind]
+                    body = hook.get(key)
+                    if not isinstance(body, str) or not body.strip():
+                        found.append(f'hooks: {where} has no {key}')
+                        continue
+                    if kind != 'command':
+                        continue
+                    for token in HOOK_SCRIPT_RE.findall(body):
+                        script = hook_script(city, token)
+                        if script is None:
+                            continue
+                        if not script.is_file():
+                            found.append(f'hooks: {where} names missing {token}')
+                        elif (err := compile_error(script)):
+                            found.append(f'hooks: {where} script {token} does not compile: {err}')
+            for m in sorted({m for m in matchers if matchers.count(m) > 1}):
+                found.append(f'hooks: {rel} {event} has {matchers.count(m)} blocks with matcher "{m}" (gc keeps one)')
+    override, rendered = loaded.get(HOOK_OVERRIDE), loaded.get(HOOK_RENDERED)
+    if override is not None and rendered is not None:
+        for event, blocks in override.items():
+            missing = hook_commands(blocks if isinstance(blocks, list) else []) - hook_commands(rendered.get(event) or [])
+            for cmd in sorted(c for c in missing if c):
+                found.append(f'hooks: {HOOK_RENDERED} dropped the {HOOK_OVERRIDE} {event} hook: {cmd[:90]}')
+    return found
+
+
 def seat_memory(city, seat=None):
     _, out, _ = sh(sys.executable, 'dispatch/seat_memory_sync.py', 'check', cwd=city)
     lines = [l for l in out.splitlines() if ':' in l]
@@ -173,6 +375,8 @@ def doctor(city):
                 found.append(f'{doc}: names missing {ref}')
     found += [f'seat-memory: {line}' for line in seat_memory(city)]
     found += memory_findings(city)
+    found += skill_findings(city)
+    found += hook_findings(city)
     return found
 
 
@@ -263,6 +467,8 @@ def main(argv=None):
     p.add_argument('--also', type=Path, action='append', default=[])
     p.add_argument('files', nargs='+')
     sub.add_parser('memory')
+    sub.add_parser('skills')
+    sub.add_parser('hooks')
     p = sub.add_parser('seat-memory')
     p.add_argument('seat', choices=SEATS)
     p = sub.add_parser('last-pass')
@@ -285,9 +491,9 @@ def main(argv=None):
                 print(f'{"ok  " if ok else "MISS"} {f}: {ref}')
                 bad += not ok
         return 1 if bad else 0
-    if args.cmd == 'memory':
-        found = memory_findings(city)
-        print('\n'.join(found) or 'memory: clean')
+    if args.cmd in ('memory', 'skills', 'hooks'):
+        found = {'memory': memory_findings, 'skills': skill_findings, 'hooks': hook_findings}[args.cmd](city)
+        print('\n'.join(found) or f'{args.cmd}: clean')
         return 1 if found else 0
     if args.cmd == 'seat-memory':
         lines = seat_memory(city, args.seat)
