@@ -35,8 +35,21 @@ gitbutler radar dir; switch files whose absence is normal, like `wall.off`, are 
 `~/.cache/gascity-docs/`); `dispatch/seat_memory_sync.py check` is in step; the mayor's
 MEMORY.md lists exactly the files on disk, every `[[link]]` and every plain name after
 `See`/`Related:` resolves to a memory, doc or skill, and every frontmatter parses as YAML with
-a name and description. Finding lines: `<agent>: prompt names missing <path>`,
-`seat-memory: <seat>: copy|retired <file>`, `memory: <file> …`. Run it first, and again after any edit you prove.
+a name and description; every skill under the provider sinks (`.claude/skills/`,
+`.agents/skills/`, `.opencode/skills/`, `.gemini/skills/`, `agents/*/skills/`) has a frontmatter
+whose `name` matches its directory (`<binding>.<name>` for a pack skill), every `.py` and `.sh`
+inside a skill compiles (`compile()` and `bash -n`, nothing written), and each city-owned skill
+(a real directory, not a pack symlink) is triggered, meaning always-on text names it, its
+description has a `when` clause, or it is user-invoked, and its rooted paths and script names
+exist; every hook file (`hooks/claude.json`, `.gc/settings.json`, `.codex/hooks.json`) parses
+with known event names, well-formed blocks and commands, one block per matcher (gc merges by
+matcher and keeps one), scripts the commands name present and compiling, and no command of the
+owner override dropped from the rendered `.gc/settings.json`. Finding lines:
+`<agent>: prompt names missing <path>`, `seat-memory: <seat>: copy|retired <file>`,
+`memory: <file> …`, `skill: <sink>/<dir> …`, `hooks: <file> <event>[i].hooks[j] …`.
+`context.py skills` and `context.py hooks` run those two groups alone. Run it first, and again
+after any edit you prove. Unit tier for the skill and hook checks:
+`python3 .claude/skills/verify-agent-context/scripts/test_context.py` (scratch city, no gc).
 
 ## Drive
 
