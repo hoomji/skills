@@ -75,7 +75,10 @@ def refs(city, path, also=()):
             continue
         token = words[1] if words[0] in ('python3', 'bash', 'gc-docs') and len(words) > 1 else words[0]
         token = token.rstrip('.,;:')
+        # A wildcard under .gc/runtime/ names a set of runtime files that is often empty
+        # (mergify markers during the wall): skip it rather than call an empty set missing.
         if (any(c in token for c in '$~{}|') or token in seen or token in SENTINELS
+                or (token.startswith('.gc/runtime/') and '*' in token)
                 or not PATH_RE.match(token)):
             continue
         seen.add(token)
