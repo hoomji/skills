@@ -29,7 +29,7 @@ from pathlib import Path
 
 import yaml
 
-AGENTS = ('mayor', 'ci-controller', 'fleet-watcher', 'receipt-grader', 'backlog-curator')
+AGENTS = ('mayor', 'ci-controller', 'fleet-watcher', 'receipt-grader', 'backlog-curator', 'review-queue')
 SEATS = AGENTS[1:]
 TICK_RE = re.compile(r'`([^`\n]+)`')
 ROOTED = r'(?:agents|dispatch|docs|orders|formulas|hooks|prompts|archive|scripts|lib|\.gc|\.claude-memory|\.claude)/'
@@ -43,7 +43,10 @@ SKILL_DIRS = (Path.home() / '.claude' / 'skills',)
 # Where a bare file name (`fleet.py`, `seat-check.sh`, `pending.txt`) is looked up, and the gc
 # docs corpus that prompts cite as `gc-docs docs/...`.
 BARE_DIRS = ('', 'dispatch', 'orders/scripts', 'docs')
-BARE_GLOBS = ('agents/*/{}', 'agents/*/memory/{}', '.gc/runtime/fleet/{}', '.gc/runtime/fleet/seats/*/{}')
+BARE_GLOBS = ('agents/*/{}', 'agents/*/memory/{}', '.gc/runtime/fleet/{}', '.gc/runtime/fleet/seats/*/{}',
+              'dispatch/ledgers/{}', '.gc/runtime/wall-ci/{}', '.gc/runtime/fleet/gitbutler-radar/{}')
+# Switch files whose absence is the normal state: a prompt names them as the condition that ends a mode.
+SENTINELS = ('.gc/runtime/wall-ci/wall.off', '.gc/runtime/wall-e2e/off')
 GC_DOCS = Path.home() / '.cache' / 'gascity-docs'
 
 
@@ -72,7 +75,8 @@ def refs(city, path, also=()):
             continue
         token = words[1] if words[0] in ('python3', 'bash', 'gc-docs') and len(words) > 1 else words[0]
         token = token.rstrip('.,;:')
-        if any(c in token for c in '$~{}|') or token in seen or not PATH_RE.match(token):
+        if (any(c in token for c in '$~{}|') or token in seen or token in SENTINELS
+                or not PATH_RE.match(token)):
             continue
         seen.add(token)
         roots = [city, GC_DOCS, *also]

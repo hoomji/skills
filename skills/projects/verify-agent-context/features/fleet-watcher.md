@@ -1,6 +1,6 @@
 # fleet-watcher
 
-The fleet-watcher seat (Codex, `agents/fleet-watcher/`) diagnoses tripped fleet health probes
+The fleet-watcher seat (`agents/fleet-watcher/`; provider in its `agent.toml`) diagnoses tripped fleet health probes
 read-only and mails the mayor a cause with evidence. It wakes on `fleet-watcher-pass` when
 `orders/scripts/fleet-watcher-check.sh` writes probe lines to `pending.txt`.
 
@@ -29,10 +29,15 @@ Preconditions:
 - **Paths.** Run `context.py refs agents/fleet-watcher/prompt.template.md`. Every line reads `ok`.
   The order names and timer in the prompt are plain text: each order appears in `gc order list`
   and `tmp-reaper.timer` in `systemctl --user list-timers`.
-- **Probes.** Run `grep -nE 'echo|print' orders/scripts/fleet-watcher-check.sh`. Shapes are
-  `ryzen mem-available …`, `ryzen swap …`, `ryzen /tmp …`, `ryzen / …`,
-  `job <id> no receipt <N>h state=<state>` and `session.stranded x<N> in recent events`.
-  Each matches one prompt handler and every handler matches a shape.
+- **Probes.** Run `grep -nE 'echo|print' orders/scripts/fleet-watcher-check.sh` and
+  `grep -nE 'out.append|return \[' orders/scripts/fleet-supply-probe.py`. Shapes are
+  `ryzen mem-available …`, `ryzen swap …`, `ryzen /tmp …`, `ryzen / …`, `<host> / free …`,
+  `job <id> no receipt <N>h state=<state>`, `session.stranded x<N> in recent events`,
+  `probe error …`, `session create loop <template> on <provider> …`, `provider …` (codex-fallback
+  controller, quota-history, muse-code outage or stale reading, hopscotch balance),
+  `quota wall …` (pool, codex login, agy panes, muse-code, hopscotch), `quota reading <login> missing …`,
+  `quota fallback ryzen backend …` and `aa-snapshot prod …`. Each matches one prompt handler and
+  every handler matches a shape.
 - **Memory.** Run `context.py seat-memory fleet-watcher`. Output is `fleet-watcher: seat memory in step`.
 - **Last pass.** Run `context.py last-pass fleet-watcher > $EV/fleet-watcher.last-pass.json`.
   With `prompt_newer: false`, the `close_reason` names a cause for the probe lines.

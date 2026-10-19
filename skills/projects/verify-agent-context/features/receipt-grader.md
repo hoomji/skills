@@ -1,6 +1,6 @@
 # receipt-grader
 
-The receipt-grader seat (Codex, `agents/receipt-grader/`) grades fleet lane receipts against
+The receipt-grader seat (`agents/receipt-grader/`; provider in its `agent.toml`) grades fleet lane receipts against
 remote evidence, appends one row per receipt to `dispatch/ledgers/model-grades.tsv`, comments
 the acceptance bead and mails the mayor `GRADES:`. It wakes on `receipt-grader-pass` when
 ungraded receipt ids appear in `pending.txt`.
@@ -9,6 +9,7 @@ ungraded receipt ids appear in `pending.txt`.
 
 - `rg-wake` the nudge and the pass formula give the Seat contract's wake order.
 - `rg-refs` every path and script the prompt names exists.
+- `rg-grade` every grade row goes through `dispatch/grade.py`, the ledger's single write door.
 - `rg-ledger` the grade vocabulary in the prompt matches the ledger header.
 - `rg-memory` the seat's memory copies are in step.
 - `rg-pass` the last pass graded, committed, commented and mailed as the prompt asks.
@@ -32,6 +33,9 @@ Preconditions:
   (`<id>`, `--job-only`, `--receipt-only`); its `--help` exits 2 by design.
 - **Ledger.** Run `head -5 dispatch/ledgers/model-grades.tsv`. The prompt's grade words
   (`WORKED`, `BLOCKED-JUSTIFIED`, `BLOCKED-UNJUSTIFIED`) are the header's.
+- **Grade door.** `sed -n 1,30p dispatch/grade.py` shows the argument order the prompt uses
+  (`<id8> <grade> <kind> <cause> <why...>`) and the `grades: <id8>` pathspec commit;
+  `git log -5 --format='%h %s' -- dispatch/ledgers/model-grades.tsv` shows only `grades:` commits.
 - **Memory.** Run `context.py seat-memory receipt-grader`. Output is `receipt-grader: seat memory in step`.
 - **Last pass.** Run `context.py last-pass receipt-grader > $EV/receipt-grader.last-pass.json`
   and `git log -5 --format='%h %cI %s' -- dispatch/ledgers/model-grades.tsv`. The pass names

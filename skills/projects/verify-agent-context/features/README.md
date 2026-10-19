@@ -37,4 +37,5 @@ this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with cont
 - [fleet-watcher](./fleet-watcher.md) covers the watcher's prompt, the probe lines it handles, memory and last pass.
 - [receipt-grader](./receipt-grader.md) covers the grader's prompt, grade ledger, memory and last pass.
 - [backlog-curator](./backlog-curator.md) covers the curator's prompt, probe lines, read-only contract, memory and last pass.
+- [review-queue](./review-queue.md) covers the Supply review seat's prompt, helper doors, ref-stack relaunch, memory and last pass.
 - [Mayor memory](./mayor-memory.md) covers the mayor's memory index, links, frontmatter and the seat copies taken from it.
