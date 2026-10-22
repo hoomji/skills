@@ -4,7 +4,7 @@ How city code reaches the remote hosts (Dell, GTX, Hailey) and whether they run 
 expects. Ryzen runs the live `~/city` checkout: a `dispatch/` edit is live there at once, before
 any commit. The remotes' `~/city` is not a git checkout. Each runs a checksummed release of the
 `FILES` list in `dispatch/deploy-resource-routing.py`, installed by `dispatch/stage-release.sh`
-(the owner runs it), plus its own host-specific `city.toml`. The release marker is
+(run by the `host-release` order through `dispatch/auto-release.py`), plus its own host-specific `city.toml`. The release marker is
 `~/city/.gc/runtime/fleet/release.json` on each host: `release` (the city commit), `installed`
 (epoch) and a sha256 for each released file. The harness is `.claude/skills/verify-city/scripts/host_release.py`.
 
@@ -31,9 +31,13 @@ any commit. The remotes' `~/city` is not a git checkout. Each runs a checksummed
 
 ## How to get to it (user POV)
 
-- The owner runs `dispatch/stage-release.sh [<commit>] [<host>...]`. The defaults are HEAD and
-  `dell gtx hailey`. It reads `FILES` from the **working tree's** `deploy-resource-routing.py`,
-  takes each file's content with `git show <commit>:<path>`, then scp's a tarball to each host. On
+- The `host-release` order runs `dispatch/auto-release.py` every 10 min: it compares each host's
+  `release.json` hashes with HEAD, waits for 10 min without a commit to `FILES`, pre-checks the
+  staged tree (compile, `bash -n`, `import fleet, resource_guard`), then runs
+  `dispatch/stage-release.sh HEAD <stale hosts>` and re-reads each `release.json`. State:
+  `.gc/runtime/auto-release/state.json`; `auto-release.py --dry-run` is read-only (it writes nothing).
+  `stage-release.sh [<commit>] [<host>...]` (defaults HEAD and `dell gtx hailey`) reads `FILES` and
+  each file's content with `git show <commit>:<path>`, then scp's a tarball to each host. On
   the host it runs `deploy-resource-routing.py <stage> ~/city --release <sha>`, which writes
   `release.json` and an `archive/resource-routing-<sha>/` backup, and prints the new head. Never
   run it from a verification pass: it writes to every host.
@@ -77,9 +81,11 @@ Run from the city root. `H=~/projects/skills-verify-agent-context/skills/project
 
 - Release lag alone is normal: 85 commits behind HEAD is fine when none touched `FILES`. Only
   `released files behind HEAD` is skew.
-- `stage-release.sh` takes `FILES` from the working tree but the file bytes from the commit. A
-  `FILES` entry added but not yet committed makes `git show` fail mid-stage. Doctor's
-  "not in HEAD" line catches it.
+- `stage-release.sh` reads `FILES` from the commit since 2026-10-22; before that it read the
+  working tree and an uncommitted `FILES` entry failed mid-stage. Doctor's "not in HEAD" line
+  still names such an entry.
+- Skew that lasts past about 20 min means the order is failing: read its `order.failed` message or
+  the mayor's `AUTO-RELEASE failed` mail, not the doctor.
 - `dispatch/ledgers/review-feedback.jsonl` is merged with the host's own rows on install, so it
   differs from HEAD by design and is skipped. The resource-bin shims (`pnpm`, `npm`, `npx`, `tsc`,
   `vitest`, `node`, `bazel`) are symlinks to `heavy-shim` and are compared as links.
