@@ -246,7 +246,8 @@ def doctor(city):
         started = proc_start(pid)
         for s in SERVER_LOADS:
             mt = (city / s).stat().st_mtime
-            if mt > started:
+            # server.py's code watch restarts within MIN_UPTIME + settle + one interval (~6 min).
+            if mt > started and time.time() - max(mt, started + 300) > 400:
                 f.append(f"obs-mobile-fresh: gc-mobile pid {pid} started {time.strftime('%FT%TZ', time.gmtime(started))}, "
                          f"{s} changed {time.strftime('%FT%TZ', time.gmtime(mt))} (server runs the old code)")
     # obs-gaps: lane gap kinds agree across gc-top, alerts.GAP_KINDS and the doc table.
