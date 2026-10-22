@@ -1,7 +1,7 @@
 # Gas City operations verification map
 
 This directory is the maintained source for verifying the city's operational subsystems on the
-live Ryzen city: merge queue and standing wall, fleet dispatch, quota routing, resource guard,
+live Ryzen city: trunk landing, trunk-to-develop promotion, fleet dispatch, quota routing, resource guard,
 orders, multi-host releases, gc promotion and observability. Read the index, then use the
 matching feature file as the recipe. Agent prompts and memory are verify-agent-context's.
 
@@ -39,7 +39,8 @@ this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with <har
 
 ## Features
 
-- [merge-wall](./merge-wall.md) covers the merge queue, the standing wall, holds, conflict sweep and the big-bang exit.
+- [merge-wall](./merge-wall.md) covers trunk landing, the validated and CI gates, holds, tip-red lanes, develop-watch sync, conflict sweep and the per-PR develop gate.
+- [trunk-promotion](./trunk-promotion.md) covers the deployable ratchet, the promotable sha, the cut, the preflight hold, the promotion queue path, cadence verdicts and the promotion ledgers.
 - [quota-routing](./quota-routing.md) covers quota readings, backend fallback, Pareto write and review placement.
 - [resource-guard](./resource-guard.md) covers lane reservations, command permits, the PATH shims and record hygiene.
 - [orders](./orders.md) covers every order file, its script and formula target, cadence and the seat wake checks.

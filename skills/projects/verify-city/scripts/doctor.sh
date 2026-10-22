@@ -6,10 +6,10 @@ set -uo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 city=()
 if [ "${1:-}" = "--city" ]; then city=(--city "$2"); shift 2; fi
-declare -A H=([merge-wall]=merge_wall.py [quota-routing]=quota_routing.py [resource-guard]=resource_guard_check.py
+declare -A H=([merge-wall]=merge_wall.py [trunk-promotion]=trunk_promotion.py [quota-routing]=quota_routing.py [resource-guard]=resource_guard_check.py
               [orders]=orders_check.py [host-release]=host_release.py [gc-promotion]=gc_promotion.py
               [observability]=observability.py)
-features=("$@"); [ ${#features[@]} -gt 0 ] || features=(merge-wall quota-routing resource-guard orders host-release gc-promotion observability)
+features=("$@"); [ ${#features[@]} -gt 0 ] || features=(merge-wall trunk-promotion quota-routing resource-guard orders host-release gc-promotion observability)
 rc=0
 for f in "${features[@]}"; do
   s=${H[$f]:-}; [ -n "$s" ] || { echo "$f: unknown feature"; rc=1; continue; }

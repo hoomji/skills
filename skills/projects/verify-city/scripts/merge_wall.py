@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""merge_wall.py -- read-only verification harness for the merge queue and the standing wall.
+"""merge_wall.py -- read-only verification harness for trunk landing and the per-PR develop gate.
 
 Subcommands (all read-only: file reads, `gc order list/history`, `git rev-parse/merge-base/
 ls-remote`, `gh pr list/view`; never land.sh, wall-land.sh, queue-ready.sh, merge-queue.sh run,
@@ -37,13 +37,14 @@ SCRIPTS = {
     "dispatch/queue-ready.sh": True, "dispatch/wall-land.sh": True, "dispatch/wall-ready.sh": True,
     "dispatch/wall-deploy.sh": True, "dispatch/wall-candidates.py": True,
     "dispatch/gitbutler-radar.sh": True, "dispatch/kept-beads.py": True,
-    "dispatch/red-fix-rounds.py": True, "orders/scripts/conflict-sweep.sh": True,
+    "dispatch/red-fix-rounds.py": True, "dispatch/tip-red-rounds.py": True,
+    "dispatch/develop-watch.py": True, "orders/scripts/conflict-sweep.sh": True,
     "orders/scripts/conflict-sweep.py": True, "orders/scripts/elapsed-check.sh": True,
     "dispatch/wall-checks.sh": False,
 }
-# Orders the feature owns: name -> max minutes since its last run while the wall stands.
+# Orders the feature owns: name -> max minutes since its last run while the trunk orders run (no wall.off).
 WALL_ORDERS = {"wall-land": 60, "wall-verify": 120, "wall-deploy": 120, "pr-conflict-sweep": 30,
-               "red-fix-rounds": 60}
+               "red-fix-rounds": 60, "tip-red-rounds": 120, "develop-watch": 60}
 OTHER_ORDERS = {"queue-ready": 30, "kept-beads": 60}
 # Subcommands docs and seat prompts drive: script -> case arms that must exist.
 ARMS = {
@@ -146,9 +147,9 @@ def monitor_bases(conf):
     return out
 
 
-def doc_section(city, start, stop_re=r"^## "):
+def doc_section(city, start, stop_re=r"^## ", doc="docs/trunk-and-promotion.md"):
     try:
-        text = (city / "docs/merge-queue.md").read_text()
+        text = (city / doc).read_text()
     except OSError:
         return ""
     i = text.find(start)
@@ -172,7 +173,7 @@ def doctor(city):
         elif need_x and not os.access(p, os.X_OK):
             f.append(f"script-not-executable {rel}")
 
-    for doc in ("docs/merge-queue.md", "docs/merge-train.md"):
+    for doc in ("docs/trunk-and-promotion.md", "docs/merge-queue.md", "docs/merge-train.md"):
         try:
             text = (city / doc).read_text()
         except OSError:
@@ -199,11 +200,12 @@ def doctor(city):
         f.append(f"gc-order-list-failed {err}")
         ords = {}
     else:
-        section = doc_section(city, "## Standing wall")
+        # The trunk method page names every trunk order ("The `wall-land` order ...").
+        section = doc_section(city, "# Trunk and promotion", stop_re=r"^## History")
         named = set(re.findall(r"order `([a-z0-9-]+)`|`([a-z0-9-]+)` order", section))
         for name in sorted({a or b for a, b in named}):
             if name not in ords:
-                f.append(f"doc-order-missing docs/merge-queue.md Standing wall names order {name}; gc order list lacks it")
+                f.append(f"doc-order-missing docs/trunk-and-promotion.md names order {name}; gc order list lacks it")
         for name in list(WALL_ORDERS) + list(OTHER_ORDERS):
             o = ords.get(name)
             if not o:
@@ -341,7 +343,7 @@ def state(city):
     print(f"deployed/           {', '.join(f'{p.name}={p.read_text().strip()[:8]}' for p in sorted(dep.glob('*'))) if dep.is_dir() else '(absent: nothing deployed yet)'}")
     ords, err = orders(city)
     print("orders (enabled, last run):")
-    for name in list(WALL_ORDERS) + list(OTHER_ORDERS) + ["wall-e2e"]:
+    for name in list(WALL_ORDERS) + list(OTHER_ORDERS) + ["wall-e2e", "tip-red-revert"]:
         o = (ords or {}).get(name)
         ts = last_run(city, name) if o else None
         en = "MISSING" if not o else ("enabled" if o.get("enabled", True) else "DISABLED")

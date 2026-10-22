@@ -1,6 +1,6 @@
 ---
 name: verify-city
-description: Verify a Gas City's operations on the live Ryzen city — merge queue and standing wall, quota routing, resource guard, orders, multi-host releases, gc promotion and the gc-top/gc-mobile views — by reading live state read-only and checking it against the code and docs. Use when proving a change to dispatch/, orders/ or a city doc, when a subsystem acts on a stale rule, before staging a release, or when /maintain-verification-skill audits this map.
+description: Verify a Gas City's operations on the live Ryzen city — trunk landing and the develop gate, trunk-to-develop promotion, quota routing, resource guard, orders, multi-host releases, gc promotion and the gc-top/gc-mobile views — by reading live state read-only and checking it against the code and docs. Use when proving a change to dispatch/, orders/ or a city doc, when a subsystem acts on a stale rule, before staging a release, or when /maintain-verification-skill audits this map.
 ---
 
 # Verify city operations
@@ -36,6 +36,7 @@ One harness per feature, all python3 stdlib, each with `--city` and a safe `--he
 | Feature | Harness | Drives |
 |---|---|---|
 | [merge-wall](features/merge-wall.md) | `.claude/skills/verify-city/scripts/merge_wall.py` | `state`, `holds`, `candidates` |
+| [trunk-promotion](features/trunk-promotion.md) | `.claude/skills/verify-city/scripts/trunk_promotion.py` | `state`, `promotable`, `gate` |
 | [quota-routing](features/quota-routing.md) | `.claude/skills/verify-city/scripts/quota_routing.py` | `readings`, `placement`, `orders`, `supply` |
 | [resource-guard](features/resource-guard.md) | `.claude/skills/verify-city/scripts/resource_guard_check.py` | `state`, `classes`, `prove-permit` (the one drive that takes a permit) |
 | [orders](features/orders.md) | `.claude/skills/verify-city/scripts/orders_check.py` | `inventory`, `order <name>`, `seats` |
@@ -61,6 +62,6 @@ Drives start nothing long-lived. `observability top` creates and kills its own t
 
 ## Helpers
 
-`.claude/skills/verify-city/scripts/doctor.sh` and the seven harnesses above are executable. The weekly order
+`.claude/skills/verify-city/scripts/doctor.sh` and the eight harnesses above are executable. The weekly order
 `verify-skill-doctors` (city `orders/scripts/verify-skill-doctors.sh`) runs `.claude/skills/verify-city/scripts/doctor.sh`
 and mails the mayor `VERIFY-SKILLS:` when its findings change.
