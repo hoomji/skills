@@ -263,7 +263,11 @@ def doctor(city):
             if I not in bases:
                 f.append(f"switch-split city.toml github.pr_monitor.base_branches {bases} lacks {I}")
     try:
-        m = re.search(r"^WALL=([^;\s]+)", (city / "dispatch/wall-land.sh").read_text(), re.M)
+        src = (city / "dispatch/wall-land.sh").read_text()
+        m = re.search(r"^WALL=([^;\s]+)", src, re.M)
+        if m and m.group(1).startswith("$"):
+            # Read from dispatch/integration-branch; only the ${WALL:-...} fallback is literal.
+            m = re.search(r"WALL=\$\{WALL:-([^}]+)\}", src)
         if walled and m and m.group(1) != I:
             f.append(f"switch-split dispatch/wall-land.sh hardcodes WALL={m.group(1)} but integration-branch={I}")
     except OSError:

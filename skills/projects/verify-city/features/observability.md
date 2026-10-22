@@ -68,9 +68,10 @@ are `verified-unreachable` with that output.
 
 - gc-top and gc-pr-top live at the city root, not `dispatch/`.
 - gc-top caches `fleet.py` for the life of the process (`routing_module`, `_ROUTING_MOD`). The
-  gc-mobile server loads gc-top once at start, so after any `fleet.py` change the phone shows
-  the old rules until `systemctl --user restart gc-mobile`. `obs-mobile-fresh` names that. The
-  restart is the owner's or mayor's call, never the verifier's.
+  gc-mobile server loads gc-top once at start; its `code_watch` thread exits the server once a
+  loaded city `.py` changed and compiles (after 5 min uptime and 10 s settle), and systemd restarts
+  it. `obs-mobile-fresh` therefore names only a change older than about 6 min: the watch failed
+  or the new code does not compile (journal line `code watch:`). Never restart it as the verifier.
 - `GET /api/<name>?refresh=1` wakes a collector run; never pass `refresh`. Every POST route
   (`subscribe`, `unsubscribe`, `test-push`, `alerts/ack`) writes or pushes to the phone.
 - Do not run `gc-pr-top.py` directly as a check: when its cache is over 45 s old it rewrites
