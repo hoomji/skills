@@ -110,10 +110,12 @@ Preconditions:
     past one `red-fix-rounds` interval (15 min) is a product gap.
   - `MOVED`: a new commit; the PR is a candidate again.
   - `MERGED`/`CLOSED`: done.
-- **Candidates** (`mw-land`). Run `merge_wall.py candidates > $EV/merge-wall/candidates.txt`. It imports
-  `dispatch/wall-candidates.py` and prints the PR list the next `wall-land` run would pass to
-  `wall-land.sh`, with each excluded PR's reason (`draft`, `held at head`, `landed at head`). A PR
-  on `develop` with label `wall-landed` and a later head is a `CANDIDATE`; that is correct.
+- **Candidates** (`mw-land`). Run `merge_wall.py candidates > $EV/merge-wall/candidates.txt`. It runs
+  `wall-ready.sh land`'s one PR query and `dispatch/wall-candidates.py`'s `candidates()` with the same
+  inputs (`on_trunk` git ancestry, `red-heads.tsv`, live fleet lanes), and prints the picks before the
+  validated and CI gates, with each excluded PR's reason (`draft`, `held at head`, `landed at head`, or
+  `excluded()`'s text: a release branch, a foreign base, a live write lane). A develop PR whose head is
+  on the trunk reads `landed at head`.
 - **Conflicts** (`mw-conflict`). Run `grep -E 'PR-RETARGET|conflict' .gc/runtime/route.log | tail` and
   `gc order history pr-conflict-sweep --limit 5`. Retargets name the conflicting file.
 - **Kept** (`mw-kept`). Run `python3 dispatch/kept-beads.py list`, which only prints the last summary
