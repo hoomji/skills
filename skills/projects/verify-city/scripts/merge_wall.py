@@ -380,34 +380,32 @@ def holds(city):
 
 # ----------------------------------------------------------------------------------- candidates
 def candidates(city):
-    I = integration(city)
-    bases = ["develop"] + ([I] if I != "develop" else [])
-    prs = []
-    for b in bases:
-        rc, out, err = run(["gh", "pr", "list", "-R", GH_REPO, "--base", b, "--state", "open", "--author",
-                            "hoomji", "--limit", "300", "--json", "number,isDraft,labels,createdAt,headRefOid"], timeout=60)
-        if rc != 0:
-            print(f"gh pr list --base {b} failed: {err.strip()[:200]}")
-            return 1
-        got = json.loads(out)
-        for p in got:
-            p["_base"] = b
-        prs += got
-        print(f"open hoomji PRs on {b}: {len(got)}")
+    """Mirror wall-ready.sh land: one PR query (every base), then wall-candidates.py's candidates() with
+    the same landed (git ancestry of origin/<trunk>), held and live-lane inputs. Read-only."""
+    rc, out, err = run(["gh", "pr", "list", "-R", GH_REPO, "--state", "open", "--author", "hoomji", "--limit", "300",
+                        "--json", "number,isDraft,labels,createdAt,headRefOid,headRefName,baseRefName,author"], timeout=60)
+    if rc != 0:
+        print(f"gh pr list failed: {err.strip()[:200]}")
+        return 1
+    prs = json.loads(out)
+    by_base = {}
+    for p in prs:
+        by_base[p.get("baseRefName")] = by_base.get(p.get("baseRefName"), 0) + 1
+    print("open hoomji PRs: %d (%s)" % (len(prs), ", ".join(f"{b} {n}" for b, n in sorted(by_base.items()))))
     spec = importlib.util.spec_from_file_location("wall_candidates", city / "dispatch/wall-candidates.py")
     wc = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(wc)
-    heads = wc.landed_heads(str(city / "dispatch/ledgers/wall-land.tsv"))
+    landed = wc.on_trunk(wc.wall_repo(), wc.trunk_name())
     held = wc.held_heads(str(city / ".gc/runtime/wall-ci/red-heads.tsv"))
-    picks = wc.candidates(prs, heads, held)
-    print(f"next wall-land candidates ({len(picks)}): {','.join(map(str, picks)) or '(none)'}")
+    live = wc.fleet_facts(city / ".gc/runtime/fleet")["live"]
+    skipped = {}
+    picks = wc.candidates(prs, landed, held, live, skip=lambda n, why: skipped.__setitem__(n, why))
+    print(f"next wall-land candidates before the validated/CI gates ({len(picks)}): {','.join(map(str, picks)) or '(none)'}")
     for p in sorted(prs, key=lambda p: p["number"]):
-        n, h = str(p["number"]), p.get("headRefOid", "")
-        lab = "wall-landed" in {x.get("name") for x in p.get("labels") or []}
-        why = ("draft" if p.get("isDraft") else "held at head" if h in held.get(n, ())
-               else "landed at head" if lab and (not heads.get(n) or h in heads[n])
-               else "CANDIDATE")
-        print(f"  #{n}\t{p['_base']}\t{h[:8]}\tlabel={'y' if lab else 'n'}\tledger_heads={len(heads.get(n, ()))}\t{why}")
+        n, h = p["number"], p.get("headRefOid", "")
+        why = ("draft" if p.get("isDraft") else "held at head" if h in held.get(str(n), ())
+               else "landed at head" if landed(h) else skipped.get(n) or "CANDIDATE")
+        print(f"  #{n}\t{p.get('baseRefName')}\t{h[:8]}\t{why}")
     return 0
 
 
