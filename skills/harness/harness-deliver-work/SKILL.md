@@ -40,8 +40,8 @@ Wrap the installed Matt Pocock skill matching the work:
 
 - `diagnosing-bugs` before modifying a poorly understood failure;
 - `tdd` for behavior changes and bug fixes that need a red/green loop;
-- `implement` for execution from an established spec;
-- `resolving-merge-conflicts` for an active merge or rebase conflict.
+- `implement` for execution from one ticket or a small spec;
+- `implement-spec` for a whole spec run across parallel implementers.
 
 Do not restate the specialist’s method. Supply it with the repository contract, then
 resume this harness lifecycle with its artifacts and evidence.

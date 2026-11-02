@@ -41,7 +41,7 @@ Check:
   what regeneration would produce;
 - repeated workarounds or learning-ledger entries without disposition;
 - skills whose triggers, references, or scripts no longer match the repository;
-- broken `CONTEXT-MAP.md` links, terms owned by multiple contexts, stale avoided
+- broken `GLOSSARY-MAP.md` links, terms owned by multiple contexts, stale avoided
   synonyms, or code and guidance that use contradictory meanings;
 - ADRs with broken predecessor/successor links, conflicting accepted decisions, or
   implementation and guidance that silently drifted from the recorded choice;

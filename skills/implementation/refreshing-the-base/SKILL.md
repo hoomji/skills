@@ -13,7 +13,7 @@ Refreshing the base is the pass that finds that before the code is written, not 
 
 **Drift** is everything that landed on the integration branch since the merge-base. Only the drift that intersects your planned change matters — the **blast radius** — and inside it there are two kinds:
 
-- A **textual conflict** is drift git can see. Two edits to the same lines. Git names it, `resolving-merge-conflicts` handles it, and the worst case is an hour.
+- A **textual conflict** is drift git can see. Two edits to the same lines. Git names it, you resolve it in place, and the worst case is an hour.
 - A **counter-decision** is drift git cannot see: a change on the base that deletes, forbids, reverses, or already performs what you are about to build. It produces no conflict marker, which is exactly what makes it expensive — it surfaces in review, or in production, as a reviewer asking why you re-added the thing they removed.
 
 Counter-decisions are the whole reason for this pass. A clean `git rebase` is not evidence of their absence.
@@ -71,7 +71,7 @@ Read the intersecting commits for these, in order of how loudly they speak:
 
    Done when every counter-decision has one of those three outcomes recorded, and none is still open.
 
-5. **Move onto the current base, then prove it.** Rebase a branch nobody else has pulled; merge when the branch is shared or the drift is large enough that one merge commit reads better than fifty replays. Hand real conflicts to `resolving-merge-conflicts`.
+5. **Move onto the current base, then prove it.** Rebase a branch nobody else has pulled; merge when the branch is shared or the drift is large enough that one merge commit reads better than fifty replays. Resolve real conflicts in place, keeping both sides' intent.
 
    ```bash
    git rebase $BASE            # or: git merge $BASE

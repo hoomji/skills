@@ -110,11 +110,13 @@ accepted shortcuts. Route a fact to the one that owns it rather than restating i
 ## Domain context
 
 Follow the repository's established domain-document convention. When none exists, use one
-root `CONTEXT.md` and create it lazily after the first term is resolved. Treat an existing
-`CONTEXT-MAP.md` as the authority for multi-context layout; keep domain relationships in
+root `GLOSSARY.md` and create it lazily after the first term is resolved. Treat an existing
+`GLOSSARY-MAP.md` as the authority for multi-context layout; keep domain relationships in
 the map and each owned term in exactly one context glossary.
+A legacy `CONTEXT.md` / `CONTEXT-MAP.md` is the same document under its pre-1.3.0
+mattpocock-skills name; recommend renaming it to the `GLOSSARY` name.
 
-`CONTEXT.md` is a living glossary of current, project-specific language. It is not a spec,
+`GLOSSARY.md` is a living glossary of current, project-specific language. It is not a spec,
 implementation guide, decision log, or scratch pad. Prefer one canonical term, a one- or
 two-sentence definition of what it is, and meaningful rejected synonyms under `_Avoid_`.
 Edit obsolete meanings in place; use repository history and ADRs for historical rationale.

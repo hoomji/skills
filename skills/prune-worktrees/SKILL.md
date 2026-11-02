@@ -1,6 +1,6 @@
 ---
 name: prune-worktrees
-description: Remove git worktrees and branches whose content is fully subsumed by a target branch (usually main or develop) - safe cleanup after branches get picked up, squash-merged, or rebased elsewhere so a plain ancestor check misses them. Use for "clean up my worktrees", "prune merged branches", "worktree cleanup", "delete stale branches", or when `git worktree list` has piled up. Do NOT use to abort or force through an in-progress merge/rebase (see resolving-merge-conflicts), and do not run it as a matter of routine - only when asked.
+description: Remove git worktrees and branches whose content is fully subsumed by a target branch (usually main or develop) - safe cleanup after branches get picked up, squash-merged, or rebased elsewhere so a plain ancestor check misses them. Use for "clean up my worktrees", "prune merged branches", "worktree cleanup", "delete stale branches", or when `git worktree list` has piled up. Do NOT use to abort or force through an in-progress merge/rebase, and do not run it as a matter of routine - only when asked.
 ---
 
 # Prune worktrees
