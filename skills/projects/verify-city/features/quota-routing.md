@@ -21,7 +21,7 @@ lines. Policy lives in `docs/quota-fallback.md`, `docs/model-routing-contract.md
 - `qr-providers` every pool the code maps to (`POOL_BACKENDS`, `EXPERIMENTAL_POOLS`, seat, implementer,
   review, light and `-ub` twin tables) has a `[providers.<name>]` block in `city.toml`.
 - `qr-mayor` `agents/mayor/agent.toml` names `claude-mayor`; its default model resolves to
-  `--model claude-opus-5-5`, effort `low`; its `CLAUDE_CONFIG_DIR` is the login `mayor_login` picks
+  `--model claude-opus-5-5`, effort `medium` (since 2026-11-02); its `CLAUDE_CONFIG_DIR` is the login `mayor_login` picks
   from the latest readings (`MAYOR_LOGINS` order, under `MAYOR_THRESHOLD`).
 - `qr-backend` this host's `pool-backend` is known to `POOL_BACKENDS` and consistent with its readings
   (no Sol backend over the Codex threshold; `dsh` only above the dsh floor).

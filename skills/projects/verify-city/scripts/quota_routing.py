@@ -341,8 +341,8 @@ def doctor(city):
              if c.get("value") == (cm.get("option_defaults") or {}).get("model") for a in c.get("flag_args", [])]
     if "claude-opus-5-5" not in flags:
         out.append(f"mayor drift: claude-mayor default model resolves to {flags}, docs/mayor-provider.md pins claude-opus-5-5")
-    if (cm.get("option_defaults") or {}).get("effort") != "low":
-        out.append(f"mayor drift: claude-mayor effort {(cm.get('option_defaults') or {}).get('effort')!r}, docs say low")
+    if (cm.get("option_defaults") or {}).get("effort") != "medium":
+        out.append(f"mayor drift: claude-mayor effort {(cm.get('option_defaults') or {}).get('effort')!r}, docs say medium")
     cfg_dir = (cm.get("env") or {}).get("CLAUDE_CONFIG_DIR")
     dirs = cf.get("MAYOR_CONFIG_DIR") or {}
     pinned = next((n for n, d in dirs.items() if d == cfg_dir), None)
