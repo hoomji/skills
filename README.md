@@ -88,7 +88,7 @@ Run `./install.sh` again after adding a new skill to link it.
 | [harness-plan-work](skills/harness/harness-plan-work/SKILL.md) | Create a repository-grounded execution plan with evidence gates. |
 | [harness-product-spec](skills/harness/harness-product-spec/SKILL.md) | Create and maintain repository-local product intent and acceptance contracts. |
 | [harness-design-doc](skills/harness/harness-design-doc/SKILL.md) | Create and maintain indexed, verified design documentation without replacing ADRs. |
-| [harness-model-domain](skills/harness/harness-model-domain/SKILL.md) | Maintain canonical repository domain language in CONTEXT.md and context maps. |
+| [harness-model-domain](skills/harness/harness-model-domain/SKILL.md) | Maintain canonical repository domain language in GLOSSARY.md and glossary maps. |
 | [harness-record-decision](skills/harness/harness-record-decision/SKILL.md) | Record and maintain consequential architecture decisions without rewriting history. |
 | [harness-exec-plan](skills/harness/harness-exec-plan/SKILL.md) | Create and maintain self-contained living ExecPlans through evidence-backed completion. |
 | [harness-reference](skills/harness/harness-reference/SKILL.md) | Curate durable external reference material in a repository knowledge store. |
@@ -184,21 +184,29 @@ the update.
 |------------------------------|-------------------------------------------------------------------------------------------------|
 | `mattpocock-skills:grill-with-docs` | A relentless interview to sharpen a plan or design, creating ADRs and a glossary as it goes. |
 | `mattpocock-skills:grilling` | Grill the user relentlessly about a plan or design to stress-test it before building.          |
-| `mattpocock-skills:domain-modeling` | Build and sharpen a project's domain model — terminology, ubiquitous language, and ADRs. |
+| `mattpocock-skills:domain-modeling` | Build and sharpen a project's domain model: terms in `GLOSSARY.md`, decisions in ADRs. |
 | `mattpocock-skills:to-spec` | Turn the current conversation into a spec and publish it to the project issue tracker.          |
 | `mattpocock-skills:to-tickets` | Break a plan, spec, or conversation into tracer-bullet tickets with blocking edges.           |
 | `mattpocock-skills:triage`  | Move issues and external PRs through a state machine of triage roles into agent-ready briefs.   |
 | `mattpocock-skills:implement` | Implement a piece of work based on a spec or set of tickets.                                   |
+| `mattpocock-skills:implement-spec` | Implement a whole spec in one run: parallel implementers onto one integration branch.     |
 | `mattpocock-skills:tdd`     | Test-driven development — red-green-refactor for features and bugfixes.                         |
 | `mattpocock-skills:code-review` | Review changes since a fixed point along two axes: repo Standards and originating Spec.    |
+| `mattpocock-skills:pr` | The shape of a PR body: summary visual, before/after evidence, merge-danger call.               |
+| `mattpocock-skills:retro` | Look back at a session and suggest changes to the agent's environment, not the code.        |
 | `mattpocock-skills:wayfinder` | Plan a large chunk of work as a shared map of investigation tickets, resolved one at a time.   |
-| `mattpocock-skills:resolving-merge-conflicts` | Resolve an in-progress git merge/rebase conflict.                             |
 | `mattpocock-skills:setup-matt-pocock-skills` | Configure a repo for the engineering skills — issue tracker, triage labels, domain doc layout. |
 
 The plugin also ships several skills this repo never vendored (`diagnosing-bugs`,
 `improve-codebase-architecture`, `prototype`, `research`, `codebase-design`, `wizard`,
 and the productivity bucket) — see the [upstream README](https://github.com/mattpocock/skills)
 for the current full list.
+
+**1.3.0 renamed the domain glossary.** `CONTEXT.md` / `CONTEXT-MAP.md` are now
+`GLOSSARY.md` / `GLOSSARY-MAP.md`, and every plugin skill looks only for the new names.
+`git mv` an existing file (or re-run `/mattpocock-skills:setup-matt-pocock-skills`, which
+offers to) and update the repo's `docs/agents/domain.md`. `resolving-merge-conflicts`
+was removed in the same release; `implement-spec`, `pr` and `retro` were added.
 
 **What changed by moving off vendored copies:**
 

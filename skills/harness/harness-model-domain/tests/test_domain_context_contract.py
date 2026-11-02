@@ -6,8 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
 SKILL = ROOT / "SKILL.md"
-CONTEXT_TEMPLATE = ROOT / "assets" / "context.md.template"
-MAP_TEMPLATE = ROOT / "assets" / "context-map.md.template"
+CONTEXT_TEMPLATE = ROOT / "assets" / "glossary.md.template"
+MAP_TEMPLATE = ROOT / "assets" / "glossary-map.md.template"
 HARNESS = ROOT.parent / "harness" / "SKILL.md"
 CONTRACTS = ROOT.parent / "harness" / "references" / "contracts.md"
 

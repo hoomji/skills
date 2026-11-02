@@ -14,7 +14,9 @@ harness-specific inputs and evidence around it instead of rewriting its procedur
 | Implement test-first | `tdd` | `mattpocock-skills:tdd` |
 | Implement from a spec | `implement` | `mattpocock-skills:implement` |
 | Review standards and spec fit | `code-review` | `mattpocock-skills:code-review` |
-| Resolve merge conflicts | `resolving-merge-conflicts` | `mattpocock-skills:resolving-merge-conflicts` |
+| Implement a whole spec in parallel | `implement-spec` | `mattpocock-skills:implement-spec` |
+| Write the PR body | `pr` | `mattpocock-skills:pr` |
+| Improve the agent environment after a session | `retro` | `mattpocock-skills:retro` |
 
 At runtime, use the installed name exposed by the active agent. Codex installations may
 expose the unprefixed skill; Claude Code’s plugin exposes the namespaced form. If the

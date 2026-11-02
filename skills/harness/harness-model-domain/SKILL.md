@@ -1,7 +1,7 @@
 ---
 name: harness-model-domain
 disable-model-invocation: true
-description: User-invoked only. Create, inspect, revise, or reconcile repository domain glossaries in CONTEXT.md and multi-context maps. Use when project terminology is vague, overloaded, inconsistent with code, missing from the canonical glossary, duplicated across contexts, or needs to be updated without mixing in specifications, implementation details, or architecture decisions.
+description: User-invoked only. Create, inspect, revise, or reconcile repository domain glossaries in GLOSSARY.md and multi-context maps. Use when project terminology is vague, overloaded, inconsistent with code, missing from the canonical glossary, duplicated across contexts, or needs to be updated without mixing in specifications, implementation details, or architecture decisions.
 ---
 
 # Harness Model Domain
@@ -17,12 +17,12 @@ authorized task directly when a recommended skill has not been invoked.
 Maintain the repository's canonical domain language. Read
 [`../harness/references/contracts.md`](../harness/references/contracts.md),
 [`../harness/references/composition.md`](../harness/references/composition.md),
-repository guidance, relevant `CONTEXT.md` or `CONTEXT-MAP.md` files, code, specs, and
+repository guidance, relevant `GLOSSARY.md` or `GLOSSARY-MAP.md` files, code, specs, and
 ADRs before changing the glossary.
 
 ## 1. Prove that the glossary owns the change
 
-Use `CONTEXT.md` only for domain-specific language: concepts whose precise meaning helps
+Use `GLOSSARY.md` only for domain-specific language: concepts whose precise meaning helps
 people and agents reason about this product. Exclude general programming terms,
 implementation details, requirements, plans, decisions, and scratch notes. Route
 consequential rationale to `harness-record-decision`; keep behavior and acceptance
@@ -39,11 +39,15 @@ domain source, and intended glossary action are explicit.
 ## 2. Resolve the context boundary
 
 Follow the repository's established domain-document convention. If
-`CONTEXT-MAP.md` exists, read it and select the relevant context-specific `CONTEXT.md`;
+`GLOSSARY-MAP.md` exists, read it and select the relevant context-specific `GLOSSARY.md`;
 ask when ownership remains ambiguous. Keep relationships between bounded contexts in the
 map and terms owned by one context in that context's glossary.
 
-When no convention exists, default to one root `CONTEXT.md`. Create it lazily only after
+A `CONTEXT.md` or `CONTEXT-MAP.md` is the pre-1.3.0 name for the same file; the
+`domain-modeling` skill now reads only the `GLOSSARY` names. Report it and recommend a
+`git mv` plus a sweep of the guidance that names it; rename only when the user authorized it.
+
+When no convention exists, default to one root `GLOSSARY.md`. Create it lazily only after
 the first term is resolved; do not scaffold an empty glossary. Name the root context from
 an authoritative repository or product identity; do not promote the first glossary term
 into the context name. Ask or leave the heading unresolved when no context name is known.
@@ -64,8 +68,8 @@ silently.
 Write a term only after it is resolved. Prefer one canonical name, define what the concept
 is in one or two sentences, and list meaningful rejected synonyms under `_Avoid_`.
 Include only project-specific concepts. Group terms only when a stable domain grouping
-improves navigation. Use [the context template](assets/context.md.template), and
-[the context-map template](assets/context-map.md.template) only for an evidenced
+improves navigation. Use [the glossary template](assets/glossary.md.template), and
+[the glossary-map template](assets/glossary-map.md.template) only for an evidenced
 multi-context repository, when no repository template exists.
 
 Completion criterion: every changed entry is precise, scoped, supported by repository or
