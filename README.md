@@ -36,6 +36,7 @@ Category folders under `skills/`:
 | `prompting/` | Sharpening prompts and standing up recurring routines. |
 | `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
 | `projects/` | Skills tied to one tool or project rather than a general workflow. |
+| `verification/` | Proving a change works on the real artifact: a project-local verify skill and its feature map, its maintenance pass, a decision trail, blast radius, and the verification principles (from pstack, MIT). |
 
 ## SKILL.md standard
 
@@ -130,6 +131,19 @@ Run `./install.sh` again after adding a new skill to link it.
 | [team-prompt](skills/prompting/team-prompt/SKILL.md) | Compile work into a lead prompt that spawns and steers a Claude Code agent team — team-or-not gate, owned work pieces, self-contained spawn briefs. |
 | [subagent-prompt](skills/prompting/subagent-prompt/SKILL.md) | Compile work into a dispatch prompt that fans it out to subagents — subagents-or-not gate, independent pieces, briefs with a return contract. |
 | [writing-great-recurring](skills/prompting/writing-great-recurring/SKILL.md) | Stand up a recurring routine end to end — pick the surface, write the recurring prompt, wire it, verify the first firing. |
+
+### verification/
+
+From [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT, licence kept in `skills/verification/LICENSE-pstack`), rewritten for Claude Code.
+
+| Skill | Use it when |
+|---|---|
+| [verification-principles](skills/verification/verification-principles/SKILL.md) | Model-invoked index over six principles: prove it works, sequence verifiable units, test behavior not implementation, fix root causes, build the lever, encode lessons in structure. |
+| [create-verification-skill](skills/verification/create-verification-skill/SKILL.md) | A repo has no scripted way to drive the real app; generates `.claude/skills/verify-<app>/` with a feature map. |
+| [maintain-verification-skill](skills/verification/maintain-verification-skill/SKILL.md) | The feature map has drifted; source wave plus one live pass, at most one PR of proven corrections. |
+| [show-me-your-work](skills/verification/show-me-your-work/SKILL.md) | Long or unattended work needs a reviewable decision trail (one TSV row per decision, `scripts/log.sh`). |
+| [blast-radius](skills/verification/blast-radius/SKILL.md) | A small diff you do not trust; find the one fact it is safe because of and prove it by running code. |
+| [auditing-tests](skills/verification/auditing-tests/SKILL.md) | A test is red, written, or under review; asks whether a plausible wrong implementation would still pass it, proved by a targeted mutation. |
 
 ### lateral-thinking/
 
