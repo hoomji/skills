@@ -49,13 +49,33 @@ ORDER = "promotion-cadence"
 ORDER_MAX_MIN = 45  # elapsed-check 900 s: 3x the interval
 # Ledger shapes per the writers' printf/write lines.
 PROMO_STATES = {"DRY-RUN", "DRY-RUN-HELD", "QUEUED", "CURRENT", "HELD", "QUEUE-FAILED", "FAILED",
-                "CONFLICT", "REFUSED", "MERGED-BY-HAND"}
+                "CONFLICT", "REFUSED", "MERGED-BY-HAND", "NEEDS-REVIEW"}
+# The verdicts promotion-cadence.py writes (grep its record() calls), plus UNVERIFIED, retired by
+# R-20261023-05 but still in older rows.
 CADENCE_VERDICTS = {"UP-TO-DATE", "HELD", "IN-FLIGHT", "DEQUEUED", "SPACING", "CUT", "STARVED",
-                    "WAIT", "GATE-RED"}
+                    "WAIT", "GATE-RED", "CONFLICT", "QUEUE-FAILED", "NEEDS-REVIEW", "MERGED-BY-HAND",
+                    "REQUEUED", "REQUEUE-SKIPPED", "REVIEW-FILED", "REVIEW-NEEDED", "REVIEW-WAIT",
+                    "REVIEW-BLOCKING", "UNVERIFIED"}
 SWITCHES = ["wall.off", "promotion-cadence.off", "wall-deploy.off", "verify.off", "land-validated.on",
             "ci-gate.off", "tip-red-rounds.off", "sync-pending"]
 MARKERS = ["deployable", "green", "verified", "ci-green"]
 
+
+
+def ledger_row_findings(rel, rs, n, check, cols):
+    """Bad rows of one ledger: a wrong column count, or the right count with a field the check
+    rejects (an unknown state, a malformed sha). The message says which; a right count used to
+    read "want 6 cols, got 6"."""
+    out, bad = [], []
+    for i, r in enumerate(rs, 1):
+        if len(r) != n:
+            bad.append(f"ledger-row-bad {rel}:{i} want {n} cols ({cols}), got {len(r)}: {chr(9).join(r)[:120]}")
+        elif not check(r):
+            bad.append(f"ledger-row-bad {rel}:{i} field check failed ({cols}): {chr(9).join(r)[:120]}")
+    out.extend(bad[:3])
+    if len(bad) > 3:
+        out.append(f"ledger-row-bad {rel}: {len(bad) - 3} more bad rows")
+    return out
 
 def run(cmd, cwd=None, timeout=90, env=None, stdin=None):
     try:
@@ -242,11 +262,7 @@ def doctor(city):
         if rs is None:
             f.append(f"ledger-missing {rel}")
             continue
-        bad = [(i, r) for i, r in enumerate(rs, 1) if len(r) != n or not check(r)]
-        for i, r in bad[:3]:
-            f.append(f"ledger-row-bad {rel}:{i} want {n} cols ({cols}), got {len(r)}: {chr(9).join(r)[:120]}")
-        if len(bad) > 3:
-            f.append(f"ledger-row-bad {rel}: {len(bad) - 3} more bad rows")
+        f.extend(ledger_row_findings(rel, rs, n, check, cols))
 
     fp = set(first_parents(t))
     if not fp:
