@@ -262,6 +262,22 @@ def ref_exists(city, ref):
     return False
 
 
+def formula_names(root):
+    """Formulas gc resolves: root formulas/ plus the formulas/ of every local-path pack import
+    (a root order's formula may live in its pack: mol-dog-stale-db names city-dog-stale-db from
+    packs/ops/formulas/)."""
+    names = {p.name.split(".")[0] for p in (root / "formulas").glob("*.toml")}
+    try:
+        imports = (tomllib.loads((root / "pack.toml").read_text()).get("imports") or {}).values()
+    except (OSError, tomllib.TOMLDecodeError):
+        return names
+    for imp in imports:
+        src = (imp or {}).get("source") or ""
+        if src.startswith(("./packs/", "packs/")):
+            names |= {p.name.split(".")[0] for p in (root / src / "formulas").glob("*.toml")}
+    return names
+
+
 def doctor(city, no_history):
     findings = []
     add = findings.append
@@ -273,7 +289,7 @@ def doctor(city, no_history):
     skip = set((city.cfg.get("orders") or {}).get("skip") or [])
     rc, out, _ = run(["gc", "order", "--help"], city.root)
     subs = set(re.findall(r"^  ([a-z][a-z-]+)\s+\S", out.split("Available Commands:")[-1].split("Flags:")[0], re.M)) if rc == 0 else set()
-    formulas = {p.name.split(".")[0] for p in (city.root / "formulas").glob("*.toml")}
+    formulas = formula_names(city.root)
     hist = None if no_history else city.history24()
     runs = Counter(e["order"] for e in hist) if hist is not None else None
     if not no_history and hist is None:

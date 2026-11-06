@@ -141,6 +141,44 @@ def city_toml(city):
         return None
 
 
+def pack_imports(city):
+    """Packs pack.toml imports, or None when pack.toml is unreadable (fail open: an unreadable
+    pack.toml must not reword findings). A commented-out [imports.X] block is not an import."""
+    try:
+        return set((tomllib.loads((city / "pack.toml").read_text()).get("imports") or {}))
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+
+
+def order_home(city, name):
+    """Owning pack of the order file defining name (None for a root orders/ file or no file)."""
+    if (city / "orders" / f"{name}.toml").is_file():
+        return None
+    hits = sorted((city / "packs").glob(f"*/orders/{name}.toml"))
+    return hits[0].parent.parent.name if hits else None
+
+
+def disabled_orders(city):
+    """Orders city.toml [[orders.overrides]] pins enabled=false (R-20261103-01 keeps wall-deploy
+    and the paused seats' passes off inside the restored landing pack)."""
+    conf = city_toml(city) or {}
+    return {o.get("name") for o in conf.get("orders", {}).get("overrides", []) if o.get("enabled") is False}
+
+
+def down_status(city, name):
+    """(PAUSED|RETIRED, reason) when a missing order is off by config, else None. Fleet orders are
+    retired (R-20261105-15); orders of other unimported packs are paused (R-20261101-07)."""
+    imports = pack_imports(city)
+    pack = order_home(city, name)
+    if imports is not None and pack and pack not in imports:
+        if pack == "fleet":
+            return "RETIRED", "fleet pack not imported in pack.toml (R-20261105-15)"
+        return "PAUSED", f"{pack} pack not imported in pack.toml (R-20261101-07)"
+    if name in disabled_orders(city):
+        return "PAUSED", "city.toml [[orders.overrides]] sets enabled=false"
+    return None
+
+
 def formula_base_branches(conf):
     rigs = conf.get("rigs")
     out = []
@@ -217,11 +255,15 @@ def doctor(city):
         named = set(re.findall(r"order `([a-z0-9-]+)`|`([a-z0-9-]+)` order", section))
         for name in sorted({a or b for a, b in named}):
             if name not in ords:
-                f.append(f"doc-order-missing docs/trunk-and-promotion.md names order {name}; gc order list lacks it")
+                st = down_status(city, name)
+                suffix = f" ({st[0]}: {st[1]})" if st else ""
+                f.append(f"doc-order-missing docs/trunk-and-promotion.md names order {name}; gc order list lacks it{suffix}")
         for name in list(WALL_ORDERS) + list(OTHER_ORDERS):
             o = ords.get(name)
             if not o:
-                f.append(f"order-missing {name}")
+                st = down_status(city, name)
+                suffix = f" ({st[0]}: {st[1]})" if st else ""
+                f.append(f"order-missing {name}{suffix}")
                 continue
             if not o.get("enabled", True):
                 f.append(f"order-disabled {name} ({o.get('source')})")
@@ -236,7 +278,9 @@ def doctor(city):
             if rel.endswith("wall-deploy.tsv") and not (wall_ci / "green").exists():
                 continue
             if walled:
-                f.append(f"ledger-missing {rel}")
+                st = down_status(city, Path(rel).stem)
+                suffix = f" ({st[0]}: {st[1]})" if st else ""
+                f.append(f"ledger-missing {rel}{suffix}")
             continue
         bad = 0
         for i, r in enumerate(rs, 1):
@@ -255,23 +299,21 @@ def doctor(city):
             f.append(f"ledger-row-bad {rel}: {bad - 3} more bad rows")
 
     # Switch agreement: dispatch/integration-branch vs wall.off, queue-ready.off, city.toml, wall-land.sh.
+    # Retired (ci-zfxu): queue-ready.off is not required during the wall (queue-ready is live under
+    # R-20261103-01), and rigs.formula_vars.base_branch is per-rig (hoppy-city's main is its own
+    # trunk; the var feeds legacy formulas only).
     off = (wall_ci / "wall.off").exists()
     qr_off = (city / ".gc/runtime/fleet/merge-queue/queue-ready.off").exists()
     if walled and off:
         f.append(f"switch-split integration-branch={I} but wall.off is present: wall autopilot stopped (big-bang in progress?)")
     if not walled and not off:
         f.append("switch-split integration-branch=develop but wall.off absent: wall orders still land on wall/develop")
-    if walled and not off and not qr_off:
-        f.append("switch-split wall stands but queue-ready.off is absent: develop queueing runs during the wall")
     if not walled and qr_off:
         f.append("switch-split integration-branch=develop but queue-ready.off is present: nothing queues in Mergify")
     conf = city_toml(city)
     if conf is None:
         f.append("city-toml-unreadable city.toml")
     else:
-        for b in formula_base_branches(conf):
-            if b != I:
-                f.append(f"switch-split city.toml rigs.formula_vars.base_branch={b} vs integration-branch={I}")
         for bases in monitor_bases(conf):
             if I not in bases:
                 f.append(f"switch-split city.toml github.pr_monitor.base_branches {bases} lacks {I}")
