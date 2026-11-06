@@ -123,9 +123,7 @@ def memory_findings(city):
     found += [f'memory: {f} not in MEMORY.md' for f in sorted(files - listed)]
     for f in sorted(files):
         text = (mem / f).read_text()
-        for link in re.findall(r'\[\[([^\]]+)\]\]', text):
-            if link not in names:
-                found.append(f'memory: {f} links missing [[{link}]]')
+        # A [[name]] with no file yet is allowed: it marks a memory worth writing (memory contract).
         for group in SEE_RE.findall(text):
             for name in SLUG_RE.findall(re.sub(r'\[\[[^\]]+\]\]', ' ', group)):
                 if (name not in names and not (city / 'docs' / f'{name}.md').exists()

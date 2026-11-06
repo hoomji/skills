@@ -192,5 +192,15 @@ class HookFindings(Scratch):
         self.assertEqual(context.hook_findings(self.city), [])
 
 
+class MemoryLinks(Scratch):
+    def test_a_link_to_an_unwritten_memory_is_allowed(self):
+        # The memory contract (harness memory rules): a [[name]] with no file yet marks a memory worth
+        # writing, not an error. 70 such rows filled the VERIFY-SKILLS mail (ci-h4c9, 2026-11-06).
+        mem = self.city / '.claude-memory'
+        (mem / 'a.md').write_text('---\nname: a\ndescription: d\n---\nSee [[not-written-yet]].\n')
+        (mem / 'MEMORY.md').write_text('- [A](a.md) — x\n')
+        self.assertEqual([f for f in context.memory_findings(self.city) if 'links missing' in f], [])
+
+
 if __name__ == '__main__':
     unittest.main()
