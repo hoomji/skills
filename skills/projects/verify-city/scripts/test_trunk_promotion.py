@@ -34,5 +34,16 @@ class LedgerRows(unittest.TestCase):
         self.assertIn("want 5 cols (c), got 1", out[0])
 
 
+class ExecPaths(unittest.TestCase):
+    def test_city_and_pack_variables_expand(self):
+        o = {"exec": "bash $PACK_DIR/assets/scripts/conflict-sweep.sh", "source": "/c/packs/landing/orders/x.toml"}
+        self.assertEqual(tp.exec_paths(o, "/c"), ["/c/packs/landing/assets/scripts/conflict-sweep.sh"])
+        o = {"exec": "$GC_CITY_PATH/dispatch/promotion-cadence.py", "source": "/c/orders/p.toml"}
+        self.assertEqual(tp.exec_paths(o, "/c"), ["/c/dispatch/promotion-cadence.py"])
+
+    def test_an_unknown_variable_is_not_reported_as_a_path(self):
+        self.assertEqual(tp.exec_paths({"exec": "$OTHER/x.sh"}, "/c"), [])
+
+
 if __name__ == "__main__":
     unittest.main()
