@@ -32,7 +32,7 @@ promotion evidence, promotable sha, gate red).
   older open `release/*` PR as superseded. A recut (ADR 0003) is a new cut at a newer sha; evidence
   carrying across the promotion delta is ADR policy, and the harness shows whether the live code
   does it yet.
-- `tp-preflight` The migration preflight (`scripts/release-migration-preflight.mjs --source develop
+- `tp-preflight` The migration preflight (`<gateway-llm>/scripts/release-migration-preflight.mjs --source develop
   --develop-ref <merge>`, a Gateway-LLM script). FAIL or UNAVAILABLE opens the PR unqueued with
   `**Held (preflight):**` in the body (`PROMOTION HELD`, exit 5). `promotion.sh --requeue <pr>
   --ack-preflight "<reason>" --yes` comments the reason and queues it.

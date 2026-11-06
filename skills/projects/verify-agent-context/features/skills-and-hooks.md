@@ -58,4 +58,4 @@ invoked when the model matches its description, when a prompt names it, or when 
   description; a skill whose only trigger is a prompt line is one prompt edit from dead.
 - `.sh` checks are `bash -n`: a script with a bad sourced file or a runtime error passes.
 - `HOOK_EVENTS` is a fixed set. A new Claude Code event lands as a false `is not a hook event`
-  until the set is extended; the list is in `scripts/context.py`.
+  until the set is extended; the list is in `<skill>/scripts/context.py`.

@@ -25,6 +25,7 @@ import os
 import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 FEEDBACK = 'dispatch/ledgers/review-feedback.jsonl'  # merged on install, diverges by design
@@ -106,6 +107,15 @@ def head_hashes(city, paths):
 def git(city, *a):
     rc, out, _ = sh('git', '-C', str(city), *a)
     return out.strip() if rc == 0 else None
+
+
+def pack_imports(city):
+    """Packs pack.toml imports, or None when pack.toml is unreadable (fail open). A commented-out
+    [imports.X] block is not an import."""
+    try:
+        return set((tomllib.loads((city / 'pack.toml').read_text()).get('imports') or {}))
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
 
 
 def probe(host, info, paths):
@@ -238,7 +248,12 @@ def doctor_findings(city):
     out.extend(partial_findings(city, files))
     remotes = sorted(h for h in hosts if h != 'ryzen')
     if sorted(stage_default) != remotes:
-        out.append('stage-release.sh default hosts %s != fleet.py HOSTS remotes %s' % (stage_default, remotes))
+        imports = pack_imports(city)
+        if imports is not None and 'fleet' not in imports:
+            out.append('fleet RETIRED: fleet.py HOSTS is retired with the fleet pack (not imported in '
+                       'pack.toml; R-20261105-15): the stage-release/hosts comparison and host probing are skipped')
+        else:
+            out.append('stage-release.sh default hosts %s != fleet.py HOSTS remotes %s' % (stage_default, remotes))
     for h in remotes:
         for p in ('dispatch/%s.sh' % h, 'dispatch/%s-sync.sh' % h, 'orders/%s-sync.toml' % h):
             if not (city / p).exists():

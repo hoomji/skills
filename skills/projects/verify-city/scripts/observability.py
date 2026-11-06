@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import time
+import tomllib
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -159,13 +160,44 @@ def save(ev, name, text):
         (ev / name).write_text(text)
 
 
+def pack_imports(city):
+    """Packs pack.toml imports, or None when pack.toml is unreadable (fail open: an unreadable
+    pack.toml must not reword findings). A commented-out [imports.X] block is not an import."""
+    try:
+        return set((tomllib.loads((city / "pack.toml").read_text()).get("imports") or {}))
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+
+
+def order_home(city, name):
+    """Owning pack of the order file defining name (None for a root orders/ file or no file)."""
+    if (city / "orders" / f"{name}.toml").is_file():
+        return None
+    hits = sorted((city / "packs").glob(f"*/orders/{name}.toml"))
+    return hits[0].parent.parent.name if hits else None
+
+
+def down_status(city, name):
+    """(PAUSED|RETIRED, reason) when a missing order is off by config, else None. Fleet orders are
+    retired (R-20261105-15); orders of other unimported packs are paused (R-20261101-07)."""
+    imports = pack_imports(city)
+    pack = order_home(city, name)
+    if imports is not None and pack and pack not in imports:
+        if pack == "fleet":
+            return "RETIRED", "fleet pack not imported in pack.toml (R-20261105-15)"
+        return "PAUSED", f"{pack} pack not imported in pack.toml (R-20261101-07)"
+    return None
+
+
 # ------------------------------------------------------------------ doctor
 def doctor(city):
     f = []
     # obs-docs: every script the feature covers exists where this map says.
     for s in SCRIPTS:
         if not (city / s).exists():
-            f.append(f"obs-docs: {s} missing")
+            st = down_status(city, Path(s).stem) if s.startswith("orders/") and s.endswith(".toml") else None
+            suffix = f" ({st[0]}: {st[1]})" if st else ""
+            f.append(f"obs-docs: {s} missing{suffix}")
     # obs-docs: every path docs/gc-mobile.md names in backticks exists.
     doc = (city / "docs/gc-mobile.md").read_text()
     for tok in sorted(set(re.findall(r"`([^`\s]+)`", doc))):
@@ -229,15 +261,20 @@ def doctor(city):
     st, body = get("/api/now", timeout=30)
     if st == 200:
         now = json.loads(body).get("data") or {}
-        shown = ((now.get("quota") or {}).get("muse") or {}).get("state")
-        fresh = fresh_muse_state(city)
-        if fresh is None:
-            f.append("obs-parity: fleet.muse_state could not be computed")
-        elif shown != fresh.get("state"):
-            f.append(f"obs-parity: gc-mobile /api/now muse state '{shown}', fleet.muse_state now '{fresh.get('state')}'")
-        hosts = [h.get("name") for h in now.get("hosts") or []]
-        if hosts != fleet_hosts(city):
-            f.append(f"obs-parity: gc-mobile hosts {hosts} != fleet.HOSTS {fleet_hosts(city)}")
+        imports = pack_imports(city)
+        if imports is not None and "fleet" not in imports:
+            f.append("obs-parity: RETIRED (fleet pack not imported in pack.toml (R-20261105-15); "
+                     "gc-mobile/fleet muse-state and host parity skipped)")
+        else:
+            shown = ((now.get("quota") or {}).get("muse") or {}).get("state")
+            fresh = fresh_muse_state(city)
+            if fresh is None:
+                f.append("obs-parity: fleet.muse_state could not be computed")
+            elif shown != fresh.get("state"):
+                f.append(f"obs-parity: gc-mobile /api/now muse state '{shown}', fleet.muse_state now '{fresh.get('state')}'")
+            hosts = [h.get("name") for h in now.get("hosts") or []]
+            if hosts != fleet_hosts(city):
+                f.append(f"obs-parity: gc-mobile hosts {hosts} != fleet.HOSTS {fleet_hosts(city)}")
     # obs-mobile-fresh: the running server loaded every module it caches after that file last changed.
     pid = server_pid()
     if not pid:

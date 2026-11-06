@@ -31,6 +31,7 @@ import py_compile
 import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import yaml
@@ -332,6 +333,24 @@ def seat_memory(city, seat=None):
     return [l for l in lines if seat is None or l.startswith(f'{seat}:')]
 
 
+def named_sessions(city):
+    """Templates with a [[named_session]] in city.toml, or None when city.toml is unreadable
+    (fail open: an unreadable city.toml must not reword findings)."""
+    try:
+        sessions = tomllib.loads((city / 'city.toml').read_text()).get('named_session') or []
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+    return {s.get('template') for s in sessions if isinstance(s, dict)}
+
+
+def seat_paused(seat, sessions):
+    """True when the seat has no reserved session (its [[named_session]] is commented out, so the
+    seat never wakes and its memory copies drift by design)."""
+    if sessions is None:
+        return False
+    return not any(t == seat or (t or '').split('.')[-1] == seat or t == f'{seat}-pool' for t in sessions)
+
+
 def prompt_file(city, agent):
     return city / 'agents' / agent / 'prompt.template.md'
 
@@ -371,7 +390,16 @@ def doctor(city):
         for ref, ok in refs(city, city / doc):
             if not ok:
                 found.append(f'{doc}: names missing {ref}')
-    found += [f'seat-memory: {line}' for line in seat_memory(city)]
+    sessions = named_sessions(city)
+    mem = {}
+    for line in seat_memory(city):
+        mem.setdefault(line.split(':', 1)[0], []).append(line)
+    for seat, lines in mem.items():
+        if seat in SEATS and seat_paused(seat, sessions):
+            found.append(f'seat-memory: {seat}: PAUSED (no [[named_session]] for {seat} in city.toml; '
+                         f'R-20261101-07; {len(lines)} sync findings suppressed)')
+        else:
+            found += [f'seat-memory: {line}' for line in lines]
     found += memory_findings(city)
     found += skill_findings(city)
     found += hook_findings(city)

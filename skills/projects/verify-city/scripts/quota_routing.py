@@ -80,6 +80,14 @@ def last_history(city):
         return None
 
 
+def pack_imported(city, pack):
+    """True when pack.toml imports pack (a commented-out [imports.X] block is not an import)."""
+    try:
+        return pack in (tomllib.loads((city / "pack.toml").read_text()).get("imports") or {})
+    except (OSError, tomllib.TOMLDecodeError):
+        return True  # fail open: an unreadable pack.toml must not silence the checks
+
+
 def import_fleet(city):
     sys.dont_write_bytecode = True  # no __pycache__ writes into the city checkout
     os.environ.setdefault("FLEET_CITY", str(city))
@@ -265,10 +273,52 @@ def cmd_orders(city):
 
 # ---------------------------------------------------------------------------------------------- doctor
 
+def mayor_findings(city, now, cf):
+    """Doctor section 4: the live mayor's provider, model and login pin (city.toml vs docs). Runs
+    whether or not the fleet is retired; only the login-pick arm reads codex-fallback constants."""
+    out = []
+    mayor = tomllib.loads((city / "agents/mayor/agent.toml").read_text()).get("provider")
+    if mayor != "claude-mayor":
+        out.append(f"mayor drift: agents/mayor/agent.toml provider {mayor!r}, docs/mayor-provider.md says claude-mayor")
+    cfg = tomllib.loads((city / "city.toml").read_text())
+    cm = cfg.get("providers", {}).get("claude-mayor", {})
+    flags = [a for o in cm.get("options_schema", []) if o.get("key") == "model" for c in o.get("choices", [])
+             if c.get("value") == (cm.get("option_defaults") or {}).get("model") for a in c.get("flag_args", [])]
+    if "claude-opus-5-5" not in flags:
+        out.append(f"mayor drift: claude-mayor default model resolves to {flags}, docs/mayor-provider.md pins claude-opus-5-5")
+    if (cm.get("option_defaults") or {}).get("effort") != "medium":
+        out.append(f"mayor drift: claude-mayor effort {(cm.get('option_defaults') or {}).get('effort')!r}, docs say medium")
+    cfg_dir = (cm.get("env") or {}).get("CLAUDE_CONFIG_DIR")
+    dirs = cf.get("MAYOR_CONFIG_DIR") or {}
+    pinned = next((n for n, d in dirs.items() if d == cfg_dir), None)
+    hist = (last_history(city) or {}).get("pools") or {}
+    want, known = None, False
+    for name in cf.get("MAYOR_LOGINS") or ():
+        wins = [hist.get(f"claude-{name}:{t}") for t in ("5h", "7d")]
+        wins = [w for w in wins if isinstance(w, dict)]
+        if not wins:
+            continue
+        known = True
+        if not any((w.get("resets_at") or now + 1) > now and (w.get("used") or 0) >= (cf.get("MAYOR_THRESHOLD") or 95) for w in wins):
+            want = name
+            break
+    if pinned is None:
+        out.append(f"mayor drift: claude-mayor CLAUDE_CONFIG_DIR {cfg_dir!r} is not a MAYOR_CONFIG_DIR login")
+    elif known and want and want != pinned:
+        out.append(f"mayor drift: latest readings pick login {want} (MAYOR_LOGINS order, <{cf.get('MAYOR_THRESHOLD')}%), city.toml pins {pinned}")
+    return out
+
+
 def doctor(city):
-    now, out = time.time(), []
+    now = time.time()
     D = city / "dispatch"
-    fl, cf = consts(D / "fleet.py"), consts(D / "codex-fallback.py")
+    cf = consts(D / "codex-fallback.py")
+    if not pack_imported(city, "fleet"):
+        return ["fleet RETIRED: fleet pack not imported in pack.toml (R-20261105-15); quota readings, "
+                "constants, providers, backend, contract and timer checks skipped",
+                *mayor_findings(city, now, cf)]
+    out = []
+    fl = consts(D / "fleet.py")
     qr, sp = consts(D / "quota-runway.py"), consts(city / "orders/scripts/fleet-supply-probe.py")
 
     # 1. readings fresh against the max ages the code uses
@@ -332,35 +382,8 @@ def doctor(city):
         if pool and pool not in providers and pool != "write-pool":
             out.append(f"provider missing: {pool} (named by {src}) has no [providers.{pool}] in city.toml")
 
-    # 4. mayor provider, model and login
-    mayor = tomllib.loads((city / "agents/mayor/agent.toml").read_text()).get("provider")
-    if mayor != "claude-mayor":
-        out.append(f"mayor drift: agents/mayor/agent.toml provider {mayor!r}, docs/mayor-provider.md says claude-mayor")
-    cm = cfg.get("providers", {}).get("claude-mayor", {})
-    flags = [a for o in cm.get("options_schema", []) if o.get("key") == "model" for c in o.get("choices", [])
-             if c.get("value") == (cm.get("option_defaults") or {}).get("model") for a in c.get("flag_args", [])]
-    if "claude-opus-5-5" not in flags:
-        out.append(f"mayor drift: claude-mayor default model resolves to {flags}, docs/mayor-provider.md pins claude-opus-5-5")
-    if (cm.get("option_defaults") or {}).get("effort") != "medium":
-        out.append(f"mayor drift: claude-mayor effort {(cm.get('option_defaults') or {}).get('effort')!r}, docs say medium")
-    cfg_dir = (cm.get("env") or {}).get("CLAUDE_CONFIG_DIR")
-    dirs = cf.get("MAYOR_CONFIG_DIR") or {}
-    pinned = next((n for n, d in dirs.items() if d == cfg_dir), None)
-    hist = (last_history(city) or {}).get("pools") or {}
-    want, known = None, False
-    for name in cf.get("MAYOR_LOGINS") or ():
-        wins = [hist.get(f"claude-{name}:{t}") for t in ("5h", "7d")]
-        wins = [w for w in wins if isinstance(w, dict)]
-        if not wins:
-            continue
-        known = True
-        if not any((w.get("resets_at") or now + 1) > now and (w.get("used") or 0) >= (cf.get("MAYOR_THRESHOLD") or 95) for w in wins):
-            want = name
-            break
-    if pinned is None:
-        out.append(f"mayor drift: claude-mayor CLAUDE_CONFIG_DIR {cfg_dir!r} is not a MAYOR_CONFIG_DIR login")
-    elif known and want and want != pinned:
-        out.append(f"mayor drift: latest readings pick login {want} (MAYOR_LOGINS order, <{cf.get('MAYOR_THRESHOLD')}%), city.toml pins {pinned}")
+    # 4. mayor provider, model and login (live with or without the fleet)
+    out += mayor_findings(city, now, cf)
 
     # 5. host backend consistent with the readings it was chosen from
     try:
