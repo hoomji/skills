@@ -63,6 +63,18 @@ LEDGERS = {
 }
 
 
+
+def exec_paths(o, city):
+    """Script paths an order's exec names, with the variables gc sets expanded: $GC_CITY_PATH and
+    $PACK_DIR (the pack holding the order's source). A raw "$PACK_DIR/..." read as "/assets/..." and
+    reported a live script missing (ci-h4c9)."""
+    ex = (o.get("exec") or "").replace("$GC_CITY_PATH", str(city)).replace("${GC_CITY_PATH}", str(city))
+    src = o.get("source") or ""
+    if "/orders/" in src:
+        pack = src.rsplit("/orders/", 1)[0]
+        ex = ex.replace("$PACK_DIR", pack).replace("${PACK_DIR}", pack)
+    return [t for t in re.findall(r"(\S*/\S+\.(?:sh|py))", ex) if t.startswith("/") and "$" not in t]
+
 def run(cmd, cwd=None, timeout=90):
     try:
         p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
@@ -213,8 +225,7 @@ def doctor(city):
                 continue
             if not o.get("enabled", True):
                 f.append(f"order-disabled {name} ({o.get('source')})")
-            ex = (o.get("exec") or "").replace("$GC_CITY_PATH", str(city))
-            for tok in re.findall(r"(/\S+\.(?:sh|py))", ex):
+            for tok in exec_paths(o, city):
                 if not Path(tok).is_file():
                     f.append(f"order-exec-missing {name} runs {tok}")
 

@@ -62,6 +62,18 @@ MARKERS = ["deployable", "green", "verified", "ci-green"]
 
 
 
+
+def exec_paths(o, city):
+    """Script paths an order's exec names, with the variables gc sets expanded: $GC_CITY_PATH and
+    $PACK_DIR (the pack holding the order's source). A raw "$PACK_DIR/..." read as "/assets/..." and
+    reported a live script missing (ci-h4c9)."""
+    ex = (o.get("exec") or "").replace("$GC_CITY_PATH", str(city)).replace("${GC_CITY_PATH}", str(city))
+    src = o.get("source") or ""
+    if "/orders/" in src:
+        pack = src.rsplit("/orders/", 1)[0]
+        ex = ex.replace("$PACK_DIR", pack).replace("${PACK_DIR}", pack)
+    return [t for t in re.findall(r"(\S*/\S+\.(?:sh|py))", ex) if t.startswith("/") and "$" not in t]
+
 def ledger_row_findings(rel, rs, n, check, cols):
     """Bad rows of one ledger: a wrong column count, or the right count with a field the check
     rejects (an unknown state, a malformed sha). The message says which; a right count used to
@@ -239,7 +251,7 @@ def doctor(city):
     else:
         if not o.get("enabled", True):
             f.append(f"order-disabled {ORDER} ({o.get('source')})")
-        for tok in re.findall(r"(/\S+\.(?:sh|py))", o.get("exec") or ""):
+        for tok in exec_paths(o, city):
             if not Path(tok).is_file():
                 f.append(f"order-exec-missing {ORDER} runs {tok}")
         off = [s for s in ("wall.off", "promotion-cadence.off") if (wall_ci(city) / s).exists()]
