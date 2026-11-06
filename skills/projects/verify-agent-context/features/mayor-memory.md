@@ -28,7 +28,7 @@ Preconditions:
 - Doctor ran this pass.
 
 - **Index, links, frontmatter.** Run `context.py memory`. Output is `memory: clean`; findings
-  read `memory: <file> not in MEMORY.md`, `… links missing [[x]]`, `… names missing memory x
+  read `memory: <file> not in MEMORY.md`, `… names missing memory x
   (plain text)` or `… frontmatter is invalid YAML (…)`.
 - **Live facts.** Run `context.py refs --also ~/projects/Gateway-LLM .claude-memory/*.md`;
   a `MISS` on a bare product file name (`renderedness-corpus.test.ts`) is checked with
