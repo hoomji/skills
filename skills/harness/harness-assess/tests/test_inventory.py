@@ -60,7 +60,7 @@ class InventoryTests(unittest.TestCase):
     def test_reports_context_map_as_domain_architecture(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "CONTEXT-MAP.md").write_text(
+            (root / "GLOSSARY-MAP.md").write_text(
                 "# Context Map\n", encoding="utf-8"
             )
 
@@ -73,7 +73,7 @@ class InventoryTests(unittest.TestCase):
             payload = json.loads(result.stdout)
 
             self.assertIn(
-                "CONTEXT-MAP.md", payload["architecture_and_domain_docs"]
+                "GLOSSARY-MAP.md", payload["architecture_and_domain_docs"]
             )
 
     def test_reports_knowledge_stores_and_walks_generated_documentation(self) -> None:
@@ -110,7 +110,7 @@ class InventoryTests(unittest.TestCase):
     def test_reports_context_map_as_domain_architecture(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "CONTEXT-MAP.md").write_text(
+            (root / "GLOSSARY-MAP.md").write_text(
                 "# Context Map\n", encoding="utf-8"
             )
 
@@ -123,7 +123,7 @@ class InventoryTests(unittest.TestCase):
             payload = json.loads(result.stdout)
 
             self.assertIn(
-                "CONTEXT-MAP.md", payload["architecture_and_domain_docs"]
+                "GLOSSARY-MAP.md", payload["architecture_and_domain_docs"]
             )
 
     @staticmethod

@@ -53,7 +53,16 @@ BUILD_NAMES = {
     "docker-compose.yml",
     "docker-compose.yaml",
 }
-ARCHITECTURE_NAMES = {"ARCHITECTURE.md", "CONTEXT.md", "CONTEXT-MAP.md", "DESIGN.md"}
+ARCHITECTURE_NAMES = {
+    "ARCHITECTURE.md",
+    "GLOSSARY.md",
+    "GLOSSARY-MAP.md",
+    # Legacy names from mattpocock-skills before 1.3.0; still reported so an
+    # assessment can flag them for renaming.
+    "CONTEXT.md",
+    "CONTEXT-MAP.md",
+    "DESIGN.md",
+}
 HOOK_NAMES = {"hooks.json", ".pre-commit-config.yaml", ".pre-commit-config.yml"}
 TEST_MARKERS = ("/test/", "/tests/", ".spec.", ".test.")
 OBSERVABILITY_WORDS = (
