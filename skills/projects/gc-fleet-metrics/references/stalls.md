@@ -32,6 +32,7 @@ Lines repeat once per backlog tick while the condition holds, so rank by **disti
 | bead.claim_rejected | repeating for one bead? | actor shadowing (memory claim-rejected-loop-is-beads-actor-shadowing) or re-served claim (memory re-served-claim-loops-the-guard) |
 | session.crashed | the pane's last lines | provider or harness error |
 | order.failed | `gc order history <name>` | the order's own exit; an order that ran is not proof it worked (memory order-executed-is-not-evidence-of-effect) |
+| order.skipped | the event's payload `outcome` (skipped/partial) and `scopes` | gc 1.5.0+: the order exited 0 but declared work it did not do — an unreachable bead scope or a held safety gate; `gc order run <name>` prints the same declaration |
 
 ## Node-level shapes
 

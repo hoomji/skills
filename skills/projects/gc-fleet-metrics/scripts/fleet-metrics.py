@@ -42,7 +42,7 @@ STALL_VERBS = ("QUEUED", "QUEUE-FULL", "REQUEUED", "LAUNCH-STALL", "FAIR-WAIT", 
                "HELD", "HOLD", "WITHDRAWN", "RETRY", "STRANDED-BASE", "PARENT-GONE", "PR-CONFLICT")
 STALL_EVENTS = ("session.stranded", "session.idle_killed", "session.draining", "session.crashed",
                 "session.drain_acked_with_assigned_work", "session.demand_claim_divergence",
-                "bead.dead_assignee_reopened", "bead.claim_rejected", "order.failed")
+                "bead.dead_assignee_reopened", "bead.claim_rejected", "order.failed", "order.skipped")
 
 
 def fleet_hosts():
@@ -151,7 +151,7 @@ def parse_route(since, until, jobs):
         if m:
             t = iso(m[1])
             first = first or t
-            launch.setdefault(m[4], (t, m[3]))
+            launch.setdefault(m[4], (t, {"hailey": "hdell"}.get(m[3], m[3])))  # hailey renamed hdell 2026-10-26
             continue
         m = LINE.match(line)
         if not m or m[2] not in STALL_VERBS:
@@ -340,7 +340,7 @@ def events(since, until):
         return None
     with fh:
         for line in fh:
-            if '"session.' not in line and '"bead.' not in line and '"order.failed"' not in line:
+            if '"session.' not in line and '"bead.' not in line and '"order.' not in line:
                 continue
             try:
                 e = json.loads(line)
@@ -350,7 +350,9 @@ def events(since, until):
             first = first or t
             if e.get("type") in STALL_EVENTS and since <= t < until:
                 counts[e["type"]] += 1
-                who = (e.get("payload") or {}).get("template") or (e.get("payload") or {}).get("agent") or e.get("actor") or "?"
+                # order.* events name the order in subject; gc 1.5.0 emits order.skipped when an
+                # order exits 0 but skipped scopes or steps (payload outcome skipped|partial).
+                who = (e.get("subject") if e["type"].startswith("order.") else None) or (e.get("payload") or {}).get("template") or (e.get("payload") or {}).get("agent") or e.get("actor") or "?"
                 agents[e["type"]][agent_type(str(who))] += 1
     return {"since": utc(first), "counts": dict(counts), "by_agent": {k: dict(v.most_common(6)) for k, v in agents.items()}}
 
