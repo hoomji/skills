@@ -89,6 +89,18 @@ created a convoy, and attached no workflow — so the work bead sat untouched. M
 pairs), created 13-38 minutes apart: someone saw nothing happen and slung again, and got a
 second dud rather than a refusal.
 
+**graph.v2 formulas (`--on review`, `--on do-work`) look like duds and are not.** Their
+root keys on the input convoy (`gc.graphv2_root_key=graphv2-root:<convoy>:...`) and never sets
+`gc.routed_to`, a root key or an assignee on the work bead; `review` also leaves its source bead
+open after it finishes. On 2026-11-04 five reviews were reported "stuck, no workflow" for 25 min
+while all five had run and written their reports. Check for the root before calling a dud:
+
+```bash
+gc bd --rig <rig> list --all --json --limit 0 | jq -r --arg c "<convoy>" '.[] | select(((.metadata//{})["gc.graphv2_root_key"]//"")|contains(":"+$c+":")) | "\(.id)\t\(.status)\t\(.title)"'
+```
+
+A root there means the sling attached; read its status, and the formula's report path, for the result.
+
 Tell a dud from a pin by the **work bead**, never by the convoy. A dud leaves the work bead
 clean, which is exactly why re-slinging it works.
 
