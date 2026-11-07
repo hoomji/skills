@@ -8,7 +8,7 @@ description: Prune a Gas City city's work beads and the mayor's memory of sedime
 Pruning removes **sediment**: work beads and memories whose trigger has retired. It also
 surfaces what waits on the owner. The owner's review is the product; the closes and deletes
 exist to keep that review short. Scope is the city store's **work** beads (`gc bd`, no `--rig`)
-and `.claude-memory/` (the mayor's memory dir).
+and a report on `.claude-memory/` (the mayor's memory dir), which the memory dream now prunes.
 
 Neighbours own the rest, so hand off rather than repeat them:
 - molecule step beads, husk roots, a slow store: [`gc-store-reclaim`](../gc-store-reclaim/SKILL.md)
@@ -20,7 +20,7 @@ Neighbours own the rest, so hand off rather than repeat them:
 Evidence rules: `.claude-memory/bare-closed-is-not-delivery.md` (delivery is a merged PR, a
 pushed head or an accepted receipt, never a status) and
 `.claude-memory/read-spec-and-code-from-origin-develop.md`. The memory contract is
-`.claude-memory/memory-earns-its-line.md`: read it before step 2.
+`.claude-memory/memory-earns-its-line.md`; the dream applies it.
 
 ## 1. Board
 
@@ -47,23 +47,19 @@ bead is closed with its evidence.
 
 ## 2. Memory
 
-Read every file in `.claude-memory/`, not only the index. For each one, check every bead, PR,
-path, flag and pool it names against the live system (`gc bd show`, `gh pr view`, `ls`,
-`city.toml`). Then choose one outcome:
+The memory dream consolidates memory now (owner 2026-11-07): the city's `memory-dream` order
+(pack hoomji/memory-dream) dreams weekly, the mayor reviews, and a swap merges it in. Do not edit
+memory in this step. Instead:
 
-- **Delete** when the environment now holds the fact (an order, a doc, a config comment), or its
-  trigger has retired (the pool, pilot, ledger or bug it guards is gone).
-- **Archive** instead of deleting a retired memory that records an owner ruling or incident
-  history someone may need to reconstruct: move it to `city/archive/memory-retired-<date>/`.
-- **Rewrite** when the lesson stands but names retired things, or has grown a dated log. Keep the
-  lesson, **Why** and **How to apply**, state the current state in one paragraph, and leave the
-  history on the beads.
-- **Keep** otherwise.
+- Find the latest dream: the newest folder in `.gc/runtime/packs/memory-dream/runs/`, its
+  `report.md` (two `counts:` lines and the cited changes) and `swap.json` when it was swapped.
+- If a dream's review is open (`gc bd list --metadata-field dream.step=review`), say so in the
+  digest with its bead id; the mayor reviews it per the review step.
+- Count live memory the way the dream's check does (files, MEMORY.md bytes, index lines over
+  120 characters) so the digest shows drift since the last swap.
 
-A file another session changed on disk is current state: merge its content in, never revert it.
-**Done when** every file is graded, `python3 dispatch/seat_memory_sync.py sync` has re-synced the
-seats' copies, and a mechanical check passes: every `(x.md)` in MEMORY.md
-exists, every file appears in MEMORY.md, and no `[[link]]` names a deleted file.
+**Done when** the digest's memory line names the latest dream report, its state (waiting for
+review, swapped with its rollback point, rejected, failed) and the live counts.
 
 ## 3. Owner digest
 
@@ -74,6 +70,6 @@ Mail the owner (`gc mail send human`) one message titled `Prune <date>: N items 
 2. **Close list**: owner-waiting beads that look answered, each with its evidence, for a yes or no.
 3. **Old mail**: unread owner mail more than three days old that is purely informational, listed
    by id and offered for archive. Leave all owner mail unread yourself.
-4. **Pruned**: beads closed and memories deleted or rewritten, with counts before and after.
+4. **Pruned**: beads closed, with counts before and after; memory: the latest dream report and its state.
 
 **Done when** the mail is sent and `gc mail inbox human` lists it.
