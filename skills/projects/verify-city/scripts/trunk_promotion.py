@@ -4,7 +4,7 @@
 Subcommands (all read-only: file reads under the city, `gc order list/history`, `git rev-parse/
 rev-list/merge-base/cat-file/ls-remote` in ~/projects/Gateway-LLM (never fetch, checkout or switch),
 `gh pr list/view` and `gh api` GETs; never promotion.sh, promotion-cadence.py without a patched-out
-fetch, land.sh, merge-train.sh, wall-land/wall-ready, mail, or a write under .gc/runtime/):
+fetch, land.sh, merge-train.sh, trunk-land/trunk-ready, mail, or a write under .gc/runtime/):
 
   doctor      one line per drift finding, exit 1 on any; else `trunk-promotion: clean`, exit 0
   state       markers (deployable, green, verified, ci-green) and their shas, trunk and develop tips,
@@ -42,7 +42,7 @@ MARKER = re.compile(r"<!-- promotion\.sh sha=([0-9a-f]{40}) merge=([0-9a-f]{40}|
 HELD_MARK = "**Held (preflight):**"
 
 # Scripts the feature names: path -> must be executable.
-SCRIPTS = ["dispatch/promotion.sh", "dispatch/promotion-cadence.py", "dispatch/wall-deployable.py",
+SCRIPTS = ["dispatch/promotion.sh", "dispatch/promotion-cadence.py", "dispatch/trunk-deployable.py",
            "dispatch/land.sh", "dispatch/merge-train.sh", "dispatch/migration-restamp.py",
            "dispatch/migration-order.py", "dispatch/develop-watch.py"]
 ORDER = "promotion-cadence"
@@ -56,7 +56,7 @@ CADENCE_VERDICTS = {"UP-TO-DATE", "HELD", "IN-FLIGHT", "DEQUEUED", "SPACING", "C
                     "WAIT", "GATE-RED", "CONFLICT", "QUEUE-FAILED", "NEEDS-REVIEW", "MERGED-BY-HAND",
                     "REQUEUED", "REQUEUE-SKIPPED", "REVIEW-FILED", "REVIEW-NEEDED", "REVIEW-WAIT",
                     "REVIEW-BLOCKING", "UNVERIFIED"}
-SWITCHES = ["wall.off", "promotion-cadence.off", "wall-deploy.off", "verify.off", "land-validated.on",
+SWITCHES = ["wall.off", "promotion-cadence.off", "trunk-deploy.off", "verify.off", "land-validated.on",
             "ci-gate.off", "tip-red-rounds.off", "sync-pending"]
 MARKERS = ["deployable", "green", "verified", "ci-green"]
 

@@ -35,7 +35,7 @@ One harness per feature, all python3 stdlib, each with `--city` and a safe `--he
 
 | Feature | Harness | Drives |
 |---|---|---|
-| [merge-wall](features/merge-wall.md) | `.claude/skills/verify-city/scripts/merge_wall.py` | `state`, `holds`, `candidates` |
+| [trunk-land](features/trunk-land.md) | `.claude/skills/verify-city/scripts/trunk_land.py` | `state`, `holds`, `candidates` |
 | [trunk-promotion](features/trunk-promotion.md) | `.claude/skills/verify-city/scripts/trunk_promotion.py` | `state`, `promotable`, `gate` |
 | [quota-routing](features/quota-routing.md) | `.claude/skills/verify-city/scripts/quota_routing.py` | `readings`, `placement`, `orders`, `supply` |
 | [resource-guard](features/resource-guard.md) | `.claude/skills/verify-city/scripts/resource_guard_check.py` | `state`, `classes`, `prove-permit` (the one drive that takes a permit) |

@@ -2,7 +2,7 @@
 
 The ci-controller seat (`agents/ci-controller/`; provider in its `agent.toml`) takes fleet PRs from reviewed to
 landed: mergeability upkeep, the merge queue and restacks, and during the standing wall the
-wall-land watch. It wakes on its
+trunk-land watch. It wakes on its
 `ci-controller-pass` order, follows the Seat contract (mail, claim, confirm the signature,
 `pending.txt`, memory), runs its loop and mails the mayor.
 
@@ -44,8 +44,8 @@ Preconditions:
   shape, and each state in the live `pending.txt` (`BLOCKED`, `UNSTABLE`, `DIRTY`, `CLEAN`),
   has a step in the prompt.
 - **Wall.** `cat dispatch/integration-branch` names `wall/develop` while the wall stands. Each
-  ledger the section names exists (`dispatch/ledgers/wall-land.tsv`, `.gc/runtime/wall-ci/red-heads.tsv`,
-  `.gc/runtime/fleet/gitbutler-radar/base-wall-develop.tsv`), and `gc order list` shows `wall-land`,
+  ledger the section names exists (`dispatch/ledgers/trunk-land.tsv`, `.gc/runtime/wall-ci/red-heads.tsv`,
+  `.gc/runtime/fleet/gitbutler-radar/base-wall-develop.tsv`), and `gc order list` shows `trunk-land`,
   `pr-conflict-sweep` and `red-fix-rounds`. Each wall rule reads the same in `docs/merge-queue.md`.
 - **Memory.** Run `context.py seat-memory ci-controller`. Output is `ci-controller: seat memory in step`.
 - **Last pass.** Run `context.py last-pass ci-controller > $EV/ci-controller.last-pass.json`.

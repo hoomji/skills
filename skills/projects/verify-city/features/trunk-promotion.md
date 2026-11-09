@@ -1,7 +1,7 @@
 # trunk-promotion
 
 How a trunk change reaches `develop`. The trunk (`dispatch/integration-branch`, today `wall/develop`)
-is verified after merge. `dispatch/wall-deployable.py` ratchets each post-merge check into a
+is verified after merge. `dispatch/trunk-deployable.py` ratchets each post-merge check into a
 `deployable` marker. The `promotion-cadence` order picks the promotable sha (push CI green, no critical
 red, no gate red) and writes it to `ci-green`. It then runs `dispatch/promotion.sh --yes --sha <sha>`,
 which cuts `release/trunk-<ts>` (the sha plus a develop merge), runs the migration preflight, opens the
@@ -12,12 +12,12 @@ promotion evidence, promotable sha, gate red).
 
 ## Sub-features
 
-- `tp-deployable` The deployable ratchet (R-20261021-02). `wall-deployable.py --tip <sha>` judges
+- `tp-deployable` The deployable ratchet (R-20261021-02). `trunk-deployable.py --tip <sha>` judges
   each post-merge check. It writes `.gc/runtime/wall-ci/deployable` when the tip adds no new red since
   the previous check, has no critical red (typecheck, install, `build:*`, migration-order or
   migration-prefix-unique tests) and is the newest check. It appends `deployable.tsv` (ts sha prev_sha
   new_reds verdict reason; verdict `green|deployable|held`). `verified` is the last judged tip and
-  `green` the last green one. `deployable` is what wall-deploy may ship; it is not what promotion
+  `green` the last green one. `deployable` is what trunk-deploy may ship; it is not what promotion
   ships (see `tp-promotable`).
 - `tp-promotable` The promotable sha (R-20261021-15, R-20261022-06). It is the newest first-parent
   trunk sha with all four required push workflows (`lint`, `services test`, `apps test`,
@@ -56,7 +56,7 @@ promotion evidence, promotable sha, gate red).
   `dispatch/ledgers/mergify.jsonl` `queued`/`merged`/`dequeued` rows for promotion PR numbers
   (land.sh writers only).
 - `tp-switches` `.gc/runtime/wall-ci/promotion-cadence.off` and `wall.off` stop the cadence
-  (`PROMOTION-CADENCE off`). `wall-deploy.off` (R-20261021-14) keeps the ratchet from deploying, so
+  (`PROMOTION-CADENCE off`). `trunk-deploy.off` (R-20261021-14) keeps the ratchet from deploying, so
   promotion plus develop CD is the only route to development.
 
 ## How to get to it (user POV)
@@ -85,7 +85,7 @@ Preconditions:
 - **Doctor.** Run `trunk_promotion.py doctor > $EV/trunk-promotion/doctor.txt; echo $?`. A clean run
   prints `trunk-promotion: clean` and exits 0. Findings, one per line:
   - `script-missing` / `script-not-executable`: one of promotion.sh, promotion-cadence.py,
-    wall-deployable.py, land.sh, merge-train.sh, migration-restamp.py, migration-order.py or
+    trunk-deployable.py, land.sh, merge-train.sh, migration-restamp.py, migration-order.py or
     develop-watch.py.
   - `doc-path-missing`: a backticked path in trunk-and-promotion.md's `## Promotion` section is
     missing. `scripts/` paths are checked on Gateway-LLM `origin/<trunk>`.

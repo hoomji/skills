@@ -82,7 +82,7 @@ or stamp state (`elapsed-check.sh` and `seat-throttle.sh` stamp on every call;
 - Several scripts gate real work on their own stamp (`MIN_INTERVAL` in disk-hygiene,
   checkout-freshness, dolt-tmp-pack-sweep, jsonl-archive-mirror); a fresh `.log` with an old
   `.last` means the order ran and skipped, which is a success there.
-- A ledger a script appends to (`dispatch/ledgers/wall-deploy.tsv`) does not exist until its
+- A ledger a script appends to (`dispatch/ledgers/trunk-deploy.tsv`) does not exist until its
   first record; doctor ignores ledger paths named in script headers.
 - `/home/coolhenry` is a symlink to `/home/coolhenrylinux`; order paths through it resolve.
 - Another session may add an order mid-pass; inventory reads live state, so re-run before

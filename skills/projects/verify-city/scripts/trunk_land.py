@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""merge_wall.py -- read-only verification harness for trunk landing and the per-PR develop gate.
+"""trunk_land.py -- read-only verification harness for trunk landing and the per-PR develop gate.
 
 Subcommands (all read-only: file reads, `gc order list/history`, `git rev-parse/merge-base/
-ls-remote`, `gh pr list/view`; never land.sh, wall-land.sh, queue-ready.sh, merge-queue.sh run,
+ls-remote`, `gh pr list/view`; never land.sh, trunk-land.sh, queue-ready.sh, merge-queue.sh run,
 gc order run/check, mail, bead writes or pushes):
 
-  doctor      one line per drift finding, exit 1 on any; else `merge-wall: clean`, exit 0
+  doctor      one line per drift finding, exit 1 on any; else `trunk-land: clean`, exit 0
   state       the wall as it stands: integration branch, switches, tips, last landing and its age,
               verify/deploy state, last red rows, wall orders (enabled, last run)
   holds       red-heads.tsv rows against each PR's current head, and whether red-fix-rounds filed
               a round at that head (gh pr view per held PR)
-  candidates  what the next wall-land run would take: gh pr list on both bases piped through
-              dispatch/wall-candidates.py (imported, not run), with the landed/held reasoning
+  candidates  what the next trunk-land run would take: gh pr list on both bases piped through
+              dispatch/trunk-candidates.py (imported, not run), with the landed/held reasoning
 
 --city defaults to $GC_CITY, then ~/city.
 """
@@ -31,19 +31,19 @@ GL_REPO = Path(os.environ.get("WALL_REPO", os.path.expanduser("~/projects/Gatewa
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 ISO = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
-# Scripts the feature names: path -> must be executable (wall-checks.sh is sourced, not run).
+# Scripts the feature names: path -> must be executable (local-checks.sh is sourced, not run).
 SCRIPTS = {
     "dispatch/merge-queue.sh": True, "dispatch/land.sh": True, "dispatch/merge-train.sh": True,
-    "dispatch/queue-ready.sh": True, "dispatch/wall-land.sh": True, "dispatch/wall-ready.sh": True,
-    "dispatch/wall-deploy.sh": True, "dispatch/wall-candidates.py": True,
+    "dispatch/queue-ready.sh": True, "dispatch/trunk-land.sh": True, "dispatch/trunk-ready.sh": True,
+    "dispatch/trunk-deploy.sh": True, "dispatch/trunk-candidates.py": True,
     "dispatch/gitbutler-radar.sh": True, "dispatch/kept-beads.py": True,
     "dispatch/red-fix-rounds.py": True, "dispatch/tip-red-rounds.py": True,
     "dispatch/develop-watch.py": True, "orders/scripts/conflict-sweep.sh": True,
     "orders/scripts/conflict-sweep.py": True, "orders/scripts/elapsed-check.sh": True,
-    "dispatch/wall-checks.sh": False,
+    "dispatch/local-checks.sh": False,
 }
 # Orders the feature owns: name -> max minutes since its last run while the trunk orders run (no wall.off).
-WALL_ORDERS = {"wall-land": 60, "wall-verify": 120, "wall-deploy": 120, "pr-conflict-sweep": 30,
+WALL_ORDERS = {"trunk-land": 60, "trunk-verify": 120, "trunk-deploy": 120, "pr-conflict-sweep": 30,
                "red-fix-rounds": 60, "tip-red-rounds": 120, "develop-watch": 60}
 OTHER_ORDERS = {"queue-ready": 30, "kept-beads": 60}
 # Subcommands docs and seat prompts drive: script -> case arms that must exist.
@@ -51,15 +51,15 @@ ARMS = {
     "dispatch/merge-train.sh": ["ready", "prune", "pin-aliases", "repin-waiver", "lane-blockers"],
     "dispatch/merge-queue.sh": ["status", "plan", "run", "metrics", "snapshot", "zero-lens", "hold",
                                 "held", "release"],
-    "dispatch/wall-ready.sh": ["land", "verify"],
+    "dispatch/trunk-ready.sh": ["land", "verify"],
 }
 # Ledger shapes (column counts) per the writers' printf lines.
 LEDGERS = {
-    "dispatch/ledgers/wall-land.tsv": ({5}, "time pr head tip host"),
+    "dispatch/ledgers/trunk-land.tsv": ({5}, "time pr head tip host"),
     ".gc/runtime/wall-ci/red-heads.tsv": ({3, 4}, "pr head time [steps]"),
     ".gc/runtime/wall-ci/land-all-red.tsv": ({4}, "time tip prs checks"),
     ".gc/runtime/wall-ci/wall-tip-red.tsv": ({5}, "time tip fails files log"),
-    "dispatch/ledgers/wall-deploy.tsv": ({5}, "time worker sha verdict host"),
+    "dispatch/ledgers/trunk-deploy.tsv": ({5}, "time worker sha verdict host"),
 }
 
 
@@ -159,7 +159,7 @@ def order_home(city, name):
 
 
 def disabled_orders(city):
-    """Orders city.toml [[orders.overrides]] pins enabled=false (R-20261103-01 keeps wall-deploy
+    """Orders city.toml [[orders.overrides]] pins enabled=false (R-20261103-01 keeps trunk-deploy
     and the paused seats' passes off inside the restored landing pack)."""
     conf = city_toml(city) or {}
     return {o.get("name") for o in conf.get("orders", {}).get("overrides", []) if o.get("enabled") is False}
@@ -250,7 +250,7 @@ def doctor(city):
         f.append(f"gc-order-list-failed {err}")
         ords = {}
     else:
-        # The trunk method page names every trunk order ("The `wall-land` order ...").
+        # The trunk method page names every trunk order ("The `trunk-land` order ...").
         section = doc_section(city, "# Trunk and promotion", stop_re=r"^## History")
         named = set(re.findall(r"order `([a-z0-9-]+)`|`([a-z0-9-]+)` order", section))
         for name in sorted({a or b for a, b in named}):
@@ -274,8 +274,8 @@ def doctor(city):
     for rel, (ncols, cols) in LEDGERS.items():
         rs = rows(city / rel)
         if rs is None:
-            # wall-deploy.tsv appears with the first deploy, which needs a green tip.
-            if rel.endswith("wall-deploy.tsv") and not (wall_ci / "green").exists():
+            # trunk-deploy.tsv appears with the first deploy, which needs a green tip.
+            if rel.endswith("trunk-deploy.tsv") and not (wall_ci / "green").exists():
                 continue
             if walled:
                 st = down_status(city, Path(rel).stem)
@@ -285,7 +285,7 @@ def doctor(city):
         bad = 0
         for i, r in enumerate(rs, 1):
             ok = len(r) in ncols
-            if ok and rel.endswith("wall-land.tsv"):
+            if ok and rel.endswith("trunk-land.tsv"):
                 ok = bool(ISO.match(r[0]) and r[1].isdigit() and HEX40.match(r[2]) and HEX40.match(r[3]))
             elif ok and rel.endswith("red-heads.tsv"):
                 ok = bool(r[0].isdigit() and HEX40.match(r[1]) and ISO.match(r[2]))
@@ -298,7 +298,7 @@ def doctor(city):
         if bad > 3:
             f.append(f"ledger-row-bad {rel}: {bad - 3} more bad rows")
 
-    # Switch agreement: dispatch/integration-branch vs wall.off, queue-ready.off, city.toml, wall-land.sh.
+    # Switch agreement: dispatch/integration-branch vs wall.off, queue-ready.off, city.toml, trunk-land.sh.
     # Retired (ci-zfxu): queue-ready.off is not required during the wall (queue-ready is live under
     # R-20261103-01), and rigs.formula_vars.base_branch is per-rig (hoppy-city's main is its own
     # trunk; the var feeds legacy formulas only).
@@ -318,13 +318,13 @@ def doctor(city):
             if I not in bases:
                 f.append(f"switch-split city.toml github.pr_monitor.base_branches {bases} lacks {I}")
     try:
-        src = (city / "dispatch/wall-land.sh").read_text()
+        src = (city / "dispatch/trunk-land.sh").read_text()
         m = re.search(r"^WALL=([^;\s]+)", src, re.M)
         if m and m.group(1).startswith("$"):
             # Read from dispatch/integration-branch; only the ${WALL:-...} fallback is literal.
             m = re.search(r"WALL=\$\{WALL:-([^}]+)\}", src)
         if walled and m and m.group(1) != I:
-            f.append(f"switch-split dispatch/wall-land.sh hardcodes WALL={m.group(1)} but integration-branch={I}")
+            f.append(f"switch-split dispatch/trunk-land.sh hardcodes WALL={m.group(1)} but integration-branch={I}")
     except OSError:
         pass
 
@@ -338,7 +338,7 @@ def doctor(city):
                 f.append(f"order-never-ran {name}")
             elif a > mx:
                 f.append(f"order-stale {name} last ran {ts} ({a} min ago, want <= {mx})")
-        wl = rows(city / "dispatch/ledgers/wall-land.tsv") or []
+        wl = rows(city / "dispatch/ledgers/trunk-land.tsv") or []
         if wl:
             tip = wl[-1][3]
             rc, wall_tip, _ = gl_git("rev-parse", f"origin/{I}")
@@ -346,7 +346,7 @@ def doctor(city):
             if rc == 0 and wall_tip and tip != wall_tip:
                 rc2, _, _ = gl_git("merge-base", "--is-ancestor", tip, wall_tip)
                 if rc2 == 1:
-                    f.append(f"wall-tip-diverged last wall-land.tsv tip {tip[:8]} is not an ancestor of origin/{I} {wall_tip[:8]} (local ref)")
+                    f.append(f"wall-tip-diverged last trunk-land.tsv tip {tip[:8]} is not an ancestor of origin/{I} {wall_tip[:8]} (local ref)")
         try:
             verified = (wall_ci / "verified").read_text().strip()
         except OSError:
@@ -359,7 +359,7 @@ def doctor(city):
     for line in f:
         print(line)
     if not f:
-        print("merge-wall: clean")
+        print("trunk-land: clean")
     return 1 if f else 0
 
 
@@ -379,10 +379,10 @@ def state(city):
     for l in out.splitlines():
         sha, ref = l.split("\t")
         print(f"remote {ref:<22} {sha}")
-    wl = rows(city / "dispatch/ledgers/wall-land.tsv") or []
+    wl = rows(city / "dispatch/ledgers/trunk-land.tsv") or []
     if wl:
         r = wl[-1]
-        print(f"last wall-land row  {r[0]} pr #{r[1]} head {r[2][:8]} tip {r[3][:8]} host {r[4]} ({age_min(r[0])} min ago); {len(wl)} rows")
+        print(f"last trunk-land row  {r[0]} pr #{r[1]} head {r[2][:8]} tip {r[3][:8]} host {r[4]} ({age_min(r[0])} min ago); {len(wl)} rows")
         today = now().strftime("%Y-%m-%d")
         print(f"landed today        {sum(1 for x in wl if x[0].startswith(today))} rows")
     for name in ("verified", "green"):
@@ -396,7 +396,7 @@ def state(city):
     print(f"deployed/           {', '.join(f'{p.name}={p.read_text().strip()[:8]}' for p in sorted(dep.glob('*'))) if dep.is_dir() else '(absent: nothing deployed yet)'}")
     ords, err = orders(city)
     print("orders (enabled, last run):")
-    for name in list(WALL_ORDERS) + list(OTHER_ORDERS) + ["wall-e2e", "tip-red-revert"]:
+    for name in list(WALL_ORDERS) + list(OTHER_ORDERS) + ["live-e2e", "tip-red-revert"]:
         o = (ords or {}).get(name)
         ts = last_run(city, name) if o else None
         en = "MISSING" if not o else ("enabled" if o.get("enabled", True) else "DISABLED")
@@ -433,7 +433,7 @@ def holds(city):
 
 # ----------------------------------------------------------------------------------- candidates
 def candidates(city):
-    """Mirror wall-ready.sh land: one PR query (every base), then wall-candidates.py's candidates() with
+    """Mirror trunk-ready.sh land: one PR query (every base), then trunk-candidates.py's candidates() with
     the same landed (git ancestry of origin/<trunk>), held and live-lane inputs. Read-only."""
     rc, out, err = run(["gh", "pr", "list", "-R", GH_REPO, "--state", "open", "--author", "hoomji", "--limit", "300",
                         "--json", "number,isDraft,labels,createdAt,headRefOid,headRefName,baseRefName,author"], timeout=60)
@@ -445,7 +445,7 @@ def candidates(city):
     for p in prs:
         by_base[p.get("baseRefName")] = by_base.get(p.get("baseRefName"), 0) + 1
     print("open hoomji PRs: %d (%s)" % (len(prs), ", ".join(f"{b} {n}" for b, n in sorted(by_base.items()))))
-    spec = importlib.util.spec_from_file_location("wall_candidates", city / "dispatch/wall-candidates.py")
+    spec = importlib.util.spec_from_file_location("trunk_candidates", city / "dispatch/trunk-candidates.py")
     wc = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(wc)
     landed = wc.on_trunk(wc.wall_repo(), wc.trunk_name())
@@ -453,7 +453,7 @@ def candidates(city):
     live = wc.fleet_facts(city / ".gc/runtime/fleet")["live"]
     skipped = {}
     picks = wc.candidates(prs, landed, held, live, skip=lambda n, why: skipped.__setitem__(n, why))
-    print(f"next wall-land candidates before the validated/CI gates ({len(picks)}): {','.join(map(str, picks)) or '(none)'}")
+    print(f"next trunk-land candidates before the validated/CI gates ({len(picks)}): {','.join(map(str, picks)) or '(none)'}")
     for p in sorted(prs, key=lambda p: p["number"]):
         n, h = p["number"], p.get("headRefOid", "")
         why = ("draft" if p.get("isDraft") else "held at head" if h in held.get(str(n), ())
