@@ -53,7 +53,7 @@ BARE_DIRS = ('', 'dispatch', 'orders/scripts', 'docs')
 BARE_GLOBS = ('agents/*/{}', 'agents/*/memory/{}', '.gc/runtime/fleet/{}', '.gc/runtime/fleet/seats/*/{}',
               'dispatch/ledgers/{}', '.gc/runtime/wall-ci/{}', '.gc/runtime/fleet/gitbutler-radar/{}')
 # Switch files whose absence is the normal state: a prompt names them as the condition that ends a mode.
-SENTINELS = ('.gc/runtime/wall-ci/wall.off', '.gc/runtime/wall-e2e/off')
+SENTINELS = ('.gc/runtime/wall-ci/wall.off', '.gc/runtime/live-e2e/off')
 GC_DOCS = Path.home() / '.cache' / 'gascity-docs'
 # Provider skill sinks gc fills from packs (docs/guides/capabilities-for-coding-agent-users.md:58)
 # plus role-level skills. A pack skill lives in `<binding>.<name>/` with the bare name in its

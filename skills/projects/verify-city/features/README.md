@@ -39,7 +39,7 @@ this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with <har
 
 ## Features
 
-- [merge-wall](./merge-wall.md) covers trunk landing, the validated and CI gates, holds, tip-red lanes, develop-watch sync, conflict sweep and the per-PR develop gate.
+- [trunk-land](./trunk-land.md) covers trunk landing, the validated and CI gates, holds, tip-red lanes, develop-watch sync, conflict sweep and the per-PR develop gate.
 - [trunk-promotion](./trunk-promotion.md) covers the deployable ratchet, the promotable sha, the cut, the preflight hold, the promotion queue path, cadence verdicts and the promotion ledgers.
 - [quota-routing](./quota-routing.md) covers quota readings, backend fallback, Pareto write and review placement.
 - [resource-guard](./resource-guard.md) covers lane reservations, command permits, the PATH shims and record hygiene.

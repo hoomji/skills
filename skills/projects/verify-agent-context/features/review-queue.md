@@ -11,7 +11,7 @@ and mails the mayor `REVIEW DIGEST:`. It wakes on `review-queue-pass` when
 - `rq-wake` the nudge and the pass formula give the Seat contract's wake order.
 - `rq-refs` every path, script and memory name the prompt names exists.
 - `rq-doors` every helper call in the prompt's door table is a `review_queue.py` subcommand with those arguments.
-- `rq-stack` step 1's ref-stack relaunch matches who owns the stack now (the `wall-e2e` order during the wall, the trampoline memory otherwise) and needs no `--resource` reservation from the seat shell.
+- `rq-stack` step 1's ref-stack relaunch matches who owns the stack now (the `live-e2e` order during the wall, the trampoline memory otherwise) and needs no `--resource` reservation from the seat shell.
 - `rq-authority` the prompt's authority rules (ref writes only, dev and prod read-only, money undecided) agree with the owner rulings in the mayor's memory.
 - `rq-memory` the seat's memory copies are in step.
 - `rq-pass` a pass that closed after the last context change resolved, digested and filed as the loop asks.
@@ -37,8 +37,8 @@ Preconditions:
   Each memory the prompt names by slug exists in `agents/review-queue/memory/`.
 - **Doors.** Run `grep -n 'add_parser\|choices' dispatch/review_queue.py`. Every subcommand,
   positional and flag in the door table and the loop appears.
-- **Stack.** `ls .gc/runtime/wall-e2e/state.json` decides the owner: present means step 1 defers
-  to the `wall-e2e` order. The heavy-command rule names `--permit <class>`, and each class it
+- **Stack.** `ls .gc/runtime/live-e2e/state.json` decides the owner: present means step 1 defers
+  to the `live-e2e` order. The heavy-command rule names `--permit <class>`, and each class it
   could use is a key in `.gc/runtime/fleet/resource-policy.json` `commands`.
 - **Authority.** Compare the "Authority" bullets with the mayor memories
   `baseline-sweep-owner-rulings`, `sell-models-aggressively` and

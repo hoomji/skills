@@ -41,10 +41,10 @@ Preconditions:
   "Filing and routing" with `docs/fleet-lifecycle.md`. Each rule reads the same in prompt and
   doc, and a seat prompt that defers to the mayor's section agrees with it.
 - **Wall.** While `cat dispatch/integration-branch` reads `wall/develop`, the wall paragraph sits
-  above gates 2-5 and every ledger it names exists (`dispatch/ledgers/wall-land.tsv`,
+  above gates 2-5 and every ledger it names exists (`dispatch/ledgers/trunk-land.tsv`,
   `.gc/runtime/wall-ci/{red-heads,land-all-red,wall-tip-red}.tsv`); `gc order list` shows
-  `wall-land`, `pr-conflict-sweep` and `red-fix-rounds`. `kept-beads.py` closes a bead LANDED at a
-  matching `wall-land.tsv` head (`grep -n WALL_LEDGER dispatch/kept-beads.py`).
+  `trunk-land`, `pr-conflict-sweep` and `red-fix-rounds`. `kept-beads.py` closes a bead LANDED at a
+  matching `trunk-land.tsv` head (`grep -n WALL_LEDGER dispatch/kept-beads.py`).
 - **Live.** Run `context.py primed mayor`. `on_current_context: true`; `reset_pending: true`
   with `false` means the running mayor is on an older prompt until its reset runs.
 
