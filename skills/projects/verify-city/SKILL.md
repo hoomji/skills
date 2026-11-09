@@ -1,6 +1,6 @@
 ---
 name: verify-city
-description: Verify a Gas City's operations on the live Ryzen city — trunk landing and the develop gate, trunk-to-develop promotion, the Hoppy trunk wall, quota routing, resource guard, orders, multi-host releases, gc promotion and the gc-top/gc-mobile views — by reading live state read-only and checking it against the code and docs. Use when proving a change to dispatch/, orders/ or a city doc, when a subsystem acts on a stale rule, before staging a release, or when /maintain-verification-skill audits this map.
+description: Verify a Gas City's operations on the live Ryzen city — trunk landing and the develop gate, trunk-to-develop promotion, the Hoppy trunk flow, quota routing, resource guard, orders, multi-host releases, gc promotion and the gc-top/gc-mobile views — by reading live state read-only and checking it against the code and docs. Use when proving a change to dispatch/, orders/ or a city doc, when a subsystem acts on a stale rule, before staging a release, or when /maintain-verification-skill audits this map.
 ---
 
 # Verify city operations
@@ -42,7 +42,7 @@ One harness per feature, all python3 stdlib, each with `--city` and a safe `--he
 | [orders](features/orders.md) | `.claude/skills/verify-city/scripts/orders_check.py` | `inventory`, `order <name>`, `seats` |
 | [host-release](features/host-release.md) | `.claude/skills/verify-city/scripts/host_release.py` | `skew`, `config`, `baseline` (ssh reads only) |
 | [gc-promotion](features/gc-promotion.md) | `.claude/skills/verify-city/scripts/gc_promotion.py` | `installed`, `patches`, `shadow` |
-| [hoppy-wall](features/hoppy-wall.md) | `dispatch/hoppy-wall.py` | `status`, `gate-next --dry-run`, `land --dry-run`, `promote --dry-run` |
+| [hoppy-trunk](features/hoppy-trunk.md) | `dispatch/hoppy-trunk.py` | `status`, `gate-next --dry-run`, `land --dry-run`, `promote --dry-run` |
 | [observability](features/observability.md) | `.claude/skills/verify-city/scripts/observability.py` | `mobile`, `top`, `facts`, `views` |
 
 Run a drive as `python3 .claude/skills/verify-city/scripts/<harness> <drive> > $EV/<feature>/<drive>.txt`. The feature
