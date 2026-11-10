@@ -47,6 +47,12 @@ effect, and the changes the user asked about are on it.
 | Mergify rows still queued | `python3 dispatch/mergify-metrics.py --reconcile --since <date>` | one gh call per PR |
 | events.jsonl rotated inside window | lifecycle counts start at the rotation; older ones are in `.gc/events.jsonl.archive-*.gz` | read only if the user needs them |
 | route.log starts after window | older lines are in `.gc/runtime/route.log.*.gz` (the script reads them) | — |
+| native discovery / collection stale, or collector backlog > 200 | check orders `formula-feedback-discover` / `-collect` (`gc order list`); catch up with `python3 dispatch/formula-feedback.py collect --limit 100 --open-only` | ~2 s per root |
+
+The fleet retired on 2026-11-05. `jobs/`, `receipts/`, `model-grades.tsv` and `session-ledger.jsonl`
+are fleet-only: their age is expected, and the AGENTS dispatch columns and NODES table read 0 for
+native lanes. Lane counts, pass rates and run times come from **NATIVE** (fleet-metrics) and `native`
+(city-metrics), both read from the formula-feedback ledger. Merged PRs come from `merged_by_rig`.
 
 Done when `coverage` prints no WARNING, or each remaining warning is copied into the report
 beside the figures it limits.
@@ -98,8 +104,9 @@ lane is listed with its id, host and age.
 Save it as `reports/fleet-metrics-<UTC date>.md` and print it. Owner-facing times are Toronto
 time; ids, shas and ledger rows stay UTC. Sections, in order:
 
-1. **Headline** — window; lanes filed / completed / WORKED %; $ total and $ per WORKED lane;
-   PRs merged; the single biggest bottleneck.
+1. **Headline** — window; native roots / closed / pass % (NATIVE), in flight; $ total (plus the
+   runs with no token facts, which are unpriced) and $ per merged PR; merged PRs for every rig
+   (`merged_by_rig.total`: ours, carried, all authors); the single biggest bottleneck.
 2. **Changes and epochs** — each boundary and its before→after deltas on the agents it touched.
 3. **Agents** — one row per agent type: sessions, dispatches, sessions per dispatch, hosts, model,
    effort, wall h, idle %, p50/p90 minutes, $, $ per dispatch, $ per WORKED, pass %, WORKED %,
