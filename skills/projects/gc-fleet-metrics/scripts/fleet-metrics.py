@@ -9,7 +9,8 @@ config changes, and a before/after split around any one change. Read-only.
 Sources (all local, Ryzen):
   session-facts.jsonl  one row per agent session on all three hosts (agent, models, effort, tokens, wall,
                        waste); refreshed nightly by `dispatch/session_facts.py collect`
-  jobs/, receipts/     one per fleet dispatch; receipt mtime is the finish time
+  jobs/, receipts/     one per fleet dispatch; receipt mtime is the finish time (fleet retired 2026-11-05)
+  formula-feedback     native workflow roots per rig: verdict, run time, delivery (NATIVE; via city-metrics.py)
   route.log(+.gz)      ROUTED gives launch time and host; stall verbs (QUEUED, LAUNCH-STALL, FAIR-WAIT ...)
   model-grades.tsv     mayor grade per dispatch (WORKED / BLOCKED-JUSTIFIED / BLOCKED-UNJUSTIFIED)
   events.jsonl         session lifecycle (stranded, idle_killed, draining, crashed) since its last rotation
@@ -91,10 +92,14 @@ def agent_type(agent):
     return re.sub(r"-\d+$", "", agent.rsplit("/", 1)[-1])
 
 
-def load_jobs():
-    jobs = {}
+def load_jobs(since=0):
+    # 20k+ job files cost ~800 MB parsed (gc-mobile OOM 2026-11-09/10). A job filed inside the window has mtime >= since;
+    # the 14-day margin keeps jobs filed earlier that route.log launches inside the window.
+    jobs, cut = {}, since - 14 * 86400
     for p in glob.glob(str(FLEET / "jobs/*.json")):
         try:
+            if os.path.getmtime(p) < cut:
+                continue
             j = json.load(open(p))
             jobs[j["id"]] = j
         except (ValueError, KeyError, OSError):
@@ -102,10 +107,13 @@ def load_jobs():
     return jobs
 
 
-def load_receipts():
+def load_receipts(since=0):
+    # Receipts count by _done (= mtime) inside the window, so older files are never read.
     out = {}
     for p in glob.glob(str(FLEET / "receipts/*.json")):
         try:
+            if os.path.getmtime(p) < since:
+                continue
             r = json.load(open(p))
             r["_done"] = os.path.getmtime(p)
             out[r["id"]] = r
@@ -421,12 +429,53 @@ def coverage(since, until, route_first, facts_newest, ev):
         warn.append("session-facts is older than the window end: run `dispatch/session_facts.py collect --since <days>` first")
     if ev and ev["since"] != "-" and iso(ev["since"].replace(" ", "T").replace("Z", ":00Z")) > since:
         warn.append("events.jsonl rotated inside the window: lifecycle counts start at " + ev["since"])
+    # jobs/, receipts/, model-grades and session-ledger are fleet-only: the fleet retired 2026-11-05
+    # (R-20261105-15), so their age is expected and the AGENTS dispatch columns and NODES table read 0
+    # for native lanes. Native lanes are the NATIVE section; its ledger must be fresh instead.
+    cov["fleet_only"] = "jobs/ receipts/ model-grades session-ledger (retired 2026-11-05; see NATIVE)"
+    nl = native_health()
+    cov["native_ledger"] = nl
+    if isinstance(nl, dict):
+        if not isinstance(nl.get("discovery_age_min"), int) or nl["discovery_age_min"] > 90:
+            warn.append(f"native discovery is stale ({nl.get('discovery_age_min')} min): check order formula-feedback-discover")
+        if not isinstance(nl.get("collection_age_min"), int) or nl["collection_age_min"] > 45:
+            warn.append(f"native collection is stale ({nl.get('collection_age_min')} min): check order formula-feedback-collect")
+        if isinstance(nl.get("collect_backlog"), int) and nl["collect_backlog"] > 200:
+            warn.append(f"native collector backlog {nl['collect_backlog']} roots: execution and delivery lag for the newest lanes")
     cov["warnings"] = warn
     return cov
 
 
+def _city_metrics():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("city_metrics", CITY / "dispatch/city-metrics.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod if hasattr(mod, "native_lanes") else None
+
+
+def native_health():
+    try:
+        cm = _city_metrics()
+        return cm.feedback_health(time.time()) if cm else "UNREAD (city-metrics.py has no native_lanes)"
+    except Exception as e:  # noqa: BLE001 - a broken import is a source gap, not a crash
+        return f"UNREAD ({type(e).__name__}: {e})"
+
+
+def native(since, until):
+    """Native workflow roots in the window (city-metrics.native_lanes over the formula-feedback ledger)."""
+    try:
+        cm = _city_metrics()
+        if not cm:
+            return "UNREAD (city-metrics.py has no native_lanes)"
+        ev = cm.jsonl(cm.FEEDBACK)
+        return cm.native_lanes(ev, since, until) if ev else f"UNREAD ({cm.FEEDBACK} empty)"
+    except Exception as e:  # noqa: BLE001
+        return f"UNREAD ({type(e).__name__}: {e})"
+
+
 def collect(since, until):
-    jobs, receipts, grades = load_jobs(), load_receipts(), load_grades()
+    jobs, receipts, grades = load_jobs(since), load_receipts(since), load_grades()
     launch, route_first, stalls = parse_route(since, until, jobs)
     rows, newest = facts(since, until)
     nodes = nodes_table(since, until, jobs, receipts, grades, launch)
@@ -435,7 +484,7 @@ def collect(since, until):
         "window": {"since": utc(since), "until": utc(until), "days": round((until - since) / 86400, 2)},
         "coverage": coverage(since, until, route_first, newest, ev),
         "agents": agents_table(rows, receipts, grades) if rows is not None else "UNREAD",
-        "nodes": nodes, "stalls": stalls, "lifecycle_events": ev or "UNREAD",
+        "nodes": nodes, "native": native(since, until), "stalls": stalls, "lifecycle_events": ev or "UNREAD",
         "bottlenecks": bottlenecks(nodes, stalls),
     }
 
@@ -497,6 +546,18 @@ def render(res):
     for h, n in res["nodes"].items():
         for u in n["stuck"]:
             print(f"  STUCK {h} {u['id']} {u['age_min']}m {u['state']}: {u['title']}")
+    nat = res.get("native")
+    if isinstance(nat, dict):
+        print(f"\nNATIVE (workflow roots launched in window): {nat['roots']} roots, {nat['closed']} closed, "
+              f"pass {nat['pass']} / fail {nat['fail']} ({nat['pass_pct']}%), {nat['in_flight']} in flight, "
+              f"run p50/p90 {nat['run_p50_min']}/{nat['run_p90_min']} min; delivery {nat['delivery']} "
+              f"({nat['delivery_evidence_pct']}% of closed delivering roots have evidence); uncollected {nat['uncollected']}")
+        cols = [("roots", "roots"), ("closed", "closed"), ("pass", "pass"), ("fail", "fail"), ("pass%", "pass_pct"),
+                ("flight", "in_flight"), ("run50", "run_p50_min"), ("run90", "run_p90_min"), ("lowN", lambda r: "low" if r.get("low_n") else "")]
+        table("NATIVE by rig", nat["by_rig"], cols)
+        table("NATIVE by formula", dict(sorted(nat["by_formula"].items(), key=lambda kv: -kv[1]["roots"])), cols)
+    else:
+        print(f"\nNATIVE: {nat}")
     s = res["stalls"]
     table("STALLS (route.log lines in window; distinct = jobs/beads/hosts named)",
           {v: {"lines": c, "distinct": s["distinct_subjects"].get(v), "hosts": top(s["by_host"].get(v), 3),
