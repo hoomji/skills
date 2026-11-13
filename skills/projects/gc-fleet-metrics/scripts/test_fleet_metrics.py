@@ -11,6 +11,18 @@ def load(city):
     return m
 
 
+class TwinFamilyTest(unittest.TestCase):
+    def test_fallback_twins_fold_into_their_family(self):  # ci-0o3b: twins are <binding>-fbN.<role>
+        m = load(tempfile.mkdtemp())
+        self.assertEqual(m.agent_type("gateway-llm/gc-fb1.implementation-worker-2"), "gc.implementation-worker")
+        self.assertEqual(m.agent_type("bd-fb2.dog"), "bd.dog")
+        self.assertEqual(m.agent_type("hoppy-city/bmad-drain-fb1.story-implementer"), "bmad-drain.story-implementer")
+        self.assertEqual(m.agent_type("gateway-llm/gc.implementation-worker-2"), "gc.implementation-worker")
+        self.assertEqual(m.agent_type("gateway-llm-gtx/dsh-muse-3"), "dsh-muse")
+        self.assertTrue(m.is_twin("gateway-llm/gc-fb1.run-operator"))
+        self.assertFalse(m.is_twin("gateway-llm/gc.run-operator"))
+
+
 class RouteLogTest(unittest.TestCase):
     def test_nul_padding_from_a_crash_is_skipped(self):
         # A host crash mid-append leaves a run of NULs before the next line (Ryzen 2026-10-15).

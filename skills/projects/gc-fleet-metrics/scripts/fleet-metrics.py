@@ -86,10 +86,23 @@ def share(n, d):
 
 
 def agent_type(agent):
-    """gateway-llm-gtx/dsh-muse-3 -> dsh-muse; bd.dog-1 -> bd.dog; no agent -> (interactive): the owner's own sessions."""
+    """gateway-llm-gtx/dsh-muse-3 -> dsh-muse; bd.dog-1 -> bd.dog; no agent -> (interactive): the owner's own sessions.
+
+    A provider-fallback twin folds into its family: gc-fb1.implementation-worker-2 -> gc.implementation-worker,
+    bd-fb1.dog -> bd.dog. Twins are the role pack imported again as <binding>-fbN with another provider
+    (city dispatch/fallback-twins.py, ci-0o3b); before 2026-11-13 the fork ran fallback under the primary's
+    own name, so folding keeps per-role numbers comparable across the switch. is_twin() tells them apart.
+    """
     if not agent:
         return "(interactive)"
-    return re.sub(r"-\d+$", "", agent.rsplit("/", 1)[-1])
+    return TWIN.sub(r"\1.", re.sub(r"-\d+$", "", agent.rsplit("/", 1)[-1]))
+
+
+TWIN = re.compile(r"^([A-Za-z0-9_-]+?)-fb\d+\.")
+
+
+def is_twin(agent):
+    return bool(agent) and bool(TWIN.match(agent.rsplit("/", 1)[-1]))
 
 
 def load_jobs(since=0):
