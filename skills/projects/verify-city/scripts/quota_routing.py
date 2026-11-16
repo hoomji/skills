@@ -284,10 +284,18 @@ def mayor_findings(city, now, cf):
     cm = cfg.get("providers", {}).get("claude-mayor", {})
     flags = [a for o in cm.get("options_schema", []) if o.get("key") == "model" for c in o.get("choices", [])
              if c.get("value") == (cm.get("option_defaults") or {}).get("model") for a in c.get("flag_args", [])]
-    if "claude-opus-5-5" not in flags:
-        out.append(f"mayor drift: claude-mayor default model resolves to {flags}, docs/mayor-provider.md pins claude-opus-5-5")
-    if (cm.get("option_defaults") or {}).get("effort") != "medium":
-        out.append(f"mayor drift: claude-mayor effort {(cm.get('option_defaults') or {}).get('effort')!r}, docs say medium")
+    # city.toml is the live pin; docs/mayor-provider.md keeps history, whose current entry reads
+    # "<Model> <effort> since ...". The two must agree.
+    effort = (cm.get("option_defaults") or {}).get("effort")
+    cur = re.search(r"([A-Z][A-Za-z]+ [\d.]+) (low|medium|high|xhigh|max) since", (city / "docs/mayor-provider.md").read_text())
+    if not cur:
+        out.append("mayor drift: docs/mayor-provider.md has no current '<Model> <effort> since' entry")
+    else:
+        slug = cur[1].lower().replace(" ", "-").replace(".", "-")
+        if not any(slug in a for a in flags):
+            out.append(f"mayor drift: claude-mayor default model resolves to {flags}, docs/mayor-provider.md says {cur[1]}")
+        if effort != cur[2]:
+            out.append(f"mayor drift: claude-mayor effort {effort!r}, docs/mayor-provider.md says {cur[2]}")
     cfg_dir = (cm.get("env") or {}).get("CLAUDE_CONFIG_DIR")
     dirs = cf.get("MAYOR_CONFIG_DIR") or {}
     pinned = next((n for n, d in dirs.items() if d == cfg_dir), None)

@@ -50,12 +50,29 @@ ORDER_MAX_MIN = 45  # elapsed-check 900 s: 3x the interval
 # Ledger shapes per the writers' printf/write lines.
 PROMO_STATES = {"DRY-RUN", "DRY-RUN-HELD", "QUEUED", "CURRENT", "HELD", "QUEUE-FAILED", "FAILED",
                 "CONFLICT", "REFUSED", "MERGED-BY-HAND", "NEEDS-REVIEW"}
-# The verdicts promotion-cadence.py writes (grep its record() calls), plus UNVERIFIED, retired by
-# R-20261023-05 but still in older rows.
-CADENCE_VERDICTS = {"UP-TO-DATE", "HELD", "IN-FLIGHT", "DEQUEUED", "SPACING", "CUT", "STARVED",
-                    "WAIT", "GATE-RED", "CONFLICT", "QUEUE-FAILED", "NEEDS-REVIEW", "MERGED-BY-HAND",
-                    "REQUEUED", "REQUEUE-SKIPPED", "REVIEW-FILED", "REVIEW-NEEDED", "REVIEW-WAIT",
-                    "REVIEW-BLOCKING", "UNVERIFIED"}
+# Verdicts no record() call writes any more but older rows still carry (UNVERIFIED retired by
+# R-20261023-05). The live set is read from promotion-cadence.py: cadence_verdicts().
+LEGACY_VERDICTS = {"UNVERIFIED", "MERGED-BY-HAND"}
+
+
+def cadence_verdicts(city):
+    """Every verdict promotion-cadence.py can write (its record("X", ...) calls) plus the legacy ones."""
+    try:
+        src = (city / "dispatch/promotion-cadence.py").read_text()
+    except OSError:
+        src = ""
+    return set(re.findall(r'record\("([A-Z-]+)"', src)) | LEGACY_VERDICTS
+
+
+def written_by_script(city, tok):
+    """True when a dispatch/ script names the path: an absent ledger then only means no row yet."""
+    for p in sorted((city / "dispatch").glob("*.py")) + sorted((city / "dispatch").glob("*.sh")):
+        try:
+            if tok in p.read_text(errors="replace"):
+                return True
+        except OSError:
+            pass
+    return False
 SWITCHES = ["wall.off", "promotion-cadence.off", "trunk-deploy.off", "verify.off", "land-validated.on",
             "ci-gate.off", "tip-red-rounds.off", "sync-pending"]
 MARKERS = ["deployable", "green", "verified", "ci-green"]
@@ -238,7 +255,7 @@ def doctor(city):
             if tok.startswith("scripts/"):
                 if gl_git("cat-file", "-e", f"origin/{t}:{tok}")[0] != 0:
                     f.append(f"doc-path-missing docs/trunk-and-promotion.md Promotion names {tok}; not on Gateway-LLM origin/{t}")
-            elif not (city / tok).exists():
+            elif not (city / tok).exists() and not (tok.startswith("dispatch/ledgers/") and written_by_script(city, tok)):
                 f.append(f"doc-path-missing docs/trunk-and-promotion.md Promotion names {tok}")
     except OSError:
         f.append("doc-missing docs/trunk-and-promotion.md")
@@ -262,12 +279,13 @@ def doctor(city):
         elif a > ORDER_MAX_MIN and not off:
             f.append(f"order-stale {ORDER} last ran {ts} ({a} min ago, want <= {ORDER_MAX_MIN})")
 
+    verdicts = cadence_verdicts(city)
     for rel, n, check, cols in (
         ("dispatch/ledgers/promotion.tsv", 6,
          lambda r: ISO.match(r[0]) and r[1] in PROMO_STATES and (r[2] == "-" or r[2].isdigit()) and (r[3] == "-" or HEX40.match(r[3])),
          "ts state pr sha branch preflight"),
         (".gc/runtime/wall-ci/promotion-cadence.tsv", 5,
-         lambda r: ISO.match(r[0]) and r[1] in CADENCE_VERDICTS and (r[2] == "-" or HEX40.match(r[2])) and (r[3] == "-" or r[3].isdigit()),
+         lambda r: ISO.match(r[0]) and r[1] in verdicts and (r[2] == "-" or HEX40.match(r[2])) and (r[3] == "-" or r[3].isdigit()),
          "ts verdict sha pr detail"),
     ):
         rs = rows(city / rel)

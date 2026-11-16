@@ -47,3 +47,4 @@ this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with <har
 - [host-release](./host-release.md) covers stage-release, each remote host's release marker and skew from Ryzen.
 - [gc-promotion](./gc-promotion.md) covers the installed gc, the city patch list, the shadow build and rollback.
 - [observability](./observability.md) covers gc-top, gc-mobile, fleet facts and the views' agreement with placement.
+- [hoppy-trunk](./hoppy-trunk.md) covers the Hoppy-city trunk flow: selective gates, landing PASS heads, the full gate and the fast-forward of main.

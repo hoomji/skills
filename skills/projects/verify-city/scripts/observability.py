@@ -39,7 +39,7 @@ SERVER_LOADS = ("mobile/server.py", "mobile/alerts.py", "mobile/webpush.py", "gc
 # Every script this feature covers, at its real location.
 SCRIPTS = ("gc-top.py", "gc-pr-top.py", "gc-visualize.py", "mobile/server.py", "dispatch/fleet_facts.py",
            "orders/scripts/ui-drift-check.py", "dispatch/city-metrics.py", "dispatch/mergify-metrics.py",
-           "orders/ui-drift.toml", "docs/gc-mobile.md", "docs/city-metrics.md")
+           "docs/gc-mobile.md", "docs/city-metrics.md")  # the ui-drift order is retired (ci-b22c); its script stays
 
 
 # ------------------------------------------------------------------ helpers
@@ -147,6 +147,15 @@ def server_pid():
     return pid or None
 
 
+def mobile_paused():
+    """True when gc-mobile.service is disabled and not running: switched off on purpose
+    (docs/gc-mobile.md "Retired"), where a merely crashed service is still enabled."""
+    def q(verb):
+        return subprocess.run(["systemctl", "--user", verb, "gc-mobile"], capture_output=True, text=True,
+                              timeout=10).stdout.strip()
+    return q("is-enabled") == "disabled" and q("is-active") != "active"
+
+
 def proc_start(pid):
     stat = Path(f"/proc/{pid}/stat").read_text()
     ticks = int(stat.rsplit(")", 1)[1].split()[19])
@@ -212,8 +221,14 @@ def doctor(city):
         if not found:
             f.append(f"obs-docs: docs/gc-mobile.md names `{tok}`, not found")
     # obs-mobile-up: health answers and each source is fresh and error-free.
-    st, body = get("/api/health")
-    if st != 200:
+    paused = mobile_paused()
+    if paused:
+        f.append("obs-mobile: PAUSED (gc-mobile.service is disabled and inactive, docs/gc-mobile.md; "
+                 "up, routes, parity and freshness checks skipped)")
+    st, body = (0, b"") if paused else get("/api/health")
+    if paused:
+        health = {}
+    elif st != 200:
         f.append(f"obs-mobile-up: GET /api/health -> {st} {sanitize(body.decode('utf-8', 'replace'), 80)}")
         health = {}
     else:
@@ -232,7 +247,7 @@ def doctor(city):
         if health and name not in (health.get("sources") or {}):
             f.append(f"obs-mobile-up: collector {name} absent from /api/health sources")
     # obs-mobile-routes: every route the server registers answers 200 (GET only, no refresh).
-    for path in ["/api/" + a for a in api] + static_routes(city):
+    for path in [] if paused else ["/api/" + a for a in api] + static_routes(city):
         st, _ = get(path, timeout=30)
         if st != 200:
             f.append(f"obs-mobile-routes: GET {path} -> {st}")
@@ -258,7 +273,7 @@ def doctor(city):
                 if pat.search(line) and not any(f'"{w}"' in line for w in retired):
                     f.append(f"obs-states: {fn}:{i} describes a pace gate fleet.muse_quota no longer has: {line.strip()[:110]}")
     # obs-parity: the phone's muse state equals fleet.muse_state now; host order equals fleet.HOSTS.
-    st, body = get("/api/now", timeout=30)
+    st, body = (0, b"") if paused else get("/api/now", timeout=30)
     if st == 200:
         now = json.loads(body).get("data") or {}
         imports = pack_imports(city)
@@ -276,8 +291,10 @@ def doctor(city):
             if hosts != fleet_hosts(city):
                 f.append(f"obs-parity: gc-mobile hosts {hosts} != fleet.HOSTS {fleet_hosts(city)}")
     # obs-mobile-fresh: the running server loaded every module it caches after that file last changed.
-    pid = server_pid()
-    if not pid:
+    pid = None if paused else server_pid()
+    if paused:
+        pass
+    elif not pid:
         f.append("obs-mobile-fresh: gc-mobile service has no main PID")
     else:
         started = proc_start(pid)
@@ -301,8 +318,12 @@ def doctor(city):
     if p.returncode != 0:
         f.append(f"obs-drift: ui-drift-check.py --dry-run exit {p.returncode}: {sanitize(p.stderr, 120)}")
     else:
+        imports = pack_imports(city)
         for d in json.loads(p.stdout).get("drift") or []:
-            f.append(f"obs-drift: ui-drift-check: {d}")
+            # A pin that only the retired fleet's codex-fallback.py names is applied by nothing.
+            gone = imports is not None and "fleet" not in imports and "(codex-fallback.py " in d
+            f.append(f"obs-drift: ui-drift-check: {d}"
+                     + (" (RETIRED: fleet pack not imported in pack.toml (R-20261105-15))" if gone else ""))
     return f
 
 

@@ -1,6 +1,8 @@
 """verify-city trunk-promotion ledger checks (ci-h4c9). Run: python3 -m unittest test_trunk_promotion"""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tempfile
+from pathlib import Path
 import trunk_promotion as tp
 
 SHA = "3d6220bd56b82e469aca5c42bef15fc81aaa9166"
@@ -11,7 +13,18 @@ def promo_check(r):
 
 
 def cadence_check(r):
-    return tp.ISO.match(r[0]) and r[1] in tp.CADENCE_VERDICTS and tp.HEX40.match(r[2])
+    return tp.ISO.match(r[0]) and r[1] in VERDICTS and tp.HEX40.match(r[2])
+
+
+def city_with_cadence(src):
+    d = Path(tempfile.mkdtemp())
+    (d / "dispatch").mkdir()
+    (d / "dispatch/promotion-cadence.py").write_text(src)
+    return d
+
+
+VERDICTS = tp.cadence_verdicts(city_with_cadence(
+    'st.record("REQUEUED", a)\nst.record("REVIEW-FILED", a)\nst.record("REVIEW-WAIT", a)\nst.record("QUEUE-FAILED", a)\n'))
 
 
 class LedgerRows(unittest.TestCase):
@@ -32,6 +45,19 @@ class LedgerRows(unittest.TestCase):
     def test_a_wrong_count_names_it(self):
         out = tp.ledger_row_findings("cadence.tsv", [["gc bd: answering from the rig"]], 5, cadence_check, "c")
         self.assertIn("want 5 cols (c), got 1", out[0])
+
+
+class CadenceVerdicts(unittest.TestCase):
+    def test_a_verdict_the_writer_gains_is_known_without_a_doctor_edit(self):
+        city = city_with_cadence('st.record("BATCH", fresh, None, "d")\n')
+        self.assertIn("BATCH", tp.cadence_verdicts(city))
+        self.assertIn("UNVERIFIED", tp.cadence_verdicts(city))
+        self.assertNotIn("BOGUS", tp.cadence_verdicts(city))
+
+    def test_an_absent_ledger_a_dispatch_script_names_is_not_a_missing_path(self):
+        city = city_with_cadence('RECORDS = "dispatch/ledgers/feature-verification.tsv"\n')
+        self.assertTrue(tp.written_by_script(city, "dispatch/ledgers/feature-verification.tsv"))
+        self.assertFalse(tp.written_by_script(city, "dispatch/ledgers/nobody-writes.tsv"))
 
 
 class ExecPaths(unittest.TestCase):

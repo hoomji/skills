@@ -8,8 +8,10 @@ description: Verify the Gas City `gc` binary itself (the hoomji/gascity fork at 
 The app is `gc`, one Go binary that is both the CLI and the machine-wide supervisor (the
 reconciler, order dispatcher and the HTTP API + embedded dashboard on one port). Source:
 `~/src/gascity` (a working checkout; its current branch is often not `city-next`, and it
-may be dirty). The live city at `~/city` runs a staged build of `city-next`
-(`readlink -f $(command -v gc)` → `~/src/gc-staged/gc-<sha>.d/gc`) under
+may be dirty). The live city at `~/city` runs a staged build
+(`readlink -f $(command -v gc)` → `~/projects/gc-staged/gc-<sha>.d/gc`): stock upstream since
+R-20261111-01 (`gc version --long` reads `-upstream+<sha>`; the fork is no longer maintained),
+a `city-next` build before that. It runs under
 `gascity-supervisor.service`, API on `127.0.0.1:8372`, city name `city`.
 
 **The live city is production.** Every proof that changes state runs against an isolated
@@ -62,8 +64,8 @@ exits 0, and no tmux or dolt process carries this run's `GC_HOME` (fake sessions
 processes.
 
 `$H doctor live` — `gascity-supervisor.service` active, live `/health` 200, the live gc's
-commit equals `city-next` (a mismatch means the staged binary trails or leads the fork:
-say which one you verified), and `gc status` on `~/city` exits 0. Run it before any live
+commit equals `city-next` unless it is a stock upstream build (a fork build that differs
+trails or leads the fork: say which one you verified), and `gc status` on `~/city` exits 0. Run it before any live
 read and record it.
 
 ## Drive

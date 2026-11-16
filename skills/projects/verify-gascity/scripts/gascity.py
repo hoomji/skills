@@ -357,7 +357,9 @@ def doctor_live():
     rc, out, err = run_cmd([gc, 'version', '--long'])
     ver = out.strip()
     rc2, staged, _ = run_cmd(['git', '-C', str(SRC), 'rev-parse', '--short', 'city-next'])
-    if staged.strip() and staged.strip() not in ver:
+    # The city runs stock upstream since R-20261111-01 (the fork is no longer maintained): only a
+    # fork build is compared with city-next.
+    if staged.strip() and staged.strip() not in ver and '-upstream+' not in ver:
         f.append(f'live gc {ver!r} is not city-next {staged.strip()} (staged binary trails or leads the fork)')
     rc, out, err = run_cmd([gc, 'status', '--city', str(LIVE_CITY)], cwd=LIVE_CITY, timeout=60)
     if rc:

@@ -51,7 +51,10 @@ SKILL_DIRS = (Path.home() / '.claude' / 'skills',)
 # docs corpus that prompts cite as `gc-docs docs/...`.
 BARE_DIRS = ('', 'dispatch', 'orders/scripts', 'docs')
 BARE_GLOBS = ('agents/*/{}', 'agents/*/memory/{}', '.gc/runtime/fleet/{}', '.gc/runtime/fleet/seats/*/{}',
-              'dispatch/ledgers/{}', '.gc/runtime/wall-ci/{}', '.gc/runtime/fleet/gitbutler-radar/{}')
+              'dispatch/ledgers/{}', '.gc/runtime/wall-ci/{}', '.gc/runtime/fleet/gitbutler-radar/{}',
+              '.gc/runtime/packs/*/{}', '.gc/runtime/packs/*/runs/*/{}', '.gc/runtime/perf-history/*/{}')
+# Bare names of files that live in a rig checkout (a BMad initiative's ticket tree), never in the city.
+RIG_FILES = ('tickets.toml',)
 # Switch files whose absence is the normal state: a prompt names them as the condition that ends a mode.
 SENTINELS = ('.gc/runtime/wall-ci/wall.off', '.gc/runtime/live-e2e/off')
 GC_DOCS = Path.home() / '.cache' / 'gascity-docs'
@@ -98,7 +101,7 @@ def refs(city, path, also=()):
         token = token.rstrip('.,;:')
         # A wildcard under .gc/runtime/ names a set of runtime files that is often empty
         # (mergify markers during the wall): skip it rather than call an empty set missing.
-        if (any(c in token for c in '$~{}|') or token in seen or token in SENTINELS
+        if (any(c in token for c in '$~{}|') or token in seen or token in SENTINELS or token in RIG_FILES
                 or (token.startswith('.gc/runtime/') and '*' in token)
                 or not PATH_RE.match(token)):
             continue
