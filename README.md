@@ -187,7 +187,8 @@ From [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack)
 | [gc-session-churn](skills/projects/gc-session-churn/SKILL.md) | Identify and recover from short-lived codex sessions that discard uncommitted work. The reconciler aggressively retires pool slots, causing session churn where 46% of sessions die under 5 minutes. Stranded sessions trigger bead.dead_assignee_reopened, abandoning work in progress. Watch for session.stranded and session.drain_acked_with_assigned_work. |
 | [gc-store-reclaim](skills/projects/gc-store-reclaim/SKILL.md) | Diagnose a slow or erroring Gas City bead store and reclaim it by clearing husk molecules. |
 | [gc-troubleshoot](skills/projects/gc-troubleshoot/SKILL.md) | Walk upstream's Gas City troubleshooting pages and translate each check for a city whose Dolt stores bd owns. |
-| [owner-catchup](skills/projects/owner-catchup/SKILL.md) | User-invoked. Owner catch-up brief: what landed on epics, CI/CD, merging and Gas City since a cutoff, plus owner action items with exec summaries. |
+| [owner-catchup](skills/projects/owner-catchup/SKILL.md) | User-invoked. Owner catch-up brief: Gas City mail first, what landed on epics, CI/CD, merging and Gas City since a cutoff, owner action items with exec summaries, and his Linear queue as the first pass left it (settled, ready for a yes, needs you), with his rulings applied. |
+| [owner-lookahead](skills/projects/owner-lookahead/SKILL.md) | User-invoked. Owner look-ahead brief: high-priority work in flight now, queued next and planned later, the decisions ahead with exec summaries, and his Linear queue placed on those horizons. |
 | [verify-agent-context](skills/projects/verify-agent-context/SKILL.md) | Verify a Gas City's agent context — mayor and seat prompts, seat memory copies, the mayor's memory — against the live city; the target `/maintain-verification-skill` keeps honest. |
 
 ## Matt Pocock skills
