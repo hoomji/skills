@@ -1,6 +1,6 @@
 ---
 name: owner-catchup
-description: Owner catch-up brief — processes Gas City mail first and surfaces what matters in it, then what landed on high-priority work (epics and the work ledger's story stages, CI/CD, merging, Gas City) since a cutoff, and the owner's action items, each with an exec summary to rule on.
+description: Owner catch-up brief — processes Gas City mail first and surfaces what matters in it, then what landed on high-priority work (epics and the work ledger's story stages, CI/CD, merging, Gas City) since a cutoff, the owner's action items, each with an exec summary to rule on, and his own Linear queue (issues assigned to him: decide, answer, accept, parents, orphans) with rulings applied.
 disable-model-invocation: true
 ---
 
@@ -66,7 +66,32 @@ Split them into:
 
 Done when: every live owner item has a recommendation and the reader could rule on it without opening anything.
 
-## 5. Deliver
+## 5. Your Linear queue
+
+Issues assigned to the owner in Linear are his own queue, so the four-subjects test does not filter them: an item is his because it is assigned to him. The `my-linear` order sorts them each weekday morning, and an agent's first pass checks each one against current facts before he sees it (`~/city/docs/my-linear.md`, "First pass"). Build on that pass; never ask him about an item it has not checked.
+
+1. **Read both files.** `~/city/.gc/runtime/my-linear/latest.json` holds the buckets; when its `generated` is over 12 h old, run `python3 ~/city/dispatch/my_linear.py --json` (about 5 s, read-only). `~/city/.gc/runtime/my-linear/firstpass.json` holds the verdicts, keyed by issue id. A verdict is fresh when its `key` equals `<bucket>|<int(touched)>` of the item now.
+2. **Check what is not checked.** For every item in decide, answer, accept, parent or orphan without a fresh verdict (it changed since the morning, or is new), run `python3 ~/city/dispatch/linear_first_pass.py --only <id>,<id>` (read-only without `--apply`; about a minute per six items), then reread `firstpass.json`.
+3. **Initiatives.** The app token cannot read them, so call the Linear connector's `list_initiatives` with owner `me`. Flag any Active initiative past its target date or with no health set.
+4. **Present the verdicts.**
+   - `resolved`: one line each on what the first pass settled (its `applied` field).
+   - `ready`: group by `action` and ask once per group: "accept LLM-491, HOP-694, LLM-108?", "backlog HOP-569, LLM-110, LLM-106?". Each line carries the item's `summary` and `evidence`. A summary that names something still open (for example, "the rename is still yours") is a partial delivery: move that item to Needs you.
+   - `needs_owner`: its `question` and `recommendation`. A reserved subject gets step 4's exec summary instead. An `answer` item shows the drafted `reply`.
+   - `no_change`: count only, unless the summary says it waits on something the owner controls.
+
+When the owner rules, apply it in the same session through the Linear connector, which acts as the owner:
+- **Accept**: move the issue to Done.
+- **Cancel**: move it to Canceled with a one-line reason, and set `duplicateOf` when the first pass named one.
+- **Backlog**: move it to Backlog.
+- **Remove label**: remove the named Attention label.
+- **Hand off**: set the assignee and add a comment.
+- **Sling**: file a bead with the issue url as `external_ref` through `dispatch/native-file.sh`. First check that no live bead or lane already holds it. A Live Testing issue follows the live-testing branch rule in the mayor memory.
+
+Put every ruling on the issue as a comment, not only in the chat. Then rerun `my_linear.py` and report the new counts.
+
+Done when: every item in decide, answer, accept, parent and orphan has a fresh verdict; every `ready` group was put to the owner as one question; and his rulings are applied and reflected in the counts.
+
+## 6. Deliver
 
 Reply in this shape, times in Toronto time:
 
@@ -79,6 +104,9 @@ NEEDS YOU (n)
   Actions: …
   Decisions: …   ← exec summaries, highest stake first
 
+LINEAR (n need you of N assigned)
+  Settled by the first pass · Ready for a yes (one question per action) · Needs you (question + rec) · Initiatives · Updates owed
+
 LANDED
   Epics · CI/CD & merging · Gas City · Other
 
@@ -86,4 +114,4 @@ AT RISK          ← red develop, stalled lanes, walls, work-ledger mayor rows (
 GAPS             ← sources not read, work-ledger rig errors
 ```
 
-Lead with the MAIL line and then NEEDS YOU, even when empty ("nothing needs you"). Then append `<UTC ts>\tcatchup\tbrief\t<n mail processed/surfaced, n landed, n owner items>\t-\tdelivered` to `dispatch/ledgers/decisions.tsv` so the next run knows its cutoff, and save this run's ledger as the next run's baseline: `cp <scratch>/ledger.json ~/.cache/work-ledger/catchup.json`. Save it only after the brief is delivered, so a run that stops partway does not move the baseline.
+Lead with the MAIL line and then NEEDS YOU, even when empty ("nothing needs you"). Then append `<UTC ts>\tcatchup\tbrief\t<n mail processed/surfaced, n landed, n owner items, linear n need you/N assigned>\t-\tdelivered` to `dispatch/ledgers/decisions.tsv` so the next run knows its cutoff, and save this run's ledger as the next run's baseline: `cp <scratch>/ledger.json ~/.cache/work-ledger/catchup.json`. Save it only after the brief is delivered, so a run that stops partway does not move the baseline.
