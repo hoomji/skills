@@ -72,9 +72,9 @@ Issues assigned to the owner in Linear are his own queue, so the four-subjects t
 
 1. **Read both files.** `~/city/.gc/runtime/my-linear/latest.json` holds the buckets; when its `generated` is over 12 h old, run `python3 ~/city/dispatch/my_linear.py --json` (about 5 s, read-only). `~/city/.gc/runtime/my-linear/firstpass.json` holds the verdicts, keyed by issue id. A verdict is fresh when its `key` equals `<bucket>|<int(touched)>` of the item now.
 2. **Check what is not checked.** For every item in decide, answer, accept, parent or orphan without a fresh verdict (it changed since the morning, or is new), run `python3 ~/city/dispatch/linear_first_pass.py --only <id>,<id>` (read-only without `--apply`; about a minute per six items), then reread `firstpass.json`.
-3. **Initiatives.** The app token cannot read them, so call the Linear connector's `list_initiatives` with owner `me`. Flag any Active initiative past its target date or with no health set.
+3. **Initiatives.** `latest.json` lists the Active initiatives he owns that are past their target date or have no health set (`initiatives`). If it carries an "initiatives unread" error, call the Linear connector's `list_initiatives` with owner `me` instead.
 4. **Present the verdicts.**
-   - `resolved`: one line each on what the first pass settled (its `applied` field).
+   - `resolved`, or anything with an `applied` field: one line each on what the first pass settled. An `accepted` item was moved to Done automatically (R-20261117-13: PR on main, the agent said nothing remains); list it so he can reopen it if he disagrees.
    - `ready`: group by `action` and ask once per group: "accept LLM-491, HOP-694, LLM-108?", "backlog HOP-569, LLM-110, LLM-106?". Each line carries the item's `summary` and `evidence`. A summary that names something still open (for example, "the rename is still yours") is a partial delivery: move that item to Needs you.
    - `needs_owner`: its `question` and `recommendation`. A reserved subject gets step 4's exec summary instead. An `answer` item shows the drafted `reply`.
    - `no_change`: count only, unless the summary says it waits on something the owner controls.
