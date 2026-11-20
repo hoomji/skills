@@ -35,6 +35,7 @@ Category folders under `skills/`:
 | `review/` | PR review, stacking, and rescoping workflows. |
 | `prompting/` | Sharpening prompts and standing up recurring routines. |
 | `performance/` | Making a user journey faster: baseline, the measure/ship/judge loop, and the ratchet that holds the win. |
+| `planning/` | Deciding what a plan is for before work is dispatched: the 80/20 cut and its close-out line. |
 | `lateral-thinking/` | Ideation techniques (SCAMPER, six hats, provocation, etc.) for stress-testing ideas. |
 | `projects/` | Skills tied to one tool or project rather than a general workflow. |
 | `verification/` | Proving a change works on the real artifact: a project-local verify skill and its feature map, its maintenance pass, a decision trail, blast radius, and the verification principles (from pstack, MIT). |
@@ -144,6 +145,12 @@ flow audit that produced these is [`docs/assessments/2026-09-24-hill-climbing-fl
 | [hill-climbing](skills/performance/hill-climbing/SKILL.md) | The loop that makes one user journey faster: identify, measure (deterministic lab + field signal), decide, ship behind a typed flag, judge, continue or close. |
 | [perf-baseline](skills/performance/perf-baseline/SKILL.md) | Write down how fast a repo's journeys are today, build the deterministic lab that fills the rows, check the counts in. |
 | [perf-ratchet](skills/performance/perf-ratchet/SKILL.md) | Lock in a measured win: a checked-in ceiling per journey, a rise is red, a fall lowers the ceiling in the same PR. |
+
+### planning/
+
+| Skill | Description |
+|---|---|
+| [vital-few](skills/planning/vital-few/SKILL.md) | Cut a plan to its vital few, the stories that carry most of its outcome, and park the rest behind a close-out line. |
 
 ### verification/
 
