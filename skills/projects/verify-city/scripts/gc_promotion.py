@@ -354,11 +354,21 @@ def cmd_doctor(a):
                 add(f"patch: {r['sha']} ({r['status']}) missing from installed {f['gc_commit_short']}: {r['subject']}")
     # shadow
     s = shadow_facts(a.city)
-    if s["timer_active"] != "active" or s["timer_enabled"] != "enabled":
+    # Timer switched off on purpose (docs/gc-upgrade.md status note, 2026-11-20: the city runs stock upstream gc,
+    # nothing is left to replay): a state, not a fault, and its last report is allowed to age.
+    shadow_off = s["timer_active"] != "active" and s["timer_enabled"] in ("", "disabled", None) \
+        and SHADOW_TIMER in (a.city / "docs/gc-upgrade.md").read_text(errors="replace").split("\n## ")[0]
+    if shadow_off:
+        add(f"shadow: PAUSED ({SHADOW_TIMER} is disabled, docs/gc-upgrade.md status note; report age not checked)")
+    elif s["timer_active"] != "active" or s["timer_enabled"] != "enabled":
         add(f"shadow: {SHADOW_TIMER} is {s['timer_active']}/{s['timer_enabled']}")
-    if s["service_active"] != "activating" and s["service_result"] != "success":
+    if shadow_off:
+        pass
+    elif s["service_active"] != "activating" and s["service_result"] != "success":
         add(f"shadow: last {SHADOW_SERVICE} result {s['service_result']} (status {s['service_status']})")
-    if not s["report"]:
+    if shadow_off:
+        pass
+    elif not s["report"]:
         add("shadow: no latest-shadow.json report")
     elif s["report_age_h"] > SHADOW_MAX_AGE_H:
         add(f"shadow: latest report {s['report']} is {s['report_age_h']}h old (> {SHADOW_MAX_AGE_H}h)")

@@ -299,7 +299,10 @@ def mayor_findings(city, now, cf):
     cfg_dir = (cm.get("env") or {}).get("CLAUDE_CONFIG_DIR")
     dirs = cf.get("MAYOR_CONFIG_DIR") or {}
     pinned = next((n for n, d in dirs.items() if d == cfg_dir), None)
-    hist = (last_history(city) or {}).get("pools") or {}
+    last = last_history(city) or {}
+    # A reading older than a day picks nothing: the fleet's quota rotation stopped writing this file
+    # (R-20261105-15), and a login chosen from a stale reading contradicts the owner's pin for no reason.
+    hist = (last.get("pools") or {}) if now - (last.get("at") or 0) <= 86400 else {}
     want, known = None, False
     for name in cf.get("MAYOR_LOGINS") or ():
         wins = [hist.get(f"claude-{name}:{t}") for t in ("5h", "7d")]

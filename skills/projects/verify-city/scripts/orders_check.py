@@ -363,7 +363,8 @@ def doctor(city, no_history):
         # cron comment claims a UTC time but the schedule runs in another zone
         if trig == "cron":
             tz = city.tz(od)
-            if tz not in ("UTC", "Etc/UTC", "Z") and UTC_CLAIM_RE.search(comments(f)):
+            # a comment that names the schedule's own zone states its time there; a `Z` time beside it is another clock's
+            if tz not in ("UTC", "Etc/UTC", "Z") and UTC_CLAIM_RE.search(comments(f)) and tz not in comments(f):
                 ln = next(i for i, l in enumerate(f.read_text().splitlines(), 1) if l.startswith("#") and UTC_CLAIM_RE.search(l))
                 add(f"{name}: {rel}:{ln} states a UTC time but schedule `{od.get('schedule')}` is evaluated in {tz} (no tz, no [workspace] timezone)")
         # a frequent clock order that never ran in 24h

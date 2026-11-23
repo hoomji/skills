@@ -49,7 +49,8 @@ ORDER = "promotion-cadence"
 ORDER_MAX_MIN = 45  # elapsed-check 900 s: 3x the interval
 # Ledger shapes per the writers' printf/write lines.
 PROMO_STATES = {"DRY-RUN", "DRY-RUN-HELD", "QUEUED", "CURRENT", "HELD", "QUEUE-FAILED", "FAILED",
-                "CONFLICT", "REFUSED", "MERGED-BY-HAND", "NEEDS-REVIEW"}
+                "CONFLICT", "REFUSED", "MERGED-BY-HAND", "NEEDS-REVIEW",
+                "OPENED"}  # promotion.sh --yes on a base Mergify does not queue: opens the PR and stops
 # Verdicts no record() call writes any more but older rows still carry (UNVERIFIED retired by
 # R-20261023-05). The live set is read from promotion-cadence.py: cadence_verdicts().
 LEGACY_VERDICTS = {"UNVERIFIED", "MERGED-BY-HAND"}
