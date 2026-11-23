@@ -201,6 +201,18 @@ class MemoryLinks(Scratch):
         (mem / 'MEMORY.md').write_text('- [A](a.md) — x\n')
         self.assertEqual([f for f in context.memory_findings(self.city) if 'links missing' in f], [])
 
+    def test_a_spoke_linked_from_a_listed_hub_is_indexed(self):
+        # MEMORY.md lists hubs only ("Hub spokes: not listed here"); 35 spoke rows filled the
+        # VERIFY-SKILLS mail of 2026-11-23. A file no hub and no index row names is still a finding.
+        mem = self.city / '.claude-memory'
+        fm = '---\nname: {0}\ndescription: d\n---\n'
+        (mem / 'x-hub.md').write_text(fm.format('x-hub') + 'Spokes: [[spoke-one]], [two](spoke-two.md).\n')
+        for n in ('spoke-one', 'spoke-two', 'orphan'):
+            (mem / f'{n}.md').write_text(fm.format(n) + 'body\n')
+        (mem / 'MEMORY.md').write_text('- [X hub](x-hub.md) — x\n')
+        self.assertEqual([f for f in context.memory_findings(self.city) if 'not in MEMORY.md' in f],
+                         ['memory: orphan.md not in MEMORY.md or a listed hub'])
+
 
 if __name__ == '__main__':
     unittest.main()

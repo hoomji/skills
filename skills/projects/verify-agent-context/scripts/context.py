@@ -123,8 +123,14 @@ def memory_findings(city):
     files = {p.name for p in mem.glob('*.md') if p.name != 'MEMORY.md'}
     listed = set(re.findall(r'\]\(([^)]+\.md)\)', index))
     names = {f[:-3] for f in files}
+    # A hub's spokes are indexed by the hub, not by MEMORY.md ("Hub spokes: not listed here").
+    spokes = set()
+    for hub in sorted(f for f in listed & files if f.endswith('-hub.md')):
+        text = (mem / hub).read_text()
+        spokes |= {n + '.md' for n in re.findall(r'\[\[([^\]|]+)\]\]', text)}
+        spokes |= set(re.findall(r'\]\(([^)]+\.md)\)', text))
     found = [f'memory: index lists missing {f}' for f in sorted(listed - files)]
-    found += [f'memory: {f} not in MEMORY.md' for f in sorted(files - listed)]
+    found += [f'memory: {f} not in MEMORY.md or a listed hub' for f in sorted(files - listed - spokes)]
     for f in sorted(files):
         text = (mem / f).read_text()
         # A [[name]] with no file yet is allowed: it marks a memory worth writing (memory contract).
