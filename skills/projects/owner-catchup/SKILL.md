@@ -1,6 +1,6 @@
 ---
 name: owner-catchup
-description: Owner catch-up brief — processes Gas City mail first and surfaces what matters in it, then what landed on high-priority work (epics and the work ledger's story stages, CI/CD, merging, Gas City) since a cutoff, the owner's action items, each with an exec summary to rule on, and his own Linear queue (issues assigned to him: decide, answer, accept, parents, orphans) with rulings applied.
+description: "Owner catch-up brief — processes Gas City mail first and surfaces what matters in it, then what landed on high-priority work (epics and the work ledger's story stages, CI/CD, merging, Gas City) since a cutoff, the owner's action items, each with an exec summary to rule on, and his own Linear queue (issues assigned to him: decide, answer, accept, parents, orphans) with rulings applied."
 disable-model-invocation: true
 ---
 
